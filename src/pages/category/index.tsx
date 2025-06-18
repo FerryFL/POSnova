@@ -16,6 +16,12 @@ import { Skeleton } from "~/components/ui/skeleton"
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "~/components/ui/alert-dialog"
 import { Badge } from "~/components/ui/badge"
 
+interface Category {
+    id: string;
+    nama: string;
+    status: boolean;
+}
+
 export const CategoryPage: NextPageWithLayout = () => {
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
@@ -34,7 +40,6 @@ export const CategoryPage: NextPageWithLayout = () => {
     const editForm = useForm<CategoryFormSchema>({
         resolver: zodResolver(categoryFormSchema)
     })
-
 
     const { data: kategoriData, isLoading: kategoriIsLoading } = api.kategori.lihatKategori.useQuery()
 
@@ -72,11 +77,7 @@ export const CategoryPage: NextPageWithLayout = () => {
         console.log(data)
     }
 
-    // const handleClick = () => {
-    //     toast.success("Berhasil!")
-    // }
-
-    const handleEdit = (category: { id: string, nama: string, status: boolean }) => {
+    const handleEdit = (category: Category) => {
         setIdToEdit(category.id)
         setEditOpen(true)
         editForm.reset({
@@ -117,7 +118,6 @@ export const CategoryPage: NextPageWithLayout = () => {
         <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen Kategori</h1>
 
-            {/* <Button onClick={handleClick}>Click ME</Button> */}
             <Dialog open={addOpen} onOpenChange={setAddOpen}>
                 <DialogTrigger asChild>
                     <Button variant="outline"><Plus />Tambah Kategori</Button>
@@ -185,7 +185,6 @@ export const CategoryPage: NextPageWithLayout = () => {
             </AlertDialog>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-
                 {
                     kategoriIsLoading ?
                         Array.from({ length: 20 }, (_, i) => (
@@ -199,16 +198,15 @@ export const CategoryPage: NextPageWithLayout = () => {
                             </Card>
                         ))
                         :
-                        kategoriData?.map((item) => {
+                        kategoriData?.map((item: Category) => {
                             return (
                                 <Card key={item.id} className="">
                                     <CardHeader>
                                         <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
                                         <CardTitle>{item.nama}</CardTitle>
-
                                     </CardHeader>
                                     <CardFooter className="gap-2">
-                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, status: item.status })}>
+                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit(item)}>
                                             <Pencil />
                                         </Button>
                                         <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>
@@ -220,7 +218,7 @@ export const CategoryPage: NextPageWithLayout = () => {
                         })
                 }
             </div>
-        </div >
+        </div>
     )
 }
 
