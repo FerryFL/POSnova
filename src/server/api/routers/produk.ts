@@ -3,12 +3,26 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabaseAccess } from "~/server/supabase-access";
 import { Bucket } from "~/server/bucket";
 import { TRPCError } from "@trpc/server";
+import type { Prisma } from "@prisma/client";
 
 export const produkRouter = createTRPCRouter({
-    lihatProduk: publicProcedure.query(async ({ ctx }) => {
+    lihatProduk: publicProcedure.input(
+        z.object({
+            kategoriId: z.string().optional()
+        })
+    ).query(async ({ ctx, input }) => {
         const { db } = ctx
 
+        const whereClause: Prisma.ProdukWhereInput = {}
+        if (input.kategoriId !== "all") {
+            whereClause.kategoriId = input.kategoriId
+        }
+
         const produk = await db.produk.findMany({
+            where: whereClause,
+            orderBy: {
+                nama: "asc"
+            },
             select: {
                 id: true,
                 nama: true,

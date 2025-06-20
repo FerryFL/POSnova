@@ -1,7 +1,7 @@
-import { Archive, Home, Moon, Package, Sun } from "lucide-react";
+import { Archive, Home, Moon, Package, Plus, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Suspense, useEffect, useState, type ReactNode } from "react";
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarSeparator, SidebarTrigger } from "~/components/ui/sidebar";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { Toaster } from "../ui/sonner";
@@ -46,6 +46,18 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu className="gap-0">
+                    <SidebarSeparator className="mt-2" />
+                    <SidebarMenuItem>
+                        <Link href="/dashboard-cashier">
+                            <SidebarMenuButton className="py-6" asChild>
+                                <div className="flex items-center gap-2">
+                                    <Plus />
+                                    <span>Tambah Transaksi</span>
+                                </div>
+                            </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                    <SidebarSeparator className="mb-4" />
                     {
                         item.map((item) => (
                             <SidebarMenuItem key={item.title}>

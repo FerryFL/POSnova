@@ -37,7 +37,7 @@ export const ProductPage: NextPageWithLayout = () => {
         resolver: zodResolver(productFormSchema),
     })
 
-    const { data: produkData, isLoading: produkIsLoading } = api.produk.lihatProduk.useQuery()
+    const { data: produkData, isLoading: produkIsLoading } = api.produk.lihatProduk.useQuery({})
     const { mutate: tambahProduk, isPending: tambahProdukIsPending } = api.produk.tambahProduk.useMutation({
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()

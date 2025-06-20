@@ -5,7 +5,19 @@ export const kategoriRouter = createTRPCRouter({
     lihatKategori: publicProcedure.query(async ({ ctx }) => {
         const { db } = ctx
 
-        const kategori = await db.kategori.findMany()
+        const kategori = await db.kategori.findMany({
+            select: {
+                id: true,
+                nama: true,
+                status: true,
+                Produk: {
+                    select: {
+                        id: true,
+                        status: true
+                    }
+                },
+            }
+        })
 
         return kategori
     }),
