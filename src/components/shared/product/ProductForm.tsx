@@ -20,6 +20,7 @@ export const ProductForm = ({ onSubmit, onChangeImage }: ProductFormProps) => {
     const form = useFormContext<ProductFormSchema>();
 
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
+    const { data: varianData } = api.varian.lihatVarian.useQuery()
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
 
     const changeImage = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -89,31 +90,59 @@ export const ProductForm = ({ onSubmit, onChangeImage }: ProductFormProps) => {
                 )}
             />
 
-            <FormField
-                control={form.control}
-                name="categoryId"
-                render={({ field }) => (
-                    <FormItem className="flex flex-row">
-                        <FormControl>
-                            <Select value={field.value} onValueChange={(value: string) => {
-                                field.onChange(value)
-                            }}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Kategori" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {
-                                        kategoriData?.map((item) => {
-                                            return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
-                                        })
-                                    }
-                                </SelectContent>
-                            </Select>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+            <div className="flex flex-row space-x-4">
+                <FormField
+                    control={form.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row">
+                            <FormControl>
+                                <Select value={field.value} onValueChange={(value: string) => {
+                                    field.onChange(value)
+                                }}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Kategori" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {
+                                            kategoriData?.map((item) => {
+                                                return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
+                                            })
+                                        }
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="varianId"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row">
+                            <FormControl>
+                                <Select value={field.value} onValueChange={(value: string) => {
+                                    field.onChange(value)
+                                }}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Varian" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {
+                                            varianData?.map((item) => {
+                                                return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
+                                            })
+                                        }
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </ div>
 
             <div className="space-y-2">
                 <Label>Gambar Produk</Label>
