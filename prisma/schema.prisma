@@ -29,15 +29,26 @@ model Kategori {
     Produk    Produk[]
 }
 
+model Varian {
+    id        String   @id @default(uuid())
+    nama      String
+    status    Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+    Produk    Produk[]
+}
+
 model Produk {
     id         String   @id @default(uuid())
     nama       String
     harga      Int
     gambar     String
     kategori   Kategori @relation(fields: [kategoriId], references: [id])
+    varian     Varian   @relation(fields: [varianId], references: [id])
     stok       Int      @default(0)
     status     Boolean  @default(false)
     createdAt  DateTime @default(now())
     updatedAt  DateTime @default(now()) @updatedAt
     kategoriId String
+    varianId   String
 }
