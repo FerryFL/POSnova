@@ -1,4 +1,4 @@
-import { Archive, Home, Moon, Package, Sun } from "lucide-react";
+import { Archive, CopyPlus, Home, Moon, Package, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
@@ -21,6 +21,11 @@ const item = [
         title: "Produk",
         url: "/product",
         icon: Package
+    },
+    {
+        title: "Varian",
+        url: "/variant",
+        icon: CopyPlus
     }
 ]
 
