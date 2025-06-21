@@ -5,7 +5,8 @@ export const productFormSchema = z.object({
     harga: z.coerce.number().min(1000, "Masukan Minimal Rp. 1000"),
     stok: z.coerce.number(),
     status: z.boolean(),
-    categoryId: z.string()
+    categoryId: z.string(),
+    varianId: z.string()
 })
 
 export type ProductFormSchema = z.infer<typeof productFormSchema>
