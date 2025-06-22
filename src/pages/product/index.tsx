@@ -78,11 +78,12 @@ export const ProductPage: NextPageWithLayout = () => {
             stok: data.stok,
             status: data.status,
             categoryId: data.categoryId,
+            varianId: data.varianId,
             gambar: imgUrl
         })
     }
 
-    const handleEdit = (data: { id: string, nama: string, harga: number, stok: number, status: boolean, categoryId: string, gambar: string }) => {
+    const handleEdit = (data: { id: string, nama: string, harga: number, stok: number, status: boolean, categoryId: string, varianId: string, gambar: string }) => {
         setEditOpen(true)
         setIdToEdit(data.id)
         setImgUrl(data.gambar)
@@ -92,6 +93,7 @@ export const ProductPage: NextPageWithLayout = () => {
             stok: data.stok,
             status: data.status,
             categoryId: data.categoryId,
+            varianId: data.varianId
         })
     }
 
@@ -110,6 +112,7 @@ export const ProductPage: NextPageWithLayout = () => {
             stok: data.stok,
             status: data.status,
             categoryId: data.categoryId,
+            varianId: data.varianId,
             gambar: imgUrl
         })
     }
@@ -240,7 +243,7 @@ export const ProductPage: NextPageWithLayout = () => {
                                         <p className="text-lg font-bold text-green-700">Rp. {item.harga}</p>
                                     </CardContent>
                                     <CardFooter className="gap-2">
-                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, harga: item.harga, stok: item.stok, status: item.status, categoryId: item.kategori.id, gambar: item.gambar })}>
+                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, harga: item.harga, stok: item.stok, status: item.status, categoryId: item.kategori.id, varianId: item.varian.id, gambar: item.gambar })}>
                                             <Pencil />
                                         </Button>
                                         <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>

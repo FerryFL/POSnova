@@ -16,6 +16,12 @@ export const produkRouter = createTRPCRouter({
                 gambar: true,
                 status: true,
                 stok: true,
+                varian: {
+                    select: {
+                        id: true,
+                        nama: true
+                    }
+                },
                 kategori: {
                     select: {
                         id: true,
@@ -34,6 +40,7 @@ export const produkRouter = createTRPCRouter({
             stok: z.coerce.number(),
             status: z.boolean(),
             categoryId: z.string(),
+            varianId: z.string(),
             gambar: z.string().url()
         })
     ).mutation(async ({ ctx, input }) => {
@@ -46,6 +53,7 @@ export const produkRouter = createTRPCRouter({
                 stok: input.stok,
                 status: input.status,
                 kategoriId: input.categoryId,
+                varianId: input.varianId,
                 gambar: input.gambar
             }
         })
@@ -73,6 +81,7 @@ export const produkRouter = createTRPCRouter({
             stok: z.coerce.number(),
             status: z.boolean(),
             categoryId: z.string(),
+            varianId: z.string(),
             gambar: z.string().url()
         })
     ).mutation(async ({ ctx, input }) => {
@@ -88,6 +97,7 @@ export const produkRouter = createTRPCRouter({
                 stok: input.stok,
                 status: input.status,
                 kategoriId: input.categoryId,
+                varianId: input.varianId,
                 gambar: input.gambar
             }
         })

@@ -9,13 +9,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VariantForm } from "~/components/shared/variant/VariantForm";
 import { toast } from "sonner";
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Badge } from "~/components/ui/badge";
 import { variantFormSchema, type VariantFormSchema } from "~/forms/variant";
 import { Form } from "~/components/ui/form";
-import { AlertDialogFooter, AlertDialogHeader } from "~/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "~/components/ui/alert-dialog";
 
 export const VariantPage: NextPageWithLayout = () => {
     const [addOpen, setAddOpen] = useState(false)
@@ -114,7 +113,7 @@ export const VariantPage: NextPageWithLayout = () => {
             <h1 className="text-xl font-bold">Varian</h1>
             <Dialog open={addOpen} onOpenChange={setAddOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline"><Plus />Tambah Variant</Button>
+                    <Button variant="outline"><Plus />Tambah Varian</Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
@@ -128,7 +127,7 @@ export const VariantPage: NextPageWithLayout = () => {
                             <Button variant="outline">Tutup</Button>
                         </DialogClose>
                         <Button disabled={tambahVarianIsPending} type="submit" onClick={addForm.handleSubmit(handleSubmit)}>
-                            {tambahVarianIsPending && <LoaderCircle className="animate-spin"/>}
+                            {tambahVarianIsPending && <LoaderCircle className="animate-spin" />}
                             Simpan
                         </Button>
                     </DialogFooter>
@@ -173,51 +172,49 @@ export const VariantPage: NextPageWithLayout = () => {
                         <Button disabled={hapusVarianIsPending} variant="destructive" onClick={handleSubmitDelete}>
                             {hapusVarianIsPending && <LoaderCircle className="animate-spin" />}
                             Hapus
-                            </Button>
-                       </AlertDialogFooter>
-                    </AlertDialogContent>
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
             </AlertDialog>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            
+
                 {
                     varianIsLoading ?
                         Array.from({ length: 20 }, (_, i) => (
                             <Card key={i} className="h-36 p-3 flex flex-col gap-2 justify-center">
-                                            <Skeleton className="w-full h-6" />
-                                            <Skeleton className="w-1/2 h-4" />
-                                            <div className="flex flex-row gap-2">
-                                                <Skeleton className="w-1/2 h-9" />
-                                                <Skeleton className="w-1/2 h-9" />
-                                            </div>
-                                        </Card>
-                                    ))
-                                    :
-                                    varianData?.map((item) => {
-                                        return (
-                                            <Card key={item.id} className="">
-                                                <CardHeader>
-                                                    <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                                    <CardTitle>{item.nama}</CardTitle>
-            
-                                                </CardHeader>
-                                                <CardFooter className="gap-2">
-                                                    <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, status: item.status })}>
-                                                        <Pencil />
-                                                    </Button>
-                                                    <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>
-                                                        <Trash />
-                                                    </Button>
-                                                </CardFooter>
-                                            </Card>
-                                        )
-                                    })
-                            }
-                        </div>
+                                <Skeleton className="w-full h-6" />
+                                <Skeleton className="w-1/2 h-4" />
+                                <div className="flex flex-row gap-2">
+                                    <Skeleton className="w-1/2 h-9" />
+                                    <Skeleton className="w-1/2 h-9" />
+                                </div>
+                            </Card>
+                        ))
+                        :
+                        varianData?.map((item) => {
+                            return (
+                                <Card key={item.id} className="">
+                                    <CardHeader>
+                                        <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
+                                        <CardTitle>{item.nama}</CardTitle>
+
+                                    </CardHeader>
+                                    <CardFooter className="gap-2">
+                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, status: item.status })}>
+                                            <Pencil />
+                                        </Button>
+                                        <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>
+                                            <Trash />
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            )
+                        })
+                }
+            </div>
         </div>
     )
-
-
 }
 
 VariantPage.getLayout = (page: ReactElement) => {
