@@ -1,4 +1,4 @@
-import { Archive, Boxes, FileBox, Folder, FolderOpen, Grid3X3, Inbox, Package, Package2, Pencil, ShoppingCart, Table, Tag, Tags, Trash } from "lucide-react";
+import { ShoppingCart, Tags } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { PublicLayout } from "~/components/layouts/PublicLayout";

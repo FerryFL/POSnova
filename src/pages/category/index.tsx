@@ -204,7 +204,7 @@ export const CategoryPage: NextPageWithLayout = () => {
                                 <Card key={item.id} className="">
                                     <CardHeader>
                                         <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                        <CardTitle>{item.nama}</CardTitle>
+                                        <CardTitle className="line-clamp-1 break-words">{item.nama}</CardTitle>
 
                                     </CardHeader>
                                     <CardFooter className="gap-2">

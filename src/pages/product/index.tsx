@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card"
 import { api } from "~/utils/api"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Button } from "~/components/ui/button"
-import { LoaderCircle, Pencil, Plus, Trash } from "lucide-react"
+import { LoaderCircle, Pencil, Plus, Tags, Trash } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "~/components/ui/badge"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
@@ -270,7 +270,13 @@ export const ProductPage: NextPageWithLayout = () => {
                                     </CardHeader>
                                     <CardContent className="space-y-1">
                                         <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                        <h1 className="text-lg font-medium">{item.nama}<span className="text-sm text-muted-foreground"> | {item.kategori.nama}</span></h1>
+                                        <h1 className="text-lg font-medium w-full ">
+                                            <span className="line-clamp-1 break-words">{item.nama}</span>
+                                            <span className="text-sm flex gap-1 items-center text-muted-foreground line-clamp-1 break-words">
+                                                <Tags className="size-4 shrink-0" />
+                                                {item.kategori.nama}
+                                            </span>
+                                        </h1>
                                         <p className="text-sm ">Jumlah Stok: {item.stok}</p>
                                         <p className="text-lg font-bold text-green-700">Rp. {item.harga}</p>
                                     </CardContent>
