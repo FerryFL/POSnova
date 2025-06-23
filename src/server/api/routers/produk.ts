@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabaseAccess } from "~/server/supabase-access";
-import { Bucket } from "~/server/bucket";
+import { Bucket, BucketPath } from "~/server/bucket";
 import { TRPCError } from "@trpc/server";
 import type { Prisma } from "@prisma/client";
 
@@ -106,6 +106,39 @@ export const produkRouter = createTRPCRouter({
             }
         })
     }),
+    hapusGambarProduk: publicProcedure.input(
+        z.object({
+            gambar: z.string().url()
+        })
+    ).mutation(async ({ input }) => {
+        const imgUrl = input.gambar
+        const pathPrefix = BucketPath.ProductImages
+        const fileName = imgUrl.replace(pathPrefix, "")
+        const { error } = await supabaseAccess.storage.from(Bucket.ProductImages).remove([fileName])
+        if (error) {
+            console.error("Error removing image:", error)
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Gagal Mengahapus gambar produk"
+            })
+        }
+    }),
+    hapusGambarProdukMultiple: publicProcedure.input(
+        z.object({
+            gambar: z.array(z.string().url())
+        })
+    ).mutation(async ({ input }) => {
+        const pathPrefix = BucketPath.ProductImages
+        const fileNames = input.gambar.map(imgUrl => imgUrl.replace(pathPrefix, ""))
+        const { error } = await supabaseAccess.storage.from(Bucket.ProductImages).remove(fileNames)
+        if (error) {
+            console.error("Error removing images:", error)
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Gagal Mengahapus gambar produk"
+            })
+        }
+    }),
     hapusProduk: publicProcedure.input(
         z.object({
             id: z.string()
@@ -113,10 +146,35 @@ export const produkRouter = createTRPCRouter({
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
 
+        const produk = await db.produk.findUnique({
+            where: { id: input.id },
+        })
+
+        if (!produk) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Produk tidak ditemukan"
+            })
+        }
+
+        const imgUrl = produk.gambar
+        const pathPrefix = BucketPath.ProductImages
+        const fileName = imgUrl.replace(pathPrefix, "")
+
+        const { error } = await supabaseAccess.storage.from(Bucket.ProductImages).remove([fileName])
+
+        if (error) {
+            console.error("Error removing image:", error)
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Gagal Mengahapus gambar produk"
+            })
+        }
+
         await db.produk.delete({
             where: {
                 id: input.id
             }
         })
-    })
+    }),
 })

@@ -23,6 +23,9 @@ export const ProductPage: NextPageWithLayout = () => {
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
     const [imgUrl, setImgUrl] = useState<string | null>(null)
+    const [imgUrlLama, setImgUrlLama] = useState<string | null>(null)
+    const [arrayImgUrlLama, setArrayImgUrlLama] = useState<string[]>([])
+    const [imgUrlBaru, setImgUrlBaru] = useState<string | null>(null)
     const [idToEdit, setIdToEdit] = useState<string | null>(null)
     const [idToDelete, setIdToDelete] = useState<string | null>(null)
 
@@ -42,9 +45,7 @@ export const ProductPage: NextPageWithLayout = () => {
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
             toast.success("Data Berhasil Ditambahkan!")
-            addForm.reset()
             setAddOpen(false)
-            setImgUrl(null)
         }
     })
 
@@ -52,9 +53,7 @@ export const ProductPage: NextPageWithLayout = () => {
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
             toast.success("Data Berhasil Diubah!")
-            editForm.reset()
             setEditOpen(false)
-            setImgUrl(null)
         }
     })
 
@@ -65,6 +64,10 @@ export const ProductPage: NextPageWithLayout = () => {
             toast.success("Produk Berhasil Dihapus!")
         }
     })
+
+    const { mutateAsync: hapusGambarProdukMultiple } = api.produk.hapusGambarProdukMultiple.useMutation()
+
+    // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
 
     const handleSubmit = (data: ProductFormSchema) => {
         if (!imgUrl) {
@@ -86,6 +89,9 @@ export const ProductPage: NextPageWithLayout = () => {
         setEditOpen(true)
         setIdToEdit(data.id)
         setImgUrl(data.gambar)
+        setImgUrlLama(data.gambar)
+        setArrayImgUrlLama([data.gambar])
+        setImgUrlBaru(null)
         editForm.reset({
             nama: data.nama,
             harga: data.harga,
@@ -95,12 +101,21 @@ export const ProductPage: NextPageWithLayout = () => {
         })
     }
 
-    const handleSubmitEdit = (data: ProductFormSchema) => {
+    const handleSubmitEdit = async (data: ProductFormSchema) => {
         if (!idToEdit) return
 
         if (!imgUrl) {
             toast.error("Masukan Gambar Produk!")
             return
+        }
+
+        if (imgUrlBaru && imgUrlLama && imgUrlBaru !== imgUrlLama && arrayImgUrlLama.length > 0) {
+            try {
+                // await hapusGambarProduk({ gambar: imgUrlLama })
+                await hapusGambarProdukMultiple({ gambar: arrayImgUrlLama })
+            } catch (error) {
+                console.error("Gagal menghapus gambar lama:", error)
+            }
         }
 
         ubahProduk({
@@ -128,9 +143,23 @@ export const ProductPage: NextPageWithLayout = () => {
 
     useEffect(() => {
         if (!addOpen) {
+            setImgUrl(null)
+            setImgUrlLama(null)
+            setImgUrlBaru(null)
+            setArrayImgUrlLama([])
             addForm.reset()
         }
     }, [addOpen, addForm])
+
+    useEffect(() => {
+        if (!editOpen) {
+            setImgUrl(null)
+            setImgUrlLama(null)
+            setImgUrlBaru(null)
+            setArrayImgUrlLama([])
+            editForm.reset()
+        }
+    }, [editOpen, editForm])
 
     return (
         <div className="space-y-4 w-full">
@@ -144,7 +173,7 @@ export const ProductPage: NextPageWithLayout = () => {
                         <DialogTitle className="text-lg font-semibold">Tambah Produk</DialogTitle>
                     </DialogHeader>
                     <Form {...addForm}>
-                        <ProductForm onSubmit={handleSubmit} onChangeImage={(url) => { setImgUrl(url) }} />
+                        <ProductForm onSubmit={handleSubmit} onChangeImage={(url) => { setImgUrl(url) }} imageUrl={imgUrl} />
                     </Form>
                     <DialogFooter>
                         <DialogClose asChild>
@@ -164,7 +193,13 @@ export const ProductPage: NextPageWithLayout = () => {
                         <DialogTitle className="text-lg font-semibold">Ubah Produk</DialogTitle>
                     </DialogHeader>
                     <Form {...editForm}>
-                        <ProductForm onSubmit={handleSubmitEdit} onChangeImage={(url) => { setImgUrl(url) }} />
+                        <ProductForm onSubmit={handleSubmitEdit} onChangeImage={(url) => {
+                            setImgUrl(url)
+                            setImgUrlBaru(url)
+                            if (imgUrl) {
+                                setArrayImgUrlLama((prev) => [...prev, imgUrl])
+                            }
+                        }} imageUrl={imgUrl} />
                     </Form>
                     <DialogFooter>
                         <DialogClose asChild>
