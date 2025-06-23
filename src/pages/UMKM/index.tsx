@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { api } from "~/utils/api"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { LoaderCircle, Pencil, Plus, Trash, Search } from "lucide-react"
+import { LoaderCircle, Pencil, Plus, Trash, Search, ArrowUpDown } from "lucide-react"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
 import { useForm } from "react-hook-form"
@@ -16,6 +16,16 @@ import { toast } from "sonner"
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "~/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
+import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
+import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from "@tanstack/react-table"
+
+// Tipe data UMKM
+export type UMKM = {
+  id: string
+  nama: string
+  alamat: string
+  noTelp: string
+}
 
 export const UMKMPage: NextPageWithLayout = () => {
     const apiUtils = api.useUtils()
@@ -24,9 +34,10 @@ export const UMKMPage: NextPageWithLayout = () => {
     const [idToEdit, setIdToEdit] = useState<string | null>(null)
     const [idToDelete, setIdToDelete] = useState<string | null>(null)
     
-    const [searchTerm, setSearchTerm] = useState("")
-    const [currentPage, setCurrentPage] = useState(1)
-    const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [sorting, setSorting] = useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+    const [rowSelection, setRowSelection] = useState({})
 
     const addForm = useForm<UmkmFormSchema>({
         resolver: zodResolver(umkmFormSchema),
@@ -67,30 +78,6 @@ export const UMKMPage: NextPageWithLayout = () => {
             toast.success("UMKM Berhasil Dihapus!")
         }
     })
-
-    const filteredData = useMemo(() => {
-        if (!umkmData) return []
-        
-        return umkmData.filter((item) =>
-            item.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.alamat.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.noTelp.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    }, [umkmData, searchTerm])
-
-    const paginatedData = useMemo(() => {
-        const startIndex = (currentPage - 1) * rowsPerPage
-        const endIndex = startIndex + rowsPerPage
-        return filteredData.slice(startIndex, endIndex)
-    }, [filteredData, currentPage, rowsPerPage])
-
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage)
-    const startRow = (currentPage - 1) * rowsPerPage + 1
-    const endRow = Math.min(currentPage * rowsPerPage, filteredData.length)
-
-    useEffect(() => {
-        setCurrentPage(1)
-    }, [searchTerm])
 
     const handleSubmit = (data: UmkmFormSchema) => {
         tambahUMKM({
@@ -133,19 +120,125 @@ export const UMKMPage: NextPageWithLayout = () => {
         })
     }
 
-    const handlePreviousPage = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1))
-    }
-
-    const handleNextPage = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-    }
-
     useEffect(() => {
         if (!addOpen) {
             addForm.reset()
         }
     }, [addOpen, addForm])
+
+    const columns: ColumnDef<UMKM>[] = [
+        {
+            accessorKey: "nama",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="h-8 px-2 lg:px-3 text-xs sm:text-sm"
+                    >
+                        Nama UMKM
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row }) => (
+                <div className="font-medium text-xs sm:text-sm">{row.getValue("nama")}</div>
+            ),
+        },
+        {
+            accessorKey: "alamat",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="h-8 px-2 lg:px-3 text-xs sm:text-sm"
+                    >
+                        Alamat
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row }) => (
+                <div 
+                    className="max-w-[150px] sm:max-w-xs truncate text-xs sm:text-sm" 
+                    title={row.getValue("alamat")}
+                >
+                    {row.getValue("alamat")}
+                </div>
+            ),
+        },
+        {
+            accessorKey: "noTelp",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="h-8 px-2 lg:px-3 text-xs sm:text-sm"
+                    >
+                        No Telepon
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row }) => <div className="text-xs sm:text-sm">{row.getValue("noTelp")}</div>,
+        },
+        {
+            id: "actions",
+            enableHiding: false,
+            header: () => <div className="text-xs sm:text-sm">Aksi</div>,
+            cell: ({ row }) => {
+                const umkm = row.original
+
+                return (
+                    <div className="flex gap-1">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleEdit({
+                                id: umkm.id,
+                                nama: umkm.nama,
+                                alamat: umkm.alamat,
+                                noTelp: umkm.noTelp
+                            })}
+                        >
+                            <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleDelete(umkm.id)}
+                        >
+                            <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
+                        </Button>
+                    </div>
+                )
+            },
+        },
+    ]
+
+    // Setup TanStack Table
+    const table = useReactTable({
+        data: umkmData ?? [],
+        columns,
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
+        onRowSelectionChange: setRowSelection,
+        state: {
+            sorting,
+            columnFilters,
+            columnVisibility,
+            rowSelection,
+        },
+    })
 
     return (
         <div className="space-y-4 w-full px-2 sm:px-4">
@@ -176,6 +269,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                 </DialogContent>
             </Dialog>
 
+            {/* Alert Dialog Delete */}
             <AlertDialog
                 open={!!idToDelete}
                 onOpenChange={(open) => {
@@ -215,10 +309,9 @@ export const UMKMPage: NextPageWithLayout = () => {
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-600">Show</span>
                                 <Select
-                                    value={rowsPerPage.toString()}
+                                    value={table.getState().pagination.pageSize.toString()}
                                     onValueChange={(value) => {
-                                        setRowsPerPage(Number(value))
-                                        setCurrentPage(1)
+                                        table.setPageSize(Number(value))
                                     }}
                                 >
                                     <SelectTrigger className="w-16">
@@ -267,8 +360,8 @@ export const UMKMPage: NextPageWithLayout = () => {
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <Input
                                 placeholder="Cari UMKM..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                value={(table.getColumn("nama")?.getFilterValue() as string) ?? ""}
+                                onChange={(e) => table.getColumn("nama")?.setFilterValue(e.target.value)}
                                 className="pl-10"
                             />
                         </div>
@@ -278,10 +371,9 @@ export const UMKMPage: NextPageWithLayout = () => {
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-600">Show</span>
                             <Select
-                                value={rowsPerPage.toString()}
+                                value={table.getState().pagination.pageSize.toString()}
                                 onValueChange={(value) => {
-                                    setRowsPerPage(Number(value))
-                                    setCurrentPage(1)
+                                    table.setPageSize(Number(value))
                                 }}
                             >
                                 <SelectTrigger className="w-20">
@@ -302,8 +394,8 @@ export const UMKMPage: NextPageWithLayout = () => {
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <Input
                                     placeholder="Cari UMKM..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    value={(table.getColumn("nama")?.getFilterValue() as string) ?? ""}
+                                    onChange={(e) => table.getColumn("nama")?.setFilterValue(e.target.value)}
                                     className="pl-10 w-64"
                                 />
                             </div>
@@ -346,104 +438,80 @@ export const UMKMPage: NextPageWithLayout = () => {
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-12 text-xs sm:text-sm">No</TableHead>
-                                        <TableHead className="min-w-[120px] text-xs sm:text-sm">Nama UMKM</TableHead>
-                                        <TableHead className="min-w-[150px] text-xs sm:text-sm">Alamat</TableHead>
-                                        <TableHead className="min-w-[120px] text-xs sm:text-sm">No Telepon</TableHead>
-                                        <TableHead className="w-20 sm:w-32 text-xs sm:text-sm">Aksi</TableHead>
-                                    </TableRow>
+                                    {table.getHeaderGroups().map((headerGroup) => (
+                                        <TableRow key={headerGroup.id}>
+                                            <TableHead className="w-12 text-xs sm:text-sm">No</TableHead>
+                                            {headerGroup.headers.map((header) => {
+                                                return (
+                                                    <TableHead key={header.id} className="min-w-[120px] text-xs sm:text-sm">
+                                                        {header.isPlaceholder
+                                                            ? null
+                                                            : flexRender(
+                                                                header.column.columnDef.header,
+                                                                header.getContext()
+                                                            )}
+                                                    </TableHead>
+                                                )
+                                            })}
+                                        </TableRow>
+                                    ))}
                                 </TableHeader>
                                 <TableBody>
                                     {umkmIsLoading ? (
-                                        Array.from({ length: rowsPerPage }, (_, i) => (
+                                        Array.from({ length: table.getState().pagination.pageSize }, (_, i) => (
                                             <TableRow key={i}>
                                                 <TableCell>
                                                     <div className="h-4 bg-gray-200 rounded animate-pulse" />
                                                 </TableCell>
-                                                <TableCell>
-                                                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex gap-1">
-                                                        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
-                                                        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
-                                                    </div>
-                                                </TableCell>
+                                                {columns.map((_, colIndex) => (
+                                                    <TableCell key={colIndex}>
+                                                        <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                                                    </TableCell>
+                                                ))}
                                             </TableRow>
                                         ))
-                                    ) : paginatedData.length === 0 ? (
+                                    ) : table.getRowModel().rows?.length ? (
+                                        table.getRowModel().rows.map((row, index) => (
+                                            <TableRow
+                                                key={row.id}
+                                                data-state={row.getIsSelected() && "selected"}
+                                            >
+                                                <TableCell className="font-medium text-xs sm:text-sm">
+                                                    {(table.getState().pagination.pageIndex * table.getState().pagination.pageSize) + index + 1}
+                                                </TableCell>
+                                                {row.getVisibleCells().map((cell) => (
+                                                    <TableCell key={cell.id}>
+                                                        {flexRender(
+                                                            cell.column.columnDef.cell,
+                                                            cell.getContext()
+                                                        )}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))
+                                    ) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-8 text-gray-500 text-xs sm:text-sm">
-                                                {searchTerm ? "Tidak ada data yang ditemukan" : "Belum ada data UMKM"}
+                                            <TableCell colSpan={columns.length + 1} className="text-center py-8 text-gray-500 text-xs sm:text-sm">
+                                                {(table.getColumn("nama")?.getFilterValue() as string) ? "Tidak ada data yang ditemukan" : "Belum ada data UMKM"}
                                             </TableCell>
                                         </TableRow>
-                                    ) : (
-                                        paginatedData.map((item, index) => (
-                                            <TableRow key={item.id}>
-                                                <TableCell className="font-medium text-xs sm:text-sm">
-                                                    {startRow + index}
-                                                </TableCell>
-                                                <TableCell className="font-medium text-xs sm:text-sm">
-                                                    {item.nama}
-                                                </TableCell>
-                                                <TableCell 
-                                                    className="max-w-[150px] sm:max-w-xs truncate text-xs sm:text-sm" 
-                                                    title={item.alamat}
-                                                >
-                                                    {item.alamat}
-                                                </TableCell>
-                                                <TableCell className="text-xs sm:text-sm">{item.noTelp}</TableCell>
-                                                <TableCell>
-                                                    <div className="flex gap-1">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-8 w-8 p-0"
-                                                            onClick={() => handleEdit({
-                                                                id: item.id,
-                                                                nama: item.nama,
-                                                                alamat: item.alamat,
-                                                                noTelp: item.noTelp
-                                                            })}
-                                                        >
-                                                            <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            className="h-8 w-8 p-0"
-                                                            onClick={() => handleDelete(item.id)}
-                                                        >
-                                                            <Trash className="w-3 h-3 sm:w-4 sm:h-4" />
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
                                     )}
                                 </TableBody>
                             </Table>
                         </div>
                     </div>
 
-                    {!umkmIsLoading && filteredData.length > 0 && (
+                    {!umkmIsLoading && table.getFilteredRowModel().rows.length > 0 && (
                         <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
                             <div className="text-xs sm:text-sm text-gray-600 order-2 sm:order-1">
-                                Menampilkan {startRow} sampai {endRow} dari {filteredData.length} data
+                                Menampilkan {table.getRowModel().rows.length} dari {table.getFilteredRowModel().rows.length} data
                             </div>
                             <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={handlePreviousPage}
-                                    disabled={currentPage === 1}
+                                    onClick={() => table.previousPage()}
+                                    disabled={!table.getCanPreviousPage()}
                                     className="text-xs sm:text-sm px-2 sm:px-3"
                                 >
                                     <span className="hidden sm:inline">Sebelumnya</span>
@@ -451,38 +519,16 @@ export const UMKMPage: NextPageWithLayout = () => {
                                 </Button>
                                 
                                 <div className="flex items-center gap-1">
-                                    {Array.from({ length: Math.min(window.innerWidth < 640 ? 3 : 5, totalPages) }, (_, i) => {
-                                        const maxPages = window.innerWidth < 640 ? 3 : 5;
-                                        let pageNum;
-                                        if (totalPages <= maxPages) {
-                                            pageNum = i + 1;
-                                        } else if (currentPage <= Math.floor(maxPages / 2) + 1) {
-                                            pageNum = i + 1;
-                                        } else if (currentPage >= totalPages - Math.floor(maxPages / 2)) {
-                                            pageNum = totalPages - maxPages + 1 + i;
-                                        } else {
-                                            pageNum = currentPage - Math.floor(maxPages / 2) + i;
-                                        }
-                                        
-                                        return (
-                                            <Button
-                                                key={pageNum}
-                                                variant={currentPage === pageNum ? "default" : "outline"}
-                                                size="sm"
-                                                className="w-6 h-6 sm:w-8 sm:h-8 p-0 text-xs sm:text-sm"
-                                                onClick={() => setCurrentPage(pageNum)}
-                                            >
-                                                {pageNum}
-                                            </Button>
-                                        );
-                                    })}
+                                    <span className="text-xs sm:text-sm text-gray-600">
+                                        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                                    </span>
                                 </div>
                                 
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={handleNextPage}
-                                    disabled={currentPage === totalPages}
+                                    onClick={() => table.nextPage()}
+                                    disabled={!table.getCanNextPage()}
                                     className="text-xs sm:text-sm px-2 sm:px-3"
                                 >
                                     <span className="hidden sm:inline">Selanjutnya</span>
