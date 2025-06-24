@@ -69,10 +69,18 @@ export const ProductPage: NextPageWithLayout = () => {
 
     // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
 
-    const handleSubmit = (data: ProductFormSchema) => {
+    const handleSubmit = async (data: ProductFormSchema) => {
         if (!imgUrl) {
             toast.error("Masukan Gambar Produk!")
             return
+        }
+
+        if (arrayImgUrlLama.length > 0) {
+            try {
+                await hapusGambarProdukMultiple({ gambar: arrayImgUrlLama })
+            } catch (error) {
+                console.error("Gagal menghapus gambar lama:", error)
+            }
         }
 
         tambahProduk({
@@ -90,7 +98,7 @@ export const ProductPage: NextPageWithLayout = () => {
         setIdToEdit(data.id)
         setImgUrl(data.gambar)
         setImgUrlLama(data.gambar)
-        setArrayImgUrlLama([data.gambar])
+        setArrayImgUrlLama([])
         setImgUrlBaru(null)
         editForm.reset({
             nama: data.nama,
@@ -173,7 +181,13 @@ export const ProductPage: NextPageWithLayout = () => {
                         <DialogTitle className="text-lg font-semibold">Tambah Produk</DialogTitle>
                     </DialogHeader>
                     <Form {...addForm}>
-                        <ProductForm onSubmit={handleSubmit} onChangeImage={(url) => { setImgUrl(url) }} imageUrl={imgUrl} />
+                        <ProductForm onSubmit={handleSubmit} onChangeImage={(url) => {
+                            setImgUrl(url)
+                            setImgUrlBaru(url)
+                            if (imgUrl) {
+                                setArrayImgUrlLama((prev) => [...prev, imgUrl])
+                            }
+                        }} imageUrl={imgUrl} />
                     </Form>
                     <DialogFooter>
                         <DialogClose asChild>
