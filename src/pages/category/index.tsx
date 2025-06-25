@@ -27,7 +27,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const addForm = useForm<CategoryFormSchema>({
         resolver: zodResolver(categoryFormSchema),
         defaultValues: {
-            status: false
+            status: true
         }
     })
 

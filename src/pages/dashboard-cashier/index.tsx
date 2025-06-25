@@ -15,13 +15,14 @@ const DashboardCashier = () => {
         kategoriId: selectedKategoriId,
     });
 
-    const filteredProducts = products?.filter((product) => product.status) ?? [];
+    const filteredProducts = products?.filter((product) => product.status && product.kategori.status) ?? [];
 
     const { data: categories, isLoading: isCategoriesLoading } = api.kategori.lihatKategori.useQuery();
 
     const totalProducts = categories?.reduce((a, b) => {
         if (b.status) {
-            return a + b.Produk.length;
+            const activeProduct = b.Produk.filter((product) => product.status)
+            return a + activeProduct.length;
         }
         return a;
     }, 0) ?? 0;

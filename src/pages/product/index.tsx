@@ -40,7 +40,7 @@ export const ProductPage: NextPageWithLayout = () => {
     const addForm = useForm<ProductFormSchema>({
         resolver: zodResolver(productFormSchema),
         defaultValues: {
-            status: false
+            status: true
         }
     })
 

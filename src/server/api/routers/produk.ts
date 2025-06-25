@@ -33,7 +33,8 @@ export const produkRouter = createTRPCRouter({
                 kategori: {
                     select: {
                         id: true,
-                        nama: true
+                        nama: true,
+                        status: true
                     }
                 }
             }
