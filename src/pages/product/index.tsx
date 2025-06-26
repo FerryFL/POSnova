@@ -52,7 +52,7 @@ export const ProductPage: NextPageWithLayout = () => {
     const { mutate: tambahProduk, isPending: tambahProdukIsPending } = api.produk.tambahProduk.useMutation({
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
-            toast.success("Data Berhasil Ditambahkan!")
+            toast.success("Data Produk Berhasil Ditambahkan!")
             resetImageState()
             addForm.reset()
             setAddOpen(false)
@@ -62,7 +62,7 @@ export const ProductPage: NextPageWithLayout = () => {
     const { mutate: ubahProduk, isPending: ubahProdukIsPending } = api.produk.ubahProduk.useMutation({
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
-            toast.success("Data Berhasil Diubah!")
+            toast.success("Data Produk Berhasil Diubah!")
             resetImageState()
             editForm.reset()
             setEditOpen(false)
@@ -73,7 +73,7 @@ export const ProductPage: NextPageWithLayout = () => {
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
             setIdToDelete(null)
-            toast.success("Produk Berhasil Dihapus!")
+            toast.success("Produk Produk Berhasil Dihapus!")
         }
     })
 
