@@ -23,7 +23,7 @@ export const UMKMPage: NextPageWithLayout = () => {
     const [editOpen, setEditOpen] = useState(false)
     const [idToEdit, setIdToEdit] = useState<string | null>(null)
     const [idToDelete, setIdToDelete] = useState<string | null>(null)
-    
+
     const [searchTerm, setSearchTerm] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
     const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -70,7 +70,7 @@ export const UMKMPage: NextPageWithLayout = () => {
 
     const filteredData = useMemo(() => {
         if (!umkmData) return []
-        
+
         return umkmData.filter((item) =>
             item.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
             item.alamat.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,7 +148,7 @@ export const UMKMPage: NextPageWithLayout = () => {
     }, [addOpen, addForm])
 
     return (
-        <div className="space-y-4 w-full px-2 sm:px-4">
+        <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen UMKM</h1>
 
             {/* Dialog Edit UMKM */}
@@ -164,8 +164,8 @@ export const UMKMPage: NextPageWithLayout = () => {
                         <DialogClose asChild>
                             <Button variant="outline" className="w-full sm:w-auto">Tutup</Button>
                         </DialogClose>
-                        <Button 
-                            type="submit" 
+                        <Button
+                            type="submit"
                             onClick={editForm.handleSubmit(handleSubmitEdit)}
                             className="w-full sm:w-auto"
                         >
@@ -193,9 +193,9 @@ export const UMKMPage: NextPageWithLayout = () => {
                     </AlertDialogDescription>
                     <AlertDialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
                         <AlertDialogCancel className="w-full sm:w-auto">Tutup</AlertDialogCancel>
-                        <Button 
-                            disabled={hapusUMKMIsPending} 
-                            variant="destructive" 
+                        <Button
+                            disabled={hapusUMKMIsPending}
+                            variant="destructive"
                             onClick={handleSubmitDelete}
                             className="w-full sm:w-auto"
                         >
@@ -209,7 +209,7 @@ export const UMKMPage: NextPageWithLayout = () => {
             <Card>
                 <CardHeader className="space-y-4">
                     <CardTitle>Data UMKM</CardTitle>
-                    
+
                     <div className="flex flex-col space-y-3 sm:hidden">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -232,7 +232,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            
+
                             <Dialog open={addOpen} onOpenChange={setAddOpen}>
                                 <DialogTrigger asChild>
                                     <Button variant="outline" size="sm">
@@ -250,8 +250,8 @@ export const UMKMPage: NextPageWithLayout = () => {
                                         <DialogClose asChild>
                                             <Button variant="outline" className="w-full sm:w-auto">Tutup</Button>
                                         </DialogClose>
-                                        <Button 
-                                            type="submit" 
+                                        <Button
+                                            type="submit"
                                             onClick={addForm.handleSubmit(handleSubmit)}
                                             className="w-full sm:w-auto"
                                         >
@@ -262,7 +262,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                                 </DialogContent>
                             </Dialog>
                         </div>
-                        
+
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <Input
@@ -307,7 +307,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                                     className="pl-10 w-64"
                                 />
                             </div>
-                            
+
                             <Dialog open={addOpen} onOpenChange={setAddOpen}>
                                 <DialogTrigger asChild>
                                     <Button variant="outline">
@@ -326,8 +326,8 @@ export const UMKMPage: NextPageWithLayout = () => {
                                         <DialogClose asChild>
                                             <Button variant="outline" className="w-full sm:w-auto">Tutup</Button>
                                         </DialogClose>
-                                        <Button 
-                                            type="submit" 
+                                        <Button
+                                            type="submit"
                                             onClick={addForm.handleSubmit(handleSubmit)}
                                             className="w-full sm:w-auto"
                                         >
@@ -393,8 +393,8 @@ export const UMKMPage: NextPageWithLayout = () => {
                                                 <TableCell className="font-medium text-xs sm:text-sm">
                                                     {item.nama}
                                                 </TableCell>
-                                                <TableCell 
-                                                    className="max-w-[150px] sm:max-w-xs truncate text-xs sm:text-sm" 
+                                                <TableCell
+                                                    className="max-w-[150px] sm:max-w-xs truncate text-xs sm:text-sm"
                                                     title={item.alamat}
                                                 >
                                                     {item.alamat}
@@ -449,7 +449,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                                     <span className="hidden sm:inline">Sebelumnya</span>
                                     <span className="sm:hidden">Prev</span>
                                 </Button>
-                                
+
                                 <div className="flex items-center gap-1">
                                     {Array.from({ length: Math.min(window.innerWidth < 640 ? 3 : 5, totalPages) }, (_, i) => {
                                         const maxPages = window.innerWidth < 640 ? 3 : 5;
@@ -463,7 +463,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                                         } else {
                                             pageNum = currentPage - Math.floor(maxPages / 2) + i;
                                         }
-                                        
+
                                         return (
                                             <Button
                                                 key={pageNum}
@@ -477,7 +477,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                                         );
                                     })}
                                 </div>
-                                
+
                                 <Button
                                     variant="outline"
                                     size="sm"
