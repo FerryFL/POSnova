@@ -1,6 +1,7 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { kategoriRouter } from "./routers/kategori";
 import { produkRouter } from "./routers/produk";
+import { umkmRouter } from "./routers/umkm";
 import { varianRouter } from "./routers/varian";
 
 /**
@@ -11,6 +12,7 @@ import { varianRouter } from "./routers/varian";
 export const appRouter = createTRPCRouter({
   kategori: kategoriRouter,
   produk: produkRouter,
+  umkm: umkmRouter,
   varian: varianRouter,
 });
 

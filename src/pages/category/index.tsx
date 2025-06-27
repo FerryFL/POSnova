@@ -27,7 +27,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const addForm = useForm<CategoryFormSchema>({
         resolver: zodResolver(categoryFormSchema),
         defaultValues: {
-            status: false
+            status: true
         }
     })
 
@@ -41,7 +41,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const { mutate: tambahKategori, isPending: tambahKategoriIsPending } = api.kategori.tambahKategori.useMutation({
         onSuccess: async () => {
             await apiUtils.kategori.lihatKategori.invalidate()
-            toast.success("Data Berhasil Ditambahkan!")
+            toast.success("Data Kategori Berhasil Ditambahkan!")
             addForm.reset()
             setAddOpen(false)
         }
@@ -50,7 +50,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const { mutate: ubahKategori, isPending: ubahKategoriIsPending } = api.kategori.ubahKategori.useMutation({
         onSuccess: async () => {
             await apiUtils.kategori.lihatKategori.invalidate()
-            toast.success("Data Berhasil Diubah!")
+            toast.success("Data Kategori Berhasil Diubah!")
             editForm.reset()
             setEditOpen(false)
         }
@@ -59,7 +59,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const { mutate: hapusKategori, isPending: hapusKategoriIsPending } = api.kategori.hapusKategori.useMutation({
         onSuccess: async () => {
             await apiUtils.kategori.lihatKategori.invalidate()
-            toast.success("Data Berhasil Dihapus!")
+            toast.success("Data Kategori Berhasil Dihapus!")
             setIdToDelete(null)
         }
     })
@@ -204,7 +204,7 @@ export const CategoryPage: NextPageWithLayout = () => {
                                 <Card key={item.id} className="">
                                     <CardHeader>
                                         <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                        <CardTitle>{item.nama}</CardTitle>
+                                        <CardTitle className="line-clamp-1 break-words">{item.nama}</CardTitle>
 
                                     </CardHeader>
                                     <CardFooter className="gap-2">

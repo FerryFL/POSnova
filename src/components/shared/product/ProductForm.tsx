@@ -1,4 +1,6 @@
-import { type ChangeEvent } from "react";
+import { LoaderCircle } from "lucide-react";
+import Image from "next/image";
+import { useState, type ChangeEvent } from "react";
 import { useFormContext } from "react-hook-form";
 import { Checkbox } from "~/components/ui/checkbox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
@@ -13,15 +15,18 @@ import { api } from "~/utils/api";
 interface ProductFormProps {
     onSubmit: (data: ProductFormSchema) => void
     onChangeImage: (imageUrl: string) => void
+    imageUrl: string | null
 }
 
-export const ProductForm = ({ onSubmit, onChangeImage }: ProductFormProps) => {
+export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormProps) => {
 
-    const form = useFormContext<ProductFormSchema>();
+    const form = useFormContext<ProductFormSchema>()
 
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
     const { data: varianData } = api.varian.lihatVarian.useQuery()
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
+    // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
+    const [isUploading, setIsUploading] = useState(false)
 
     const changeImage = async (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
@@ -33,16 +38,33 @@ export const ProductForm = ({ onSubmit, onChangeImage }: ProductFormProps) => {
                 return
             }
 
-            const { path, token } = await tambahImageSignedUrl()
+            // if (imageUrl) {
+            //     try {
+            //         await hapusGambarProduk({ gambar: imageUrl })
+            //     } catch (error) {
+            //         console.error("Gagal menghapus gambar produk:", error)
+            //         return
+            //     }
+            // }
+            setIsUploading(true)
 
-            const imageUrl = await uploadFileToSignedUrl({
-                bucket: Bucket.ProductImages,
-                file,
-                path,
-                token
-            })
+            try {
+                const { path, token } = await tambahImageSignedUrl()
 
-            onChangeImage(imageUrl)
+                const img = await uploadFileToSignedUrl({
+                    bucket: Bucket.ProductImages,
+                    file,
+                    path,
+                    token
+                })
+
+                onChangeImage(img)
+            } catch (error) {
+                console.error("Gagal mengupload gambar produk:", error)
+            } finally {
+                setIsUploading(false)
+            }
+
         }
     }
 
@@ -146,7 +168,25 @@ export const ProductForm = ({ onSubmit, onChangeImage }: ProductFormProps) => {
 
             <div className="space-y-2">
                 <Label>Gambar Produk</Label>
-                <Input onChange={changeImage} type="file" accept="image/*" />
+                <Input onChange={changeImage} type="file" accept="image/*" placeholder="Gambar" />
+
+                {
+                    isUploading ? (
+                        <LoaderCircle className="animate-spin" />
+                    ) : (
+                        imageUrl && (
+                            <div className="mt-2">
+                                <Image
+                                    width={128}
+                                    height={128}
+                                    src={imageUrl}
+                                    alt="Preview gambar produk"
+                                    className="object-cover rounded-lg border border-gray-200 shadow-sm"
+                                />
+                            </div>
+                        )
+                    )
+                }
             </div>
 
             <FormField

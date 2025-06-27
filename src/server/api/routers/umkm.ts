@@ -1,70 +1,72 @@
-import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
-export const kategoriRouter = createTRPCRouter({
-    lihatKategori: publicProcedure.query(async ({ ctx }) => {
+export const umkmRouter = createTRPCRouter({
+    lihatUMKM: publicProcedure.query(async ({ ctx }) => {
         const { db } = ctx
 
-        const kategori = await db.kategori.findMany({
+        const umkm = await db.uMKM.findMany({
             select: {
                 id: true,
                 nama: true,
-                status: true,
-                Produk: {
-                    select: {
-                        id: true,
-                        status: true
-                    }
-                },
+                alamat: true,
+                noTelp: true
             }
         })
 
-        return kategori
+        return umkm
     }),
-    tambahKategori: publicProcedure.input(
+
+    tambahUMKM: publicProcedure.input(
         z.object({
             nama: z.string(),
-            status: z.boolean()
+            alamat: z.string(),
+            noTelp: z.string()
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
 
-        const kategoriBaru = await db.kategori.create({
+        const umkmBaru = await db.uMKM.create({
             data: {
                 nama: input.nama,
-                status: input.status
+                alamat: input.alamat,
+                noTelp: input.noTelp
             }
         })
 
-        return kategoriBaru
+        return umkmBaru
     }),
-    ubahKategori: publicProcedure.input(
+
+    ubahUMKM: publicProcedure.input(
         z.object({
             id: z.string(),
             nama: z.string(),
-            status: z.boolean()
+            alamat: z.string(),
+            noTelp: z.string()
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
 
-        await db.kategori.update({
+        await db.uMKM.update({
             where: {
                 id: input.id
             },
             data: {
                 nama: input.nama,
-                status: input.status
+                alamat: input.alamat,
+                noTelp: input.noTelp
             }
         })
     }),
-    hapusKategori: publicProcedure.input(
+
+    hapusUMKM: publicProcedure.input(
         z.object({
             id: z.string()
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
 
-        await db.kategori.delete({
+        await db.uMKM.delete({
             where: {
                 id: input.id
             }
