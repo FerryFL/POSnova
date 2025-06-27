@@ -30,10 +30,14 @@ export const produkRouter = createTRPCRouter({
                 gambar: true,
                 status: true,
                 stok: true,
-                varian: {
+                ProdukVarian: {
                     select: {
-                        id: true,
-                        nama: true
+                        varian: {
+                            select: {
+                                id: true,
+                                nama: true
+                            }
+                        }
                     }
                 },
                 kategori: {
@@ -55,7 +59,7 @@ export const produkRouter = createTRPCRouter({
             stok: z.coerce.number(),
             status: z.boolean(),
             categoryId: z.string(),
-            varianId: z.string(),
+            varianIds: z.array(z.string()).nullable().default([]),
             gambar: z.string().url()
         })
     ).mutation(async ({ ctx, input }) => {
@@ -68,7 +72,13 @@ export const produkRouter = createTRPCRouter({
                 stok: input.stok,
                 status: input.status,
                 kategoriId: input.categoryId,
-                varianId: input.varianId,
+                ProdukVarian: {
+                    create: input.varianIds?.map((varianId) => ({
+                        varian: {
+                            connect: { id: varianId }
+                        }
+                    })),
+                },
                 gambar: input.gambar
             }
         })
@@ -96,7 +106,7 @@ export const produkRouter = createTRPCRouter({
             stok: z.coerce.number(),
             status: z.boolean(),
             categoryId: z.string(),
-            varianId: z.string(),
+            varianIds: z.array(z.string()).optional().default([]),
             gambar: z.string().url()
         })
     ).mutation(async ({ ctx, input }) => {
@@ -112,7 +122,12 @@ export const produkRouter = createTRPCRouter({
                 stok: input.stok,
                 status: input.status,
                 kategoriId: input.categoryId,
-                varianId: input.varianId,
+                ProdukVarian: {
+                    deleteMany: {},
+                    create: input.varianIds.map((variantId) => ({
+                        varian: { connect: { id: variantId } }
+                    }))
+                },
                 gambar: input.gambar
             }
         })

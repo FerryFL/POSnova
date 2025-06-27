@@ -6,7 +6,7 @@ export const productFormSchema = z.object({
     stok: z.coerce.number().max(999, "Masukan Maksimal 999"),
     status: z.boolean(),
     categoryId: z.string(),
-    varianId: z.string()
+    varianIds: z.array(z.string()).optional()
 })
 
 export type ProductFormSchema = z.infer<typeof productFormSchema>

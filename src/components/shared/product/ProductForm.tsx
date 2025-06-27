@@ -11,6 +11,7 @@ import type { ProductFormSchema } from "~/forms/product";
 import { uploadFileToSignedUrl } from "~/lib/supabase";
 import { Bucket } from "~/server/bucket";
 import { api } from "~/utils/api";
+import { MultiSelectCombobox } from "../MultiSelectCombobox";
 
 interface ProductFormProps {
     onSubmit: (data: ProductFormSchema) => void
@@ -23,7 +24,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     const form = useFormContext<ProductFormSchema>()
 
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
-    const { data: varianData } = api.varian.lihatVarian.useQuery()
+    const { data: varians = [] } = api.varian.lihatVarian.useQuery()
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
     // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
     const [isUploading, setIsUploading] = useState(false)
@@ -67,6 +68,12 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
 
         }
     }
+
+
+    const variantOptions = varians.map((v) => ({
+        value: v.id,
+        label: v.nama,
+    }))
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} id="category-form" className="space-y-4">
@@ -112,59 +119,49 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 )}
             />
 
-            <div className="flex flex-row space-x-4">
-                <FormField
-                    control={form.control}
-                    name="categoryId"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row">
-                            <FormControl>
-                                <Select value={field.value} onValueChange={(value: string) => {
-                                    field.onChange(value)
-                                }}>
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Kategori" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {
-                                            kategoriData?.map((item) => {
-                                                return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
-                                            })
-                                        }
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+            <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Kategori</FormLabel>
+                        <FormControl>
+                            <Select value={field.value} onValueChange={(value: string) => {
+                                field.onChange(value)
+                            }}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Kategori" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        kategoriData?.map((item) => {
+                                            return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
+                                        })
+                                    }
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
-                <FormField
-                    control={form.control}
-                    name="varianId"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row">
-                            <FormControl>
-                                <Select value={field.value} onValueChange={(value: string) => {
-                                    field.onChange(value)
-                                }}>
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Varian" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {
-                                            varianData?.map((item) => {
-                                                return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
-                                            })
-                                        }
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </ div>
+            <FormField
+                control={form.control}
+                name="varianIds"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Varian</FormLabel>
+                        <FormControl>
+                            <MultiSelectCombobox
+                                options={variantOptions}
+                                value={field.value ?? []}
+                                onChange={field.onChange}
+                            />
+                        </FormControl>
+                    </FormItem>
+                )}
+            />
 
             <div className="space-y-2">
                 <Label>Gambar Produk</Label>

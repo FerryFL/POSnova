@@ -110,7 +110,7 @@ export const VariantPage: NextPageWithLayout = () => {
 
     return (
         <div className="space-y-4 w-full">
-            <h1 className="text-xl font-bold">Varian</h1>
+            <h1 className="text-xl font-bold">Manajemen Varian</h1>
             <Dialog open={addOpen} onOpenChange={setAddOpen}>
                 <DialogTrigger asChild>
                     <Button variant="outline"><Plus />Tambah Varian</Button>
@@ -164,7 +164,7 @@ export const VariantPage: NextPageWithLayout = () => {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Hapus Category</AlertDialogTitle>
+                        <AlertDialogTitle>Hapus Varian</AlertDialogTitle>
                     </AlertDialogHeader>
                     <AlertDialogDescription>Apakah yakin anda akan menghapus varian ini?</AlertDialogDescription>
                     <AlertDialogFooter>
