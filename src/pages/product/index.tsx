@@ -308,17 +308,30 @@ export const ProductPage: NextPageWithLayout = () => {
                                         </div>
 
                                     </CardHeader>
-                                    <CardContent className="space-y-1">
-                                        <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                        <h1 className="text-lg font-medium w-full ">
-                                            <span className="line-clamp-1 break-words">{item.nama}</span>
+                                    <CardContent className="flex flex-col gap-2.5 h-full">
+
+                                        <div className="flex justify-between">
+                                            <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
+                                            <p className="text-sm text-destructive">{item.stok} Tersisa</p>
+                                        </div>
+                                        <div className="text-lg font-medium w-full ">
+                                            <span className="line-clamp-1 break-words font-bold">{item.nama}</span>
                                             <span className="text-sm flex gap-1 items-center text-muted-foreground line-clamp-1 break-words">
                                                 <Tags className="size-4 shrink-0" />
                                                 {item.kategori.nama}
                                             </span>
-                                        </h1>
-                                        <p className="text-sm ">Jumlah Stok: {item.stok}</p>
-                                        <p className="text-lg font-bold text-green-700">Rp. {item.harga}</p>
+                                            <p className="text-lg font-bold text-green-700">Rp. {item.harga}</p>
+                                        </div>
+
+                                        <div className="flex gap-2 flex-wrap grow h-fit">
+                                            {
+                                                item.ProdukVarian.map((varian) =>
+                                                    <Badge key={varian.varian.id} variant="outline" className="h-6 font-semibold max-w-full">
+                                                        <span className="line-clamp-1 break-words">{varian.varian.nama}</span>
+                                                    </Badge>
+                                                )
+                                            }
+                                        </div>
                                     </CardContent>
                                     <CardFooter className="gap-2">
                                         <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, harga: item.harga, stok: item.stok, status: item.status, categoryId: item.kategori.id, varianIds: item.ProdukVarian.map((pv) => pv.varian.id), gambar: item.gambar })}>

@@ -52,7 +52,7 @@ export function MultiSelectCombobox({
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button variant="outline" role="combobox" className="w-[250px] justify-between">
-                        {value.length > 0 ? `${value.length} selected` : "Pilih varian..."}
+                        {value.length > 0 ? `${value.length} Varian Terpilih` : "Pilih varian..."}
                         <ChevronsUpDown className="opacity-50 w-4 h-4" />
                     </Button>
                 </PopoverTrigger>

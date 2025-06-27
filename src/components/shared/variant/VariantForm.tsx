@@ -1,7 +1,6 @@
 import { useFormContext } from "react-hook-form"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
 import { Input } from "~/components/ui/input";
-import { Checkbox } from "~/components/ui/checkbox";
 import type { VariantFormSchema } from "~/forms/variant";
 
 interface VariantFormProps {
@@ -25,24 +24,6 @@ export const VariantForm = ({ onSubmit }: VariantFormProps) => {
                     </FormItem>
                 )}
             />
-
-            <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                    <FormItem className="flex flex-row">
-                        <FormControl>
-                            <Checkbox
-                                checked={field.value ?? false}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        <FormLabel>Aktif</FormLabel>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-
         </form>
     )
 

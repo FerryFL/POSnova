@@ -11,7 +11,6 @@ import { VariantForm } from "~/components/shared/variant/VariantForm";
 import { toast } from "sonner";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
-import { Badge } from "~/components/ui/badge";
 import { variantFormSchema, type VariantFormSchema } from "~/forms/variant";
 import { Form } from "~/components/ui/form";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "~/components/ui/alert-dialog";
@@ -26,9 +25,6 @@ export const VariantPage: NextPageWithLayout = () => {
 
     const addForm = useForm<VariantFormSchema>({
         resolver: zodResolver(variantFormSchema),
-        defaultValues: {
-            status: false,
-        }
     })
 
     const editForm = useForm<VariantFormSchema>({
@@ -67,16 +63,14 @@ export const VariantPage: NextPageWithLayout = () => {
     const handleSubmit = (data: VariantFormSchema) => {
         tambahVarian({
             nama: data.nama,
-            status: data.status
         })
     }
 
-    const handleEdit = (varian: { id: string, nama: string, status: boolean }) => {
+    const handleEdit = (varian: { id: string, nama: string }) => {
         setIdToEdit(varian.id)
         setEditOpen(true)
         editForm.reset({
             nama: varian.nama,
-            status: varian.status
         })
     }
 
@@ -86,7 +80,6 @@ export const VariantPage: NextPageWithLayout = () => {
         ubahVarian({
             id: idToEdit,
             nama: data.nama,
-            status: data.status
         })
     }
 
@@ -196,12 +189,11 @@ export const VariantPage: NextPageWithLayout = () => {
                             return (
                                 <Card key={item.id} className="">
                                     <CardHeader>
-                                        <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                        <CardTitle>{item.nama}</CardTitle>
+                                        <CardTitle className="line-clamp-1 break-words">{item.nama}</CardTitle>
 
                                     </CardHeader>
                                     <CardFooter className="gap-2">
-                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, status: item.status })}>
+                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama })}>
                                             <Pencil />
                                         </Button>
                                         <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>

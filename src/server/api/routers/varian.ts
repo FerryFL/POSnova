@@ -12,7 +12,6 @@ export const varianRouter = createTRPCRouter({
     tambahVarian: publicProcedure.input(
         z.object({
             nama: z.string(),
-            status: z.boolean()
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
@@ -20,7 +19,6 @@ export const varianRouter = createTRPCRouter({
         const varianBaru = await db.varian.create({
             data: {
                 nama: input.nama,
-                status: input.status,
             }
         })
         return varianBaru
@@ -29,7 +27,6 @@ export const varianRouter = createTRPCRouter({
         z.object({
             id: z.string(),
             nama: z.string(),
-            status: z.boolean()
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
@@ -40,7 +37,6 @@ export const varianRouter = createTRPCRouter({
             },
             data: {
                 nama: input.nama,
-                status: input.status
             }
         })
     }),
