@@ -63,7 +63,7 @@ export function MultiSelectCombobox({
                             <CommandEmpty>Varian Tidak ditemukan</CommandEmpty>
                             <CommandGroup>
                                 {options.map((item) => (
-                                    <CommandItem key={item.value} value={item.value} onSelect={() => toggleValue(item.value)}>
+                                    <CommandItem key={item.value} value={item.label} onSelect={() => toggleValue(item.value)}>
                                         {item.label}
                                         <Check
                                             className={cn(
