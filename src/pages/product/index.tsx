@@ -122,12 +122,13 @@ export const ProductPage: NextPageWithLayout = () => {
             stok: data.stok,
             status: data.status,
             categoryId: data.categoryId,
+            UMKMId: data.UMKMId,
             varianIds: data.varianIds,
             gambar: imageState.current
         })
     }
 
-    const handleEdit = (data: { id: string, nama: string, harga: number, stok: number, status: boolean, categoryId: string, varianIds: string[], gambar: string }) => {
+    const handleEdit = (data: { id: string, nama: string, harga: number, stok: number, status: boolean, categoryId: string, UMKMId: string, varianIds: string[], gambar: string }) => {
         setEditOpen(true)
         setIdToEdit(data.id)
 
@@ -143,6 +144,7 @@ export const ProductPage: NextPageWithLayout = () => {
             stok: data.stok,
             status: data.status,
             categoryId: data.categoryId,
+            UMKMId: data.UMKMId,
             varianIds: data.varianIds
         })
     }
@@ -164,6 +166,7 @@ export const ProductPage: NextPageWithLayout = () => {
             stok: data.stok,
             status: data.status,
             categoryId: data.categoryId,
+            UMKMId: data.UMKMId,
             varianIds: data.varianIds,
             gambar: imageState.current
         })
@@ -334,7 +337,19 @@ export const ProductPage: NextPageWithLayout = () => {
                                         </div>
                                     </CardContent>
                                     <CardFooter className="gap-2">
-                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, harga: item.harga, stok: item.stok, status: item.status, categoryId: item.kategori.id, varianIds: item.ProdukVarian.map((pv) => pv.varian.id), gambar: item.gambar })}>
+                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit(
+                                            {
+                                                id: item.id,
+                                                nama: item.nama,
+                                                harga: item.harga,
+                                                stok: item.stok,
+                                                status: item.status,
+                                                categoryId: item.kategori.id,
+                                                UMKMId: item.UMKM?.id ?? "",
+                                                varianIds: item.ProdukVarian.map((pv) => pv.varian.id),
+                                                gambar: item.gambar
+                                            }
+                                        )}>
                                             <Pencil />
                                         </Button>
                                         <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>

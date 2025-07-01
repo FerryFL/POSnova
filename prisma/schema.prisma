@@ -27,6 +27,9 @@ model Kategori {
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
     Produk    Produk[]
+
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
 }
 
 model Varian {
@@ -51,6 +54,9 @@ model Produk {
     updatedAt    DateTime       @default(now()) @updatedAt
     kategoriId   String
     ProdukVarian ProdukVarian[]
+
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
 }
 
 model ProdukVarian {
@@ -70,4 +76,7 @@ model UMKM {
     noTelp    String
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
+
+    Kategori Kategori[]
+    Produk   Produk[]
 }

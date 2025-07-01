@@ -5,7 +5,8 @@ export const productFormSchema = z.object({
     harga: z.coerce.number().min(1000, "Masukan Minimal Rp. 1000").max(100000000, "Masukan Maksimal Rp. 100.000.000"),
     stok: z.coerce.number().max(999, "Masukan Maksimal 999"),
     status: z.boolean(),
-    categoryId: z.string(),
+    categoryId: z.string().min(1, "Kategori Harus Diisi"),
+    UMKMId: z.string().min(1, "UMKM Harus Diisi"),
     varianIds: z.array(z.string()).optional()
 })
 

@@ -16,6 +16,12 @@ export const kategoriRouter = createTRPCRouter({
                         status: true
                     }
                 },
+                UMKM: {
+                    select: {
+                        id: true,
+                        nama: true
+                    }
+                }
             }
         })
 
@@ -24,7 +30,8 @@ export const kategoriRouter = createTRPCRouter({
     tambahKategori: publicProcedure.input(
         z.object({
             nama: z.string(),
-            status: z.boolean()
+            status: z.boolean(),
+            UMKMId: z.string()
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
@@ -32,7 +39,8 @@ export const kategoriRouter = createTRPCRouter({
         const kategoriBaru = await db.kategori.create({
             data: {
                 nama: input.nama,
-                status: input.status
+                status: input.status,
+                UMKMId: input.UMKMId,
             }
         })
 
@@ -42,7 +50,8 @@ export const kategoriRouter = createTRPCRouter({
         z.object({
             id: z.string(),
             nama: z.string(),
-            status: z.boolean()
+            status: z.boolean(),
+            UMKMId: z.string()
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
@@ -53,7 +62,8 @@ export const kategoriRouter = createTRPCRouter({
             },
             data: {
                 nama: input.nama,
-                status: input.status
+                status: input.status,
+                UMKMId: input.UMKMId
             }
         })
     }),

@@ -14,7 +14,7 @@ export const produkRouter = createTRPCRouter({
         const { db } = ctx
 
         const whereClause: Prisma.ProdukWhereInput = {}
-        if (input.kategoriId !== "all") {
+        if (input.kategoriId !== "Semua") {
             whereClause.kategoriId = input.kategoriId
         }
 
@@ -46,6 +46,12 @@ export const produkRouter = createTRPCRouter({
                         nama: true,
                         status: true
                     }
+                },
+                UMKM: {
+                    select: {
+                        id: true,
+                        nama: true,
+                    }
                 }
             }
         })
@@ -59,6 +65,7 @@ export const produkRouter = createTRPCRouter({
             stok: z.coerce.number(),
             status: z.boolean(),
             categoryId: z.string(),
+            UMKMId: z.string(),
             varianIds: z.array(z.string()).nullable().default([]),
             gambar: z.string().url()
         })
@@ -72,6 +79,7 @@ export const produkRouter = createTRPCRouter({
                 stok: input.stok,
                 status: input.status,
                 kategoriId: input.categoryId,
+                UMKMId: input.UMKMId,
                 ProdukVarian: {
                     create: input.varianIds?.map((varianId) => ({
                         varian: {
@@ -106,6 +114,7 @@ export const produkRouter = createTRPCRouter({
             stok: z.coerce.number(),
             status: z.boolean(),
             categoryId: z.string(),
+            UMKMId: z.string(),
             varianIds: z.array(z.string()).optional().default([]),
             gambar: z.string().url()
         })
@@ -122,6 +131,7 @@ export const produkRouter = createTRPCRouter({
                 stok: input.stok,
                 status: input.status,
                 kategoriId: input.categoryId,
+                UMKMId: input.UMKMId,
                 ProdukVarian: {
                     deleteMany: {},
                     create: input.varianIds.map((variantId) => ({

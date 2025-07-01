@@ -67,7 +67,8 @@ export const CategoryPage: NextPageWithLayout = () => {
     const handleSubmit = (data: CategoryFormSchema) => {
         tambahKategori({
             nama: data.nama,
-            status: data.status
+            status: data.status,
+            UMKMId: data.UMKMId
         })
         console.log(data)
     }
@@ -76,12 +77,13 @@ export const CategoryPage: NextPageWithLayout = () => {
     //     toast.success("Berhasil!")
     // }
 
-    const handleEdit = (category: { id: string, nama: string, status: boolean }) => {
+    const handleEdit = (category: { id: string, nama: string, status: boolean, UMKMId: string }) => {
         setIdToEdit(category.id)
         setEditOpen(true)
         editForm.reset({
             nama: category.nama,
-            status: category.status
+            status: category.status,
+            UMKMId: category.UMKMId
         })
     }
 
@@ -91,7 +93,8 @@ export const CategoryPage: NextPageWithLayout = () => {
         ubahKategori({
             id: idToEdit,
             nama: data.nama,
-            status: data.status
+            status: data.status,
+            UMKMId: data.UMKMId
         })
     }
 
@@ -208,7 +211,7 @@ export const CategoryPage: NextPageWithLayout = () => {
 
                                     </CardHeader>
                                     <CardFooter className="gap-2">
-                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, status: item.status })}>
+                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit({ id: item.id, nama: item.nama, status: item.status, UMKMId: item.UMKM?.id ?? "" })}>
                                             <Pencil />
                                         </Button>
                                         <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>

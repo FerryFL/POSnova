@@ -9,7 +9,8 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 
 const DashboardCashier = () => {
-    const [selectedKategoriId, setSelectedKategoriId] = useState("all");
+    const [selectedKategoriId, setSelectedKategoriId] = useState("Semua");
+    const [selectedKategori, setSelectedKategori] = useState("Semua");
 
     const { data: products, isLoading } = api.produk.lihatProduk.useQuery({
         kategoriId: selectedKategoriId,
@@ -28,8 +29,9 @@ const DashboardCashier = () => {
     }, 0) ?? 0;
 
 
-    const handleClick = (kategoriId: string) => {
+    const handleClick = (kategoriId: string, nama: string) => {
         setSelectedKategoriId(kategoriId)
+        setSelectedKategori(nama)
     };
 
     return (
@@ -45,14 +47,14 @@ const DashboardCashier = () => {
                 ) :
                     <div className="flex gap-4 overflow-x-auto pb-2 mb-4 w-full">
 
-                        <Card className="p-3 shrink-0 gap-0 w-32 text-center flex justify-center items-center cursor-pointer" onClick={() => handleClick("all")}>
-                            <h2 className="text-base font-semibold">All</h2>
+                        <Card className="p-3 shrink-0 gap-0 w-32 text-center flex justify-center items-center cursor-pointer" onClick={() => handleClick("Semua", "Semua")}>
+                            <h2 className="text-base font-semibold">Semua</h2>
                             <p className="text-sm">{totalProducts} Products</p>
                         </Card>
 
                         {
                             categories?.filter((category) => category.status === true).map((category) => (
-                                <Card key={category.id} className="shrink-0 p-3 gap-1 w-32 text-center flex justify-center items-center cursor-pointer" onClick={() => handleClick(category.id)}>
+                                <Card key={category.id} className="shrink-0 p-3 gap-1 w-32 text-center flex justify-center items-center cursor-pointer" onClick={() => handleClick(category.id, category.nama)}>
                                     <div className="w-full">
                                         <h2 className="text-base font-semibold line-clamp-1 break-words">{category.nama}</h2>
                                     </div>
@@ -84,61 +86,67 @@ const DashboardCashier = () => {
                         }
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-                        {
-                            filteredProducts.length > 0 ? (
-                                filteredProducts?.map((item) => (
-                                    <Card key={item.id} className="pt-0 gap-2 justify-between">
-                                        <CardHeader className="p-0">
-                                            <div className="relative h-40 w-full overflow-hidden">
-                                                {item.gambar ? (
-                                                    <Image src={item.gambar} alt={item.nama} fill unoptimized className="rounded-t-lg object-cover" />
-                                                ) : (
-                                                    <div className="bg-muted flex h-full w-full items-center justify-center">
-                                                        No image
-                                                    </div>
-                                                )}
-                                            </div>
+                    <div>
+                        <p>
+                            Kategori :
+                            <span className="font-semibold"> {selectedKategori}</span>
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                            {
+                                filteredProducts.length > 0 ? (
+                                    filteredProducts?.map((item) => (
+                                        <Card key={item.id} className="pt-0 gap-2 justify-between">
+                                            <CardHeader className="p-0">
+                                                <div className="relative h-40 w-full overflow-hidden">
+                                                    {item.gambar ? (
+                                                        <Image src={item.gambar} alt={item.nama} fill unoptimized className="rounded-t-lg object-cover" />
+                                                    ) : (
+                                                        <div className="bg-muted flex h-full w-full items-center justify-center">
+                                                            No image
+                                                        </div>
+                                                    )}
+                                                </div>
 
-                                        </CardHeader>
-                                        <CardContent className="flex flex-col gap-2.5 h-full">
+                                            </CardHeader>
+                                            <CardContent className="flex flex-col gap-2.5 h-full">
 
-                                            <div className="flex justify-between">
-                                                <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                                <p className="text-sm text-destructive">{item.stok} Tersisa</p>
-                                            </div>
-                                            <div className="text-lg font-medium w-full ">
-                                                <span className="line-clamp-1 break-words font-bold">{item.nama}</span>
-                                                <span className="text-sm flex gap-1 items-center text-muted-foreground line-clamp-1 break-words">
-                                                    <Tags className="size-4 shrink-0" />
-                                                    {item.kategori.nama}
-                                                </span>
-                                                <p className="text-lg font-bold text-green-700">Rp. {item.harga}</p>
-                                            </div>
+                                                <div className="flex justify-between">
+                                                    <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
+                                                    <p className="text-sm text-destructive">{item.stok} Tersisa</p>
+                                                </div>
+                                                <div className="text-lg font-medium w-full ">
+                                                    <span className="line-clamp-1 break-words font-bold">{item.nama}</span>
+                                                    <span className="text-sm flex gap-1 items-center text-muted-foreground line-clamp-1 break-words">
+                                                        <Tags className="size-4 shrink-0" />
+                                                        {item.kategori.nama}
+                                                    </span>
+                                                    <p className="text-lg font-bold text-green-700">Rp. {item.harga}</p>
+                                                </div>
 
-                                            <div className="flex gap-2 flex-wrap grow h-fit">
-                                                {
-                                                    item.ProdukVarian.map((varian) =>
-                                                        <Badge key={varian.varian.id} variant="outline" className="h-6 font-semibold max-w-full">
-                                                            <span className="line-clamp-1 break-words">{varian.varian.nama}</span>
-                                                        </Badge>
-                                                    )
-                                                }
-                                            </div>
-                                        </CardContent>
-                                        <CardFooter className="gap-2">
-                                            <Button className="w-full" variant="outline" onClick={() => alert(`Menambahkan ${item.nama} ke keranjang`)} >
-                                                <ShoppingCart className="text-primary cursor-pointer" />
-                                            </Button>
-                                        </CardFooter>
-                                    </Card>
-                                ))
-                            ) : (
-                                <div className="col-span-4 text-center p-4">
-                                    <p className="text-muted-foreground">Tidak ada produk yang tersedia di kategori ini</p>
-                                </div>
-                            )
-                        }
+                                                <div className="flex gap-2 flex-wrap grow h-fit">
+                                                    {
+                                                        item.ProdukVarian.map((varian) =>
+                                                            <Badge key={varian.varian.id} variant="outline" className="h-6 font-semibold max-w-full">
+                                                                <span className="line-clamp-1 break-words">{varian.varian.nama}</span>
+                                                            </Badge>
+                                                        )
+                                                    }
+                                                </div>
+                                            </CardContent>
+                                            <CardFooter className="gap-2">
+                                                <Button className="w-full" variant="outline" onClick={() => alert(`Menambahkan ${item.nama} ke keranjang`)} >
+                                                    <ShoppingCart className="text-primary cursor-pointer" />
+                                                </Button>
+                                            </CardFooter>
+                                        </Card>
+                                    ))
+                                ) : (
+                                    <div className="col-span-4 text-center p-4">
+                                        <p className="text-muted-foreground">Tidak ada produk yang tersedia di kategori ini</p>
+                                    </div>
+                                )
+                            }
+                        </div>
                     </div>
                 )}
             </div>

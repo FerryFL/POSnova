@@ -1,6 +1,6 @@
 import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useFormContext } from "react-hook-form";
 import { Checkbox } from "~/components/ui/checkbox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
@@ -20,10 +20,16 @@ interface ProductFormProps {
 }
 
 export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormProps) => {
-
     const form = useFormContext<ProductFormSchema>()
 
+    const initialUMKM = form.getValues("UMKMId")
+    const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
+
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
+    const { data: umkmData } = api.umkm.lihatUMKM.useQuery()
+
+    const filteredKategori = currUMKM ? kategoriData?.filter((item) => item.UMKM?.id === currUMKM) : null
+
     const { data: varians = [] } = api.varian.lihatVarian.useQuery()
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
     // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
@@ -74,6 +80,22 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
         value: v.id,
         label: v.nama,
     }))
+
+    useEffect(() => {
+        const currentCategory = form.getValues("categoryId")
+        const valid = filteredKategori?.some((item) => item.id === currentCategory)
+
+        if (!valid) {
+            form.setValue("categoryId", "")
+        }
+    }, [filteredKategori, form])
+
+    useEffect(() => {
+        const currentUMKM = form.getValues("UMKMId")
+        if (currentUMKM) {
+            setCurrUMKM(currentUMKM)
+        }
+    }, [setCurrUMKM, form])
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} id="category-form" className="space-y-4">
@@ -134,7 +156,35 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                                 </SelectTrigger>
                                 <SelectContent>
                                     {
-                                        kategoriData?.map((item) => {
+                                        filteredKategori?.map((item) => {
+                                            return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
+                                        })
+                                    }
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="UMKMId"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>UMKM</FormLabel>
+                        <FormControl>
+                            <Select value={field.value} onValueChange={(value: string) => {
+                                field.onChange(value)
+                                setCurrUMKM(value)
+                            }}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="UMKM" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        umkmData?.map((item) => {
                                             return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
                                         })
                                     }
