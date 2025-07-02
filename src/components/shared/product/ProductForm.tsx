@@ -146,7 +146,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 name="categoryId"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Kategori</FormLabel>
+                        <FormLabel>Daftar Kategori</FormLabel>
                         <FormControl>
                             <Select value={field.value} onValueChange={(value: string) => {
                                 field.onChange(value)

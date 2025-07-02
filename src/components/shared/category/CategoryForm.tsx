@@ -51,7 +51,7 @@ export const CategoryForm = ({ onSubmit }: CategoryFormProps) => {
                 name="UMKMId"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>UMKM</FormLabel>
+                        <FormLabel>Daftar UMKM</FormLabel>
                         <FormControl>
                             <Select value={field.value} onValueChange={(value: string) => {
                                 field.onChange(value)
