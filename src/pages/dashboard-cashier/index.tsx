@@ -1,13 +1,14 @@
 import type { inferRouterOutputs } from "@trpc/server";
 import { Minus, Plus, ShoppingCart, Tags, Trash } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PublicLayout } from "~/components/layouts/PublicLayout";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "~/components/ui/sheet";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -16,13 +17,22 @@ import { api } from "~/utils/api";
 
 const DashboardCashier = () => {
     type Produk = inferRouterOutputs<AppRouter>["produk"]["lihatProduk"][number]
-    type ProdukKeranjang = Produk & { jumlah: number }
+    type ProdukKeranjang = Omit<Produk, "ProdukVarian"> & {
+        jumlah: number
+        varianId?: string
+        varianNama?: string
+    }
 
     const [openDialog, setOpenDialog] = useState(false)
+    const [openDialogCart, setOpenDialogCart] = useState(false)
 
     const [selectedKategoriId, setSelectedKategoriId] = useState("Semua");
     const [selectedKategori, setSelectedKategori] = useState("Semua");
 
+    const [selectedVarianId, setSelectedVarianId] = useState("")
+    const [selectedJumlah, setSelectedJumlah] = useState(1)
+
+    const [selectedProdukCart, setSelectedProdukCart] = useState<Produk>()
     const [selectedProduk, setSelectedProduk] = useState<ProdukKeranjang[]>([])
     const [jumlah, setJumlah] = useState(0)
     const [total, setTotal] = useState(0)
@@ -49,50 +59,101 @@ const DashboardCashier = () => {
         setSelectedKategori(nama)
     };
 
-    const handleAddToCart = (product: Produk) => {
+    const handleAddToCart = (product: Produk, selectedVarianId: string, jumlahToAdd: number) => {
+        const normalizedVarianId = selectedVarianId || undefined;
+
+        const selectedVarian = product.ProdukVarian.find(
+            (item) => item.varian.id === normalizedVarianId
+        )
+
+        const totalExistingJumlah = selectedProduk
+            .filter((item) => item.id === product.id)
+            .reduce((sum, item) => sum + item.jumlah, 0)
+
+        if (totalExistingJumlah >= product.stok) {
+            toast.error("Jumlah melebihi stok tersedia!");
+            return;
+        }
+
         setSelectedProduk((prev: ProdukKeranjang[]) => {
-            const existing = prev.find((item) => item.id === product.id)
+            const existing = prev.find((item) => item.id === product.id && item.varianId === normalizedVarianId)
             if (existing) {
-                return prev.map((item) => item.id === product.id ? { ...item, jumlah: item.jumlah + 1 } : item)
+                return prev.map((item) => item.id === product.id && item.varianId === normalizedVarianId ? { ...item, jumlah: item.jumlah + jumlahToAdd } : item)
             }
 
-            return [...prev, { ...product, jumlah: 1 }]
+            const { ...rest } = product
+
+            return [
+                ...prev,
+                {
+                    ...rest,
+                    jumlah: jumlahToAdd,
+                    varianId: selectedVarian?.varian.id,
+                    varianNama: selectedVarian?.varian.nama,
+                },
+            ]
         })
-        setJumlah((prev) => prev + 1)
-        setTotal((prev) => prev + product.harga)
+        setJumlah((prev) => prev + jumlahToAdd)
+        setTotal((prev) => prev + product.harga * jumlahToAdd)
         toast.success('Berhasil Ditambah')
+        setOpenDialogCart(false)
     }
 
-    const handlePlus = (id: string) => {
-        const produk = selectedProduk.find((item) => item.id === id)
+    const handlePlus = (id: string, varianId: string | undefined) => {
+        const produk = selectedProduk.find((item) => item.id === id && item.varianId === varianId)
         if (!produk) return
 
+        const totalExistingJumlah = selectedProduk
+            .filter((item) => item.id === id)
+            .reduce((sum, item) => sum + item.jumlah, 0)
+
+        if (totalExistingJumlah >= produk.stok) {
+            toast.error("Jumlah melebihi stok tersedia!")
+            return
+        }
+
         setSelectedProduk((prev) =>
-            prev.map((item) => item.id === id ? { ...item, jumlah: item.jumlah + 1 } : item)
+            prev.map((item) => item.id === id && item.varianId === varianId ? { ...item, jumlah: item.jumlah + 1 } : item)
         )
         setJumlah((prev) => prev + 1)
         setTotal((prev) => prev + produk.harga)
     }
 
-    const handleMinus = (id: string) => {
-        const produk = selectedProduk.find((item) => item.id === id)
+    const handleMinus = (id: string, varianId: string | undefined) => {
+        const produk = selectedProduk.find((item) => item.id === id && item.varianId === varianId)
         if (!produk) return
 
         setSelectedProduk((prev) =>
-            prev.map((item) => item.id === id ? { ...item, jumlah: item.jumlah - 1 } : item)
+            prev.map((item) => item.id === id && item.varianId === varianId ? { ...item, jumlah: item.jumlah - 1 } : item)
                 .filter((item) => item.jumlah > 0)
         )
         setJumlah((prev) => prev - 1)
         setTotal((prev) => prev - produk.harga)
     }
 
-    const handleRemove = (id: string) => {
-        const produkToRemove = selectedProduk.find((item) => item.id === id)
+    const handleRemove = (id: string, varianId: string | undefined) => {
+        const produkToRemove = selectedProduk.find((item) => item.id === id && item.varianId === varianId)
         if (!produkToRemove) return
         setJumlah((prev) => Math.max(0, prev - produkToRemove.jumlah))
         setTotal((prev) => prev - produkToRemove.jumlah * produkToRemove.harga)
-        setSelectedProduk((prev) => prev.filter((item) => item.id !== id))
+        setSelectedProduk((prev) => prev.filter((item) => !(item.id === id && item.varianId === varianId)))
     }
+
+    useEffect(() => {
+        if (selectedProdukCart?.ProdukVarian[0]) {
+            setSelectedVarianId(selectedProdukCart.ProdukVarian[0].varian.id)
+        } else {
+            setSelectedVarianId("")
+        }
+    }, [selectedProdukCart])
+
+    useEffect(() => {
+        if (!openDialogCart) {
+            setSelectedJumlah(1)
+            setSelectedVarianId("")
+            setSelectedProdukCart(undefined)
+        }
+    }, [openDialogCart])
 
     return (
         <div>
@@ -194,7 +255,8 @@ const DashboardCashier = () => {
                                                 </div>
                                             </CardContent>
                                             <CardFooter className="gap-2">
-                                                <Button className="w-full" variant="outline" onClick={() => handleAddToCart(item)} >
+                                                {/* <Button className="w-full" variant="outline" onClick={() => handleAddToCart(item)} > */}
+                                                <Button className="w-full" variant="outline" onClick={() => { setOpenDialogCart(true); setSelectedProdukCart(item) }} >
                                                     <ShoppingCart className="text-primary cursor-pointer" />
                                                 </Button>
                                             </CardFooter>
@@ -229,20 +291,23 @@ const DashboardCashier = () => {
                             selectedProduk.map((item) =>
                                 <div key={item.id} className="flex items-center justify-between bg-gray-100 text-black p-3 rounded-lg">
                                     <div className="flex flex-col">
-                                        <span>{item.nama}</span>
+                                        <span>
+                                            {item.nama}
+                                            {item.varianNama ? ` - ${item.varianNama}` : ""}
+                                        </span>
                                         <span className="text-sm">Rp {item.harga} / Produk</span>
                                     </div>
                                     <div className="flex gap-2">
                                         <div className="flex items-center gap-2">
-                                            <div className="bg-black p-0.5 rounded-lg cursor-pointer" onClick={() => handleMinus(item.id)}>
+                                            <div className="bg-black p-0.5 rounded-lg cursor-pointer" onClick={() => handleMinus(item.id, item.varianId)}>
                                                 <Minus className="size-4 text-white" />
                                             </div>
                                             <span>{item.jumlah}</span>
-                                            <div className="bg-black p-0.5 rounded-lg cursor-pointer" onClick={() => handlePlus(item.id)}>
+                                            <div className="bg-black p-0.5 rounded-lg cursor-pointer" onClick={() => handlePlus(item.id, item.varianId)}>
                                                 <Plus className="size-4 text-white" />
                                             </div>
                                         </div>
-                                        <div className="p-2 rounded-lg bg-destructive cursor-pointer" onClick={() => handleRemove(item.id)}>
+                                        <div className="p-2 rounded-lg bg-destructive cursor-pointer" onClick={() => handleRemove(item.id, item.varianId)}>
                                             <Trash className="size-4 text-white" />
                                         </div>
                                     </div>
@@ -274,6 +339,66 @@ const DashboardCashier = () => {
                         <DialogClose asChild>
                             <Button>Tutup</Button>
                         </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={openDialogCart} onOpenChange={setOpenDialogCart}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{selectedProdukCart?.nama}</DialogTitle>
+                        <DialogDescription></DialogDescription>
+                    </DialogHeader>
+                    {
+                        selectedProdukCart?.ProdukVarian?.length ? (
+                            <Select value={selectedVarianId} onValueChange={setSelectedVarianId}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Varian" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        selectedProdukCart?.ProdukVarian?.map((item) => {
+                                            return <SelectItem value={item.varian.id} key={item.varian.id}>{item.varian.nama}</SelectItem>
+                                        })
+                                    }
+                                </SelectContent>
+                            </Select>
+                        ) : null
+                    }
+                    <div className="flex items-center gap-2 py-2">
+                        <div
+                            className="bg-black p-1 rounded-lg cursor-pointer"
+                            onClick={() => setSelectedJumlah((prev) => Math.max(1, prev - 1))}
+                        >
+                            <Minus className="size-4 text-white" />
+                        </div>
+                        <span className="w-6 text-center">{selectedJumlah}</span>
+                        <div
+                            className="bg-black p-1 rounded-lg cursor-pointer"
+                            onClick={() => {
+                                const totalExistingJumlah = selectedProduk
+                                    .filter((item) => item.id === selectedProdukCart?.id)
+                                    .reduce((sum, item) => sum + item.jumlah, 0)
+                                const sisaStok = (selectedProdukCart?.stok ?? 0) - totalExistingJumlah
+
+                                setSelectedJumlah((prev) => prev < sisaStok ? prev + 1 : prev)
+                            }}
+                        >
+                            <Plus className="size-4 text-white" />
+                        </div>
+                    </div>
+
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="destructive">Tutup</Button>
+                        </DialogClose>
+                        <Button
+                            onClick={() => selectedProdukCart && handleAddToCart(selectedProdukCart, selectedVarianId, selectedJumlah)}
+                            disabled={!selectedProdukCart}
+                        >
+                            Masukan Keranjang
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -60,10 +60,10 @@ model Produk {
 }
 
 model ProdukVarian {
-    produk   Produk @relation(fields: [produkId], references: [id])
+    produk   Produk @relation(fields: [produkId], references: [id], onDelete: Cascade)
     produkId String
 
-    varian   Varian @relation(fields: [varianId], references: [id])
+    varian   Varian @relation(fields: [varianId], references: [id], onDelete: Cascade)
     varianId String
 
     @@id([produkId, varianId])
