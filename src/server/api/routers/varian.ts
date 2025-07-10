@@ -2,12 +2,27 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const varianRouter = createTRPCRouter({
-    lihatVarian: publicProcedure.query(async ({ ctx }) => {
-        const { db } = ctx
+    lihatVarian: publicProcedure
+    .input(z.object({ produkId: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx
 
-        const varian = await db.varian.findMany()
+      if (input.produkId) {
+        const varian = await db.varian.findMany({
+          where: {
+            ProdukVarian: {
+              some: {
+                produkId: input.produkId,
+              },
+            },
+          },
+        })
 
         return varian
+      }
+
+      // fallback: return all variants if no produkId is passed
+      return await db.varian.findMany()
     }),
     tambahVarian: publicProcedure.input(
         z.object({

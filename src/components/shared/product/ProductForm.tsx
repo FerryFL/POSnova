@@ -7,6 +7,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/comp
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Button } from "~/components/ui/button"
 import type { ProductFormSchema } from "~/forms/product";
 import { uploadFileToSignedUrl } from "~/lib/supabase";
 import { Bucket } from "~/server/bucket";
@@ -22,6 +23,7 @@ interface ProductFormProps {
 export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormProps) => {
     const form = useFormContext<ProductFormSchema>()
 
+    const produkId = form.watch("produkId");
     const initialUMKM = form.getValues("UMKMId")
     const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
 
@@ -30,8 +32,14 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
 
     const filteredKategori = currUMKM ? kategoriData?.filter((item) => item.UMKM?.id === currUMKM) : null
 
-    const { data: varians = [] } = api.varian.lihatVarian.useQuery()
+    const { data: varians = [] } = api.varian.lihatVarian.useQuery(
+      produkId ? { produkId } : {}
+    )
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
+    const [newVariant, setNewVariant] = useState("")
+    const [customVariants, setCustomVariants] = useState<string[]>(form.getValues("varianIds") ?? [])
+    const cn = (...classes: (string | undefined | boolean)[]) => classes.filter(Boolean).join(" ")
+
     // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
     const [isUploading, setIsUploading] = useState(false)
 
@@ -81,6 +89,36 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
         label: v.nama,
     }))
 
+    const getVariantLabel = (id: string) => {
+      return variantOptions.find((v) => v.value === id)?.label ?? id
+    }
+
+    const handleAddVariant = () => {
+      const trimmed = newVariant.trim()
+      const existing = variantOptions.find((v) => v.label === trimmed)
+      if (trimmed && existing && !customVariants.includes(existing.value)) {
+        const updated = [...customVariants, existing.value]
+        setCustomVariants(updated)
+        form.setValue("varianIds", updated)
+      }
+      setNewVariant("")
+    }
+
+    const handleToggleVariant = (id: string) => {
+      const updated = customVariants.includes(id)
+        ? customVariants.filter((v) => v !== id)
+        : [...customVariants, id]
+
+        setCustomVariants(updated)
+        form.setValue("varianIds", updated)
+    }
+
+    const handleRemoveVariant = (id: string) => {
+      const updated = customVariants.filter((v) => v !== id)
+      setCustomVariants(updated)
+      form.setValue("varianIds", updated)
+    }
+
     useEffect(() => {
         const currentCategory = form.getValues("categoryId")
         const valid = filteredKategori?.some((item) => item.id === currentCategory)
@@ -96,7 +134,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
             setCurrUMKM(currentUMKM)
         }
     }, [setCurrUMKM, form])
-
+  
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} id="category-form" className="space-y-4">
             <FormField
@@ -195,22 +233,69 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                     </FormItem>
                 )}
             />
-
+                
             <FormField
-                control={form.control}
-                name="varianIds"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Varian</FormLabel>
-                        <FormControl>
-                            <MultiSelectCombobox
-                                options={variantOptions}
-                                value={field.value ?? []}
-                                onChange={field.onChange}
-                            />
-                        </FormControl>
-                    </FormItem>
-                )}
+            control={form.control}
+            name="varianIds"
+            render={() => (
+              <FormItem>
+              <FormLabel>Varian</FormLabel>
+              <FormControl>
+              <div className="space-y-2">
+              {/* Input field + add button */}
+              <div className="flex items-center gap-2">
+              <Input
+              placeholder="Masukkan varian"
+              value={newVariant}
+              onChange={(e) => setNewVariant(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  handleAddVariant()
+                }
+              }}
+              />
+              <Button type="button" onClick={handleAddVariant}>
+              Tambah
+              </Button>
+              </div>
+
+              {/* Toggle chips for all variants */}
+              <div className="flex flex-wrap gap-2">
+              {variantOptions.map(({ value, label }) => {
+                const isSelected = customVariants.includes(value)
+                return (
+                  <button
+                  key={value}
+                  type="button"
+                  onClick={() => handleToggleVariant(value)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1 rounded-full text-sm border transition-colors",
+                    isSelected
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                  )}
+                  >
+                  {label}
+                  {isSelected && (
+                    <span
+                    onClick={(e) => {
+                      e.stopPropagation() // prevent toggle on delete click
+                      handleRemoveVariant(value)
+                    }}
+                    className="text-white hover:text-red-300"
+                    >
+                    &times;
+                    </span>
+                  )}
+                  </button>
+                )
+              })}
+              </div>
+              </div>
+              </FormControl>
+              </FormItem>
+            )}
             />
 
             <div className="space-y-2">
@@ -254,5 +339,4 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
             />
         </form>
     )
-
 }
