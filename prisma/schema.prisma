@@ -39,6 +39,8 @@ model Varian {
     updatedAt    DateTime       @default(now()) @updatedAt
     // Produk       Produk[]
     ProdukVarian ProdukVarian[]
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
 }
 
 model Produk {
@@ -79,4 +81,5 @@ model UMKM {
 
     Kategori Kategori[]
     Produk   Produk[]
+    Varian   Varian[]
 }
