@@ -195,6 +195,34 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
 
             <FormField
                 control={form.control}
+                name="UMKMId"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>UMKM</FormLabel>
+                        <FormControl>
+                            <Select value={field.value} onValueChange={(value: string) => {
+                                field.onChange(value)
+                                setCurrUMKM(value)
+                            }}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="UMKM" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {
+                                        umkmData?.map((item) => {
+                                            return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
+                                        })
+                                    }
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
                 name="kategoriId"
                 render={({ field }) => (
                     <FormItem>
@@ -221,93 +249,65 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
             />
 
             <FormField
-                control={form.control}
-                name="UMKMId"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>UMKM</FormLabel>
-                        <FormControl>
-                            <Select value={field.value} onValueChange={(value: string) => {
-                                field.onChange(value)
-                                setCurrUMKM(value)
-                            }}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="UMKM" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {
-                                        umkmData?.map((item) => {
-                                            return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
-                                        })
-                                    }
-                                </SelectContent>
-                            </Select>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-                
-            <FormField
-            control={form.control}
-            name="varianIds"
-            render={() => (
-              <FormItem>
-              <FormLabel>Varian</FormLabel>
-              <FormControl>
-              <div className="space-y-2">
-              {/* Input field + add button */}
-              <div className="flex items-center gap-2">
-              <Input
-              placeholder="Masukkan varian"
-              value={newVariant}
-              onChange={(e) => setNewVariant(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  handleAddVariant()
-                }
-              }}
-              />
-              <Button type="button" onClick={handleAddVariant}>
-              Tambah
-              </Button>
-              </div>
+              control={form.control}
+              name="varianIds"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Varian</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        {/* Input field + add button */}
+                        <div className="flex items-center gap-2">
+                          <Input
+                            placeholder="Masukkan varian"
+                            value={newVariant}
+                            onChange={(e) => setNewVariant(e.target.value)}
+                            onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault()
+                              handleAddVariant()
+                            }
+                            }}
+                          />
+                        <Button type="button" onClick={handleAddVariant}>
+                          Tambah
+                        </Button>
+                      </div>
 
-              {/* Toggle chips for all variants */}
-              <div className="flex flex-wrap gap-2">
-              {variantOptions.map(({ value, label }) => {
-                const isSelected = customVariants.includes(value)
-                return (
-                  <button
-                  key={value}
-                  type="button"
-                  onClick={() => handleToggleVariant(value)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-1 rounded-full text-sm border transition-colors",
-                    isSelected
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
-                  )}
-                  >
-                  {label}
-                  {isSelected && (
-                    <span
-                    onClick={(e) => {
-                      e.stopPropagation() // prevent toggle on delete click
-                      handleRemoveVariant(value)
-                    }}
-                    className="text-white hover:text-red-300"
-                    >
-                    &times;
-                    </span>
-                  )}
-                  </button>
-                )
-              })}
-              </div>
-              </div>
-              </FormControl>
+                      {/* Toggle chips for all variants */}
+                      <div className="flex flex-wrap gap-2">
+                      {variantOptions.map(({ value, label }) => {
+                        const isSelected = customVariants.includes(value)
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => handleToggleVariant(value)}
+                            className={cn(
+                              "flex items-center gap-2 px-3 py-1 rounded-full text-sm border transition-colors",
+                            isSelected
+                              ? "bg-blue-600 text-white border-blue-600"
+                              : "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                            )}
+                        >
+                          {label}
+                          {isSelected && (
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation() // prevent toggle on delete click
+                            handleRemoveVariant(value)
+                          }}
+                          className="text-white hover:text-red-300"
+                        >
+                        &times;
+                        </span>
+                      )}
+                    </button>
+                  )
+                    })}
+                    </div>
+                  </div>
+                </FormControl>
               </FormItem>
             )}
             />
