@@ -24,17 +24,32 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     const form = useFormContext<ProductFormSchema>()
 
     const produkId = form.watch("produkId");
-    const initialUMKM = form.getValues("UMKMId")
-    const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
+    const umkmId = form.getValues("UMKMId")
+    const [currUMKM, setCurrUMKM] = useState(form.getValues("UMKMId"))
+
+    useEffect(() => {
+      const subscription = form.watch((value, { name }) => {
+        if (name === "UMKMId" && typeof value.UMKMId === "string") {
+          setCurrUMKM(value.UMKMId)
+        }
+      });
+      return () => subscription.unsubscribe();
+    }, [form]);
+    // Reset selected variants when UMKM changes
+    useEffect(() => {
+      setCustomVariants([]);
+      form.setValue("varianIds", []);
+    }, [currUMKM]);
 
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
     const { data: umkmData } = api.umkm.lihatUMKM.useQuery()
 
     const filteredKategori = currUMKM ? kategoriData?.filter((item) => item.UMKM?.id === currUMKM) : null
 
-    const { data: varians = [] } = api.varian.lihatVarian.useQuery(
-      produkId ? { produkId } : {}
-    )
+    const { data: varians = [] } = api.varian.lihatVarianByUMKM.useQuery(
+      { umkmId: currUMKM },
+      { enabled: !!currUMKM }
+    );
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
     const [newVariant, setNewVariant] = useState("")
     const [customVariants, setCustomVariants] = useState<string[]>(form.getValues("varianIds") ?? [])
@@ -83,7 +98,6 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
         }
     }
 
-
     const variantOptions = varians.map((v) => ({
         value: v.id,
         label: v.nama,
@@ -120,11 +134,11 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     }
 
     useEffect(() => {
-        const currentCategory = form.getValues("categoryId")
+        const currentCategory = form.getValues("kategoriId")
         const valid = filteredKategori?.some((item) => item.id === currentCategory)
 
         if (!valid) {
-            form.setValue("categoryId", "")
+            form.setValue("kategoriId", "")
         }
     }, [filteredKategori, form])
 
@@ -181,7 +195,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
 
             <FormField
                 control={form.control}
-                name="categoryId"
+                name="kategoriId"
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Daftar Kategori</FormLabel>

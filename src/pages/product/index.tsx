@@ -121,14 +121,14 @@ export const ProductPage: NextPageWithLayout = () => {
             harga: data.harga,
             stok: data.stok,
             status: data.status,
-            categoryId: data.categoryId,
+            kategoriId: data.kategoriId,
             UMKMId: data.UMKMId,
             varianIds: data.varianIds,
             gambar: imageState.current
         })
     }
 
-    const handleEdit = (data: { id: string, nama: string, harga: number, stok: number, status: boolean, categoryId: string, UMKMId: string, varianIds: string[], gambar: string }) => {
+    const handleEdit = (data: { id: string, nama: string, harga: number, stok: number, status: boolean, kategoriId: string, UMKMId: string, varianIds: string[], gambar: string }) => {
         setEditOpen(true)
         setIdToEdit(data.id)
 
@@ -143,7 +143,7 @@ export const ProductPage: NextPageWithLayout = () => {
             harga: data.harga,
             stok: data.stok,
             status: data.status,
-            categoryId: data.categoryId,
+            kategoriId: data.kategoriId,
             UMKMId: data.UMKMId,
             varianIds: data.varianIds
         })
@@ -165,7 +165,7 @@ export const ProductPage: NextPageWithLayout = () => {
             harga: data.harga,
             stok: data.stok,
             status: data.status,
-            categoryId: data.categoryId,
+            kategoriId: data.kategoriId,
             UMKMId: data.UMKMId,
             varianIds: data.varianIds,
             gambar: imageState.current
@@ -344,7 +344,7 @@ export const ProductPage: NextPageWithLayout = () => {
                                                 harga: item.harga,
                                                 stok: item.stok,
                                                 status: item.status,
-                                                categoryId: item.kategori.id,
+                                                kategoriId: item.kategori.id,
                                                 UMKMId: item.UMKM?.id ?? "",
                                                 varianIds: item.ProdukVarian.map((pv) => pv.varian.id),
                                                 gambar: item.gambar

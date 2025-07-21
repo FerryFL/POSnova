@@ -2,31 +2,40 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const varianRouter = createTRPCRouter({
-    lihatVarian: publicProcedure
-    .input(z.object({ produkId: z.string().optional() }))
-    .query(async ({ ctx, input }) => {
-      const { db } = ctx
+    lihatVarian: publicProcedure.query(async ({ ctx }) => {
+        const { db } = ctx
 
-      if (input.produkId) {
         const varian = await db.varian.findMany({
-          where: {
-            ProdukVarian: {
-              some: {
-                produkId: input.produkId,
-              },
-            },
-          },
+            select: {
+                id: true,
+                nama: true,
+                status: true,
+                ProdukVarian: {
+                    select: {
+                      produk: {
+                        select: {
+                          id: true,
+                          nama: true,
+                          status: true
+                        }
+                      }
+                    }
+                },
+                UMKM: {
+                    select: {
+                        id: true,
+                        nama: true
+                    }
+                }
+            }
         })
 
         return varian
-      }
-
-      // fallback: return all variants if no produkId is passed
-      return await db.varian.findMany()
     }),
     tambahVarian: publicProcedure.input(
         z.object({
             nama: z.string(),
+            umkmId: z.string(),
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
@@ -34,6 +43,7 @@ export const varianRouter = createTRPCRouter({
         const varianBaru = await db.varian.create({
             data: {
                 nama: input.nama,
+                UMKMId: input.umkmId,
             }
         })
         return varianBaru
@@ -42,6 +52,7 @@ export const varianRouter = createTRPCRouter({
         z.object({
             id: z.string(),
             nama: z.string(),
+            umkmId: z.string(),
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
@@ -52,6 +63,7 @@ export const varianRouter = createTRPCRouter({
             },
             data: {
                 nama: input.nama,
+                UMKMId: input.umkmId,
             }
         })
     }),
@@ -67,5 +79,17 @@ export const varianRouter = createTRPCRouter({
                 id: input.id
             }
         })
-    })
+    }),
+    lihatVarianByUMKM: publicProcedure
+    .input(z.object({ umkmId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.varian.findMany({
+        where: {
+          UMKMId: input.umkmId,
+        },
+        orderBy: {
+          nama: 'asc',
+        },
+      });
+    }),
 })

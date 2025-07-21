@@ -64,7 +64,7 @@ export const produkRouter = createTRPCRouter({
             harga: z.coerce.number(),
             stok: z.coerce.number(),
             status: z.boolean(),
-            categoryId: z.string(),
+            kategoriId: z.string(),
             UMKMId: z.string(),
             varianIds: z.array(z.string()).nullable().default([]),
             gambar: z.string().url()
@@ -78,8 +78,20 @@ export const produkRouter = createTRPCRouter({
                 harga: input.harga,
                 stok: input.stok,
                 status: input.status,
-                kategoriId: input.categoryId,
-                UMKMId: input.UMKMId,
+                gambar: input.gambar,
+
+                kategori: {
+                  connect: {
+                    id: input.kategoriId,
+                  }
+                },
+
+                UMKM: {
+                  connect: {
+                    id: input.UMKMId,
+                  }
+                },
+
                 ProdukVarian: {
                     create: input.varianIds?.map((varianId) => ({
                         varian: {
@@ -87,7 +99,6 @@ export const produkRouter = createTRPCRouter({
                         }
                     })),
                 },
-                gambar: input.gambar
             }
         })
 
@@ -113,7 +124,7 @@ export const produkRouter = createTRPCRouter({
             harga: z.coerce.number(),
             stok: z.coerce.number(),
             status: z.boolean(),
-            categoryId: z.string(),
+            kategoriId: z.string(),
             UMKMId: z.string(),
             varianIds: z.array(z.string()).optional().default([]),
             gambar: z.string().url()
@@ -130,7 +141,7 @@ export const produkRouter = createTRPCRouter({
                 harga: input.harga,
                 stok: input.stok,
                 status: input.status,
-                kategoriId: input.categoryId,
+                kategoriId: input.kategoriId,
                 UMKMId: input.UMKMId,
                 ProdukVarian: {
                     deleteMany: {},
@@ -207,6 +218,9 @@ export const produkRouter = createTRPCRouter({
             })
         }
 
+        await db.produkVarian.deleteMany({
+          where: { produkId: input.id }
+        })
         await db.produk.delete({
             where: {
                 id: input.id

@@ -13,7 +13,7 @@ interface VariantFormProps {
 export const VariantForm = ({ onSubmit }: VariantFormProps) => {
     const form = useFormContext<VariantFormSchema>();
     const { data: umkmData } = api.umkm.lihatUMKM.useQuery()
-    
+
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -49,7 +49,7 @@ export const VariantForm = ({ onSubmit }: VariantFormProps) => {
 
             <FormField
                 control={form.control}
-                name="UMKMId"
+                name="umkmId"
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Daftar UMKM</FormLabel>
