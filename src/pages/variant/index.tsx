@@ -63,6 +63,7 @@ export const VariantPage: NextPageWithLayout = () => {
     const handleSubmit = (data: VariantFormSchema) => {
         tambahVarian({
             nama: data.nama,
+            umkmId: data.umkmId,
         })
     }
 
@@ -80,6 +81,7 @@ export const VariantPage: NextPageWithLayout = () => {
         ubahVarian({
             id: idToEdit,
             nama: data.nama,
+            umkmId: data.umkmId,
         })
     }
 

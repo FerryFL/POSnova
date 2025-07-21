@@ -36,27 +36,29 @@ model Varian {
     id           String         @id @default(uuid())
     nama         String
     createdAt    DateTime       @default(now())
+    status       Boolean        @default(false)
     updatedAt    DateTime       @default(now()) @updatedAt
-    // Produk       Produk[]
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
     ProdukVarian ProdukVarian[]
 }
 
 model Produk {
-    id           String         @id @default(uuid())
-    nama         String
-    harga        Int
-    gambar       String
-    kategori     Kategori       @relation(fields: [kategoriId], references: [id])
-    // varian       Varian         @relation(fields: [varianId], references: [id])
-    stok         Int            @default(0)
-    status       Boolean        @default(false)
-    createdAt    DateTime       @default(now())
-    updatedAt    DateTime       @default(now()) @updatedAt
-    kategoriId   String
-    ProdukVarian ProdukVarian[]
+  id           String         @id @default(uuid())
+  nama         String
+  harga        Int
+  gambar       String
+  kategori     Kategori       @relation(fields: [kategoriId], references: [id])
+  stok         Int            @default(0)
+  status       Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
 
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
-    UMKMId String?
+  kategoriId   String
+  ProdukVarian ProdukVarian[]
+
+  UMKM         UMKM?          @relation(fields: [UMKMId], references: [id])
+  UMKMId       String?
 }
 
 model ProdukVarian {
@@ -79,4 +81,5 @@ model UMKM {
 
     Kategori Kategori[]
     Produk   Produk[]
+    Varian   Varian[]
 }
