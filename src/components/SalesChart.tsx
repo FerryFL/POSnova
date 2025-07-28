@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, Tooltip, Legend } from "recharts"
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Area, AreaChart } from "recharts"
 import {
   Card,
   CardContent,
@@ -29,7 +29,7 @@ const chartConfig: ChartConfig = {
     color: "hsl(var(--chart-1))",
   },
   totalRevenue: {
-    label: "Pemasukan",
+    label: "Pemasukan (Juta Rp)",
     color: "hsl(var(--chart-2))",
   },
 }
@@ -56,6 +56,12 @@ export function SalesChart() {
   // Calculate totals for display
   const totalTransactions = filteredData.reduce((sum, item) => sum + item.totalTransactions, 0)
   const totalRevenue = filteredData.reduce((sum, item) => sum + item.totalRevenue, 0)
+
+  // Convert revenue to millions for better chart display
+  const chartData = filteredData.map(item => ({
+    ...item,
+    totalRevenueMillion: item.totalRevenue / 1000000, // Convert to millions
+  }))
 
   return (
     <Card className="w-full">
@@ -89,36 +95,20 @@ export function SalesChart() {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[300px] w-full"
+          className="aspect-auto h-[400px] w-full"
         >
-          <AreaChart data={filteredData}>
+          <AreaChart data={chartData} margin={{ top: 20, right: 50, left: 20, bottom: 5 }}>
             <defs>
-              <linearGradient id="fillTransactions" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-totalTransactions)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-totalTransactions)"
-                  stopOpacity={0.1}
-                />
+              <linearGradient id="transactionGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.1}/>
               </linearGradient>
-              <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-totalRevenue)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-totalRevenue)"
-                  stopOpacity={0.1}
-                />
+              <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.1}/>
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
             <XAxis
               dataKey="date"
               tickLine={false}
@@ -131,6 +121,37 @@ export function SalesChart() {
                   month: "short",
                   day: "numeric",
                 })
+              }}
+            />
+            {/* Left Y-axis for Transactions */}
+            <YAxis 
+              yAxisId="transactions" 
+              orientation="left"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 12, fill: "hsl(var(--chart-1))" }}
+              width={60}
+              label={{ 
+                value: 'Transaksi', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fill: "hsl(var(--chart-1))" }
+              }}
+            />
+            {/* Right Y-axis for Revenue (in millions) */}
+            <YAxis 
+              yAxisId="revenue" 
+              orientation="right"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 12, fill: "hsl(var(--chart-2))" }}
+              width={80}
+              tickFormatter={(value: number) => `${value.toFixed(1)}JT`}
+              label={{ 
+                value: 'Pemasukan (Juta Rp)', 
+                angle: 90, 
+                position: 'insideRight',
+                style: { textAnchor: 'middle', fill: "hsl(var(--chart-2))" }
               }}
             />
             <Tooltip
@@ -148,8 +169,9 @@ export function SalesChart() {
                     if (name === "totalTransactions") {
                       return [ "Total Transaksi: ", `${value} transaksi`]
                     }
-                    if (name === "totalRevenue") {
-                      return ["Pemasukan: ", formatRupiah(value as number) ]
+                    if (name === "totalRevenueMillion") {
+                      const actualRevenue = (value as number) * 1000000
+                      return ["Pemasukan: ", formatRupiah(actualRevenue)]
                     }
                     return [value, name]
                   }}
@@ -157,22 +179,49 @@ export function SalesChart() {
                 />
               }
             />
+            {/* Transaction Area */}
             <Area
-              dataKey="totalRevenue"
-              type="natural"
-              fill="url(#fillRevenue)"
-              stroke="var(--color-totalRevenue)"
-              stackId="a"
-            />
-            <Area
+              yAxisId="transactions"
+              type="monotone"
               dataKey="totalTransactions"
-              type="natural"
-              fill="url(#fillTransactions)"
               stroke="var(--color-totalTransactions)"
-              stackId="a"
+              strokeWidth={3}
+              fill="url(#transactionGradient)"
+              fillOpacity={0.6}
+              name="totalTransactions"
+              connectNulls={true}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Revenue Area */}
+            <Area
+              yAxisId="revenue"
+              type="monotone"
+              dataKey="totalRevenueMillion"
+              stroke="var(--color-totalRevenue)"
+              strokeWidth={3}
+              fill="url(#revenueGradient)"
+              fillOpacity={0.4}
+              name="totalRevenueMillion"
+              connectNulls={true}
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <Legend 
-              content={<ChartLegendContent config={chartConfig} />}
+              content={
+                <ChartLegendContent 
+                  config={{
+                    totalTransactions: {
+                      label: "Total Transaksi",
+                      color: "hsl(var(--chart-1))",
+                    },
+                    totalRevenueMillion: {
+                      label: "Pemasukan (Juta Rp)",
+                      color: "hsl(var(--chart-2))",
+                    },
+                  }}
+                />
+              }
             />
           </AreaChart>
         </ChartContainer>
