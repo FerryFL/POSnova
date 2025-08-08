@@ -1,6 +1,7 @@
 import type { inferRouterOutputs } from "@trpc/server";
 import { Minus, Plus, ShoppingCart, Tags, Trash } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PublicLayout } from "~/components/layouts/PublicLayout";
@@ -22,6 +23,8 @@ const DashboardCashier = () => {
         varianId?: string
         varianNama?: string
     }
+
+    const router = useRouter()
 
     const [openDialog, setOpenDialog] = useState(false)
     const [openDialogCart, setOpenDialogCart] = useState(false)
@@ -53,6 +56,9 @@ const DashboardCashier = () => {
         return a;
     }, 0) ?? 0;
 
+    const handleNavigate = async () => {
+        await router.push("/payment")
+    }
 
     const handleClick = (kategoriId: string, nama: string) => {
         setSelectedKategoriId(kategoriId)
@@ -321,16 +327,16 @@ const DashboardCashier = () => {
                             <span className="text-lg font-semibold">Total Harga</span>
                             <span className="text-xl font-semibold">Rp {total}</span>
                         </div>
-                        <Button type="submit" onClick={() => setOpenDialog(true)}>Pesan Sekarang</Button>
+                        <Button type="submit" onClick={() => setOpenDialog(true)}>Pesan</Button>
                         <SheetClose asChild>
-                            <Button variant="outline">Close</Button>
+                            <Button variant="outline">Tutup</Button>
                         </SheetClose>
                     </SheetFooter>
                 </SheetContent>
             </Sheet>
 
             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[90vw]">
                     <DialogHeader>
                         <DialogTitle>Produk Rekomendasi</DialogTitle>
                         <DialogDescription>Produk Rekomendasi</DialogDescription>
@@ -379,9 +385,9 @@ const DashboardCashier = () => {
                                         </CardContent>
                                         <CardFooter className="gap-2">
                                             {/* <Button className="w-full" variant="outline" onClick={() => handleAddToCart(item)} > */}
-                                            {/* <Button className="w-full" variant="outline" onClick={() => { setOpenDialogCart(true); setSelectedProdukCart(item) }} >
+                                            <Button className="w-full" variant="outline" onClick={() => { setOpenDialogCart(true); setSelectedProdukCart(item) }} >
                                                 <ShoppingCart className="text-primary cursor-pointer" />
-                                            </Button> */}
+                                            </Button>
                                         </CardFooter>
                                     </Card>
                                 ))
@@ -394,8 +400,11 @@ const DashboardCashier = () => {
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button>Tutup</Button>
+                            <Button variant="outline">Tutup</Button>
                         </DialogClose>
+                        <Button onClick={handleNavigate}>
+                            Bayar Sekarang
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
