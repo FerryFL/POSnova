@@ -11,7 +11,7 @@ import { Badge } from "~/components/ui/badge"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
 import { useForm } from "react-hook-form"
-import { productFormSchema, type ProductFormSchema } from "~/forms/product"
+import { productFormSchema, type ProductFormSchema, type ProductFormWithVariants } from "~/forms/product"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ProductForm } from "~/components/shared/product/ProductForm"
 import { toast } from "sonner"
@@ -21,6 +21,12 @@ interface ImageState {
     current: string | null
     original: string | null
     toDelete: string[]
+}
+
+interface NewVariant {
+    tempId: string;
+    nama: string;
+    status: boolean;
 }
 
 export const ProductPage: NextPageWithLayout = () => {
@@ -33,6 +39,10 @@ export const ProductPage: NextPageWithLayout = () => {
         original: null,
         toDelete: []
     })
+
+    // State for managing new variants
+    const [addNewVariants, setAddNewVariants] = useState<NewVariant[]>([])
+    const [editNewVariants, setEditNewVariants] = useState<NewVariant[]>([])
 
     const [idToEdit, setIdToEdit] = useState<string | null>(null)
     const [idToDelete, setIdToDelete] = useState<string | null>(null)
@@ -47,26 +57,39 @@ export const ProductPage: NextPageWithLayout = () => {
 
     const editForm = useForm<ProductFormSchema>({
         resolver: zodResolver(productFormSchema),
+        defaultValues: {
+            status: true,
+            varianIds: []
+        }
     })
 
     const { data: produkData, isLoading: produkIsLoading } = api.produk.lihatProduk.useQuery({})
-    const { mutate: tambahProduk, isPending: tambahProdukIsPending } = api.produk.tambahProduk.useMutation({
+    
+    const { mutate: tambahProduk, isPending: tambahProdukIsPending } = api.produk.tambahProdukWithVariants.useMutation({
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
             toast.success("Data Produk Berhasil Ditambahkan!")
             resetImageState()
+            setAddNewVariants([])
             addForm.reset()
             setAddOpen(false)
+        },
+        onError: (error) => {
+            toast.error("Gagal menambahkan produk: " + error.message)
         }
     })
 
-    const { mutate: ubahProduk, isPending: ubahProdukIsPending } = api.produk.ubahProduk.useMutation({
+    const { mutate: ubahProduk, isPending: ubahProdukIsPending } = api.produk.ubahProdukWithVariants.useMutation({
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
             toast.success("Data Produk Berhasil Diubah!")
             resetImageState()
+            setEditNewVariants([])
             editForm.reset()
             setEditOpen(false)
+        },
+        onError: (error) => {
+            toast.error("Gagal mengubah produk: " + error.message)
         }
     })
 
@@ -74,13 +97,14 @@ export const ProductPage: NextPageWithLayout = () => {
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
             setIdToDelete(null)
-            toast.success("Produk Produk Berhasil Dihapus!")
+            toast.success("Produk Berhasil Dihapus!")
+        },
+        onError: (error) => {
+            toast.error("Gagal menghapus produk: " + error.message)
         }
     })
 
     const { mutateAsync: hapusGambarProdukMultiple } = api.produk.hapusGambarProdukMultiple.useMutation()
-
-    // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
 
     const cleanupImages = async (imagesToDelete: string[]) => {
         if (imagesToDelete.length > 0) {
@@ -108,7 +132,7 @@ export const ProductPage: NextPageWithLayout = () => {
         }))
     }
 
-    const handleSubmit = async (data: ProductFormSchema) => {
+    const handleSubmit = async (data: ProductFormWithVariants) => {
         if (!imageState.current) {
             toast.error("Masukan Gambar Produk!")
             return
@@ -116,6 +140,7 @@ export const ProductPage: NextPageWithLayout = () => {
 
         await cleanupImages(imageState.toDelete)
 
+        // Prepare data for submission - data.newVariants comes from ProductForm
         tambahProduk({
             nama: data.nama,
             harga: data.harga,
@@ -123,12 +148,32 @@ export const ProductPage: NextPageWithLayout = () => {
             status: data.status,
             kategoriId: data.kategoriId,
             UMKMId: data.UMKMId,
-            varianIds: data.varianIds,
-            gambar: imageState.current
+            varianIds: data.varianIds ?? [],
+            gambar: imageState.current,
+            newVariants: data.newVariants.map(v => ({
+                nama: v.nama,
+                status: v.status
+            })),
+            existingVariantUpdates: data.existingVariantUpdates?.map(v => ({
+                id: v.id,
+                nama: v.nama,
+                status: v.status,
+                isDeleted: v.isDeleted
+            })) ?? []
         })
     }
 
-    const handleEdit = (data: { id: string, nama: string, harga: number, stok: number, status: boolean, kategoriId: string, UMKMId: string, varianIds: string[], gambar: string }) => {
+    const handleEdit = (data: { 
+        id: string, 
+        nama: string, 
+        harga: number, 
+        stok: number, 
+        status: boolean, 
+        kategoriId: string, 
+        UMKMId: string, 
+        varianIds: string[], 
+        gambar: string 
+    }) => {
         setEditOpen(true)
         setIdToEdit(data.id)
 
@@ -137,6 +182,8 @@ export const ProductPage: NextPageWithLayout = () => {
             original: data.gambar,
             toDelete: []
         })
+
+        setEditNewVariants([]) // Reset new variants for edit
 
         editForm.reset({
             nama: data.nama,
@@ -149,7 +196,7 @@ export const ProductPage: NextPageWithLayout = () => {
         })
     }
 
-    const handleSubmitEdit = async (data: ProductFormSchema) => {
+    const handleSubmitEdit = async (data: ProductFormWithVariants) => {
         if (!idToEdit) return
 
         if (!imageState.current) {
@@ -167,8 +214,18 @@ export const ProductPage: NextPageWithLayout = () => {
             status: data.status,
             kategoriId: data.kategoriId,
             UMKMId: data.UMKMId,
-            varianIds: data.varianIds,
-            gambar: imageState.current
+            varianIds: data.varianIds ?? [],
+            gambar: imageState.current,
+            newVariants: data.newVariants.map(v => ({
+                nama: v.nama,
+                status: v.status
+            })),
+            existingVariantUpdates: data.existingVariantUpdates?.map(v => ({
+                id: v.id,
+                nama: v.nama,
+                status: v.status,
+                isDeleted: v.isDeleted
+            })) ?? []
         })
     }
 
@@ -189,6 +246,7 @@ export const ProductPage: NextPageWithLayout = () => {
             const allImagesToDelete = imageState.current ? [...imageState.toDelete, imageState.current] : imageState.toDelete
             await cleanupImages(allImagesToDelete)
             resetImageState()
+            setAddNewVariants([])
             addForm.reset()
         }
         setAddOpen(open)
@@ -205,6 +263,7 @@ export const ProductPage: NextPageWithLayout = () => {
             const filteredImagesToDelete = imagesToDelete.filter(img => img !== imageState.original)
             await cleanupImages(filteredImagesToDelete)
             resetImageState()
+            setEditNewVariants([])
             editForm.reset()
         }
         setEditOpen(open)
@@ -213,22 +272,34 @@ export const ProductPage: NextPageWithLayout = () => {
     return (
         <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen Produk</h1>
+            
             <Dialog open={addOpen} onOpenChange={handleAddDialogClose}>
                 <DialogTrigger asChild>
                     <Button variant="outline"><Plus />Tambah Produk</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-semibold">Tambah Produk</DialogTitle>
                     </DialogHeader>
                     <Form {...addForm}>
-                        <ProductForm onSubmit={handleSubmit} onChangeImage={handleImageChange} imageUrl={imageState.current} />
+                        <ProductForm 
+                            onSubmit={handleSubmit} 
+                            onChangeImage={handleImageChange} 
+                            imageUrl={imageState.current}
+                            newVariants={addNewVariants}
+                            onNewVariantsChange={setAddNewVariants}
+                            isEditMode={false}
+                        />
                     </Form>
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline">Tutup</Button>
                         </DialogClose>
-                        <Button type="submit" onClick={addForm.handleSubmit(handleSubmit)}>
+                        <Button 
+                            type="submit" 
+                            form="product-form"
+                            disabled={tambahProdukIsPending}
+                        >
                             {tambahProdukIsPending && <LoaderCircle className="animate-spin" />}
                             Simpan
                         </Button>
@@ -237,18 +308,34 @@ export const ProductPage: NextPageWithLayout = () => {
             </Dialog>
 
             <Dialog open={editOpen} onOpenChange={handleEditDialogClose}>
-                <DialogContent>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-semibold">Ubah Produk</DialogTitle>
                     </DialogHeader>
                     <Form {...editForm}>
-                        <ProductForm onSubmit={handleSubmitEdit} onChangeImage={handleImageChange} imageUrl={imageState.current} />
+                        <ProductForm 
+                            onSubmit={handleSubmitEdit} 
+                            onChangeImage={handleImageChange} 
+                            imageUrl={imageState.current}
+                            newVariants={editNewVariants}
+                            onNewVariantsChange={setEditNewVariants}
+                            existingVariants={produkData?.find(p => p.id === idToEdit)?.ProdukVarian.map(pv => ({
+                                id: pv.varian.id,
+                                nama: pv.varian.nama,
+                                status: pv.varian.status
+                            })) ?? []}
+                            isEditMode={true}
+                        />
                     </Form>
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline">Tutup</Button>
                         </DialogClose>
-                        <Button type="submit" onClick={editForm.handleSubmit(handleSubmitEdit)}>
+                        <Button 
+                            type="submit" 
+                            form="product-form"
+                            disabled={ubahProdukIsPending}
+                        >
                             {ubahProdukIsPending && <LoaderCircle className="animate-spin" />}
                             Simpan
                         </Button>
@@ -268,7 +355,9 @@ export const ProductPage: NextPageWithLayout = () => {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hapus Produk</AlertDialogTitle>
                     </AlertDialogHeader>
-                    <AlertDialogDescription>Apakah yakin anda akan menghapus produk ini? </AlertDialogDescription>
+                    <AlertDialogDescription>
+                        Apakah yakin anda akan menghapus produk ini? Varian yang terkait juga akan ikut terhapus.
+                    </AlertDialogDescription>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Tutup</AlertDialogCancel>
                         <Button disabled={hapusProdukIsPending} variant="destructive" onClick={handleSubmitDelete}>
@@ -309,12 +398,12 @@ export const ProductPage: NextPageWithLayout = () => {
                                                 </div>
                                             )}
                                         </div>
-
                                     </CardHeader>
                                     <CardContent className="flex flex-col gap-2.5 h-full">
-
                                         <div className="flex justify-between">
-                                            <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
+                                            <Badge variant={item.status ? "success" : "destructive"}>
+                                                {item.status ? "Aktif" : "Inaktif"}
+                                            </Badge>
                                             <p className="text-sm text-destructive">{item.stok} Tersisa</p>
                                         </div>
                                         <div className="text-lg font-medium w-full ">
@@ -329,7 +418,11 @@ export const ProductPage: NextPageWithLayout = () => {
                                         <div className="flex gap-2 flex-wrap grow h-fit">
                                             {
                                                 item.ProdukVarian.map((varian) =>
-                                                    <Badge key={varian.varian.id} variant="outline" className="h-6 font-semibold max-w-full">
+                                                    <Badge 
+                                                        key={varian.varian.id} 
+                                                        variant={varian.varian.status ? "outline" : "secondary"} 
+                                                        className="h-6 font-semibold max-w-full"
+                                                    >
                                                         <span className="line-clamp-1 break-words">{varian.varian.nama}</span>
                                                     </Badge>
                                                 )
@@ -337,8 +430,11 @@ export const ProductPage: NextPageWithLayout = () => {
                                         </div>
                                     </CardContent>
                                     <CardFooter className="gap-2">
-                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit(
-                                            {
+                                        <Button 
+                                            className="flex-1" 
+                                            variant="secondary" 
+                                            size="icon" 
+                                            onClick={() => handleEdit({
                                                 id: item.id,
                                                 nama: item.nama,
                                                 harga: item.harga,
@@ -348,11 +444,16 @@ export const ProductPage: NextPageWithLayout = () => {
                                                 UMKMId: item.UMKM?.id ?? "",
                                                 varianIds: item.ProdukVarian.map((pv) => pv.varian.id),
                                                 gambar: item.gambar
-                                            }
-                                        )}>
+                                            })}
+                                        >
                                             <Pencil />
                                         </Button>
-                                        <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>
+                                        <Button 
+                                            className="flex-1" 
+                                            variant="destructive" 
+                                            size="icon" 
+                                            onClick={() => handleDelete(item.id)}
+                                        >
                                             <Trash />
                                         </Button>
                                     </CardFooter>
