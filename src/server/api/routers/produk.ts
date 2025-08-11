@@ -333,28 +333,40 @@ export const produkRouter = createTRPCRouter({
         }),
 
     hapusProduk: publicProcedure
-        .input(
-            z.object({
-                id: z.string()
-            })
-        )
+        .input(z.object({ id: z.string() }))
         .mutation(async ({ ctx, input }) => {
-            const { db } = ctx
+          const { db } = ctx
 
-            // First delete variant relations
-            await db.produkVarian.deleteMany({
-                where: {
-                    produkId: input.id
-                }
-            })
+          // Find all variant IDs linked to this product
+          const linkedVariants = await db.produkVarian.findMany({
+            where: { produkId: input.id },
+            select: { varianId: true }
+          })
+          const variantIds = linkedVariants.map(v => v.varianId)
 
-            // Then delete the product
-            await db.produk.delete({
-                where: {
-                    id: input.id
-                }
+          // Delete product–variant relations
+          await db.produkVarian.deleteMany({
+            where: { produkId: input.id }
+          })
+
+          // Delete variants that are not linked to any other product
+          for (const varianId of variantIds) {
+            const count = await db.produkVarian.count({
+              where: { varianId }
             })
+            if (count === 0) {
+              await db.varian.delete({
+                where: { id: varianId }
+              })
+            }
+          }
+
+          // Delete the product itself
+          await db.produk.delete({
+            where: { id: input.id }
+          })
         }),
+
 
     tambahGambarProdukSignedUrl: publicProcedure
         .mutation(async () => {
