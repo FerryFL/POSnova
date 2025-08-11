@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useState, type ChangeEvent, useCallback } from "react";
 import { useFormContext } from "react-hook-form";
 import { Checkbox } from "~/components/ui/checkbox";
+import { Switch } from "~/components/ui/switch";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -484,7 +485,7 @@ export const ProductForm = ({
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 {/* Status toggle checkbox */}
-                                                <Checkbox
+                                                <Switch
                                                     checked={currentStatus}
                                                     onCheckedChange={() => handleToggleExistingVariantStatus(value)}
                                                 />
