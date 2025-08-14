@@ -23,7 +23,7 @@ interface ItemState {
     plusProduk: (id: string, varianId?: string) => void
     minusProduk: (id: string, varianId?: string) => void
     removeProduk: (id: string, varianId?: string) => void
-    clear: () => void
+    clearCart: () => void
 }
 
 export const useCartStore = create<ItemState>()((set, get) => ({
@@ -122,5 +122,5 @@ export const useCartStore = create<ItemState>()((set, get) => ({
         }))
     },
 
-    clear: () => set({ items: [], jumlahProduk: 0, totalProduk: 0 })
+    clearCart: () => set({ items: [], jumlahProduk: 0, totalProduk: 0 })
 }))

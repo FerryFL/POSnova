@@ -2,7 +2,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { Minus, Plus, ShoppingCart, Tags, Trash } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { PublicLayout } from "~/components/layouts/PublicLayout";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -15,8 +15,12 @@ import { Skeleton } from "~/components/ui/skeleton";
 import type { AppRouter } from "~/server/api/root";
 import { useCartStore } from "~/store/cart";
 import { api } from "~/utils/api";
+import type { NextPageWithLayout } from "../_app";
 
-const DashboardCashier = () => {
+export const DashboardCashier: NextPageWithLayout = () => {
+
+    const router = useRouter()
+
     type Produk = inferRouterOutputs<AppRouter>["produk"]["lihatProduk"][number]
     type ProdukKeranjang = Omit<Produk, "ProdukVarian"> & {
         jumlah: number
@@ -25,8 +29,6 @@ const DashboardCashier = () => {
     }
 
     const { addToCart, items, jumlahProduk, minusProduk, plusProduk, removeProduk, totalProduk } = useCartStore()
-
-    const router = useRouter()
 
     const [openDialog, setOpenDialog] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
@@ -61,8 +63,8 @@ const DashboardCashier = () => {
         return a;
     }, 0) ?? 0;
 
-    const handleNavigate = async () => {
-        await router.push("/payment")
+    const handleNavigate = () => {
+        void router.push("/payment")
     }
 
     const handleClick = (kategoriId: string, nama: string) => {
@@ -515,8 +517,9 @@ const DashboardCashier = () => {
     );
 
 }
-export default DashboardCashier
 
-DashboardCashier.getLayout = (page: React.ReactNode) => {
+DashboardCashier.getLayout = (page: ReactElement) => {
     return <PublicLayout>{page}</PublicLayout>;
 }
+
+export default DashboardCashier

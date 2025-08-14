@@ -55,8 +55,9 @@ model Produk {
     kategoriId   String
     ProdukVarian ProdukVarian[]
 
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
-    UMKMId String?
+    UMKM          UMKM?           @relation(fields: [UMKMId], references: [id])
+    UMKMId        String?
+    TransaksiItem TransaksiItem[]
 }
 
 model ProdukVarian {
@@ -79,4 +80,32 @@ model UMKM {
 
     Kategori Kategori[]
     Produk   Produk[]
+}
+
+model Transaksi {
+    id               String   @id @default(uuid())
+    tanggalTransaksi DateTime @default(now())
+    totalHarga       Int
+    totalProduk      Int
+
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @default(now()) @updatedAt
+    transaksiItem TransaksiItem[]
+}
+
+model TransaksiItem {
+    id          String    @id @default(uuid())
+    transaksi   Transaksi @relation(fields: [transaksiId], references: [id])
+    transaksiId String
+
+    produk   Produk @relation(fields: [produkId], references: [id])
+    produkId String
+
+    jumlah      Int
+    hargaSatuan Int
+    hargaTotal  Int
+
+    varianId   String?
+    varianNama String?
+    createdAt  DateTime @default(now())
 }

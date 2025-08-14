@@ -1,12 +1,38 @@
-import type { ReactElement } from "react"
 import type { NextPageWithLayout } from "../_app"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
 import { Button } from "~/components/ui/button"
 import { useCartStore } from "~/store/cart"
+import { api } from "~/utils/api"
+import { toast } from "sonner"
+import type { ReactElement } from "react"
 
 export const PaymentPage: NextPageWithLayout = () => {
 
-    const { items, jumlahProduk, totalProduk } = useCartStore()
+    const { items, jumlahProduk, totalProduk, clearCart } = useCartStore()
+    const tambahTransaksi = api.transaksi.tambahTransaksi.useMutation()
+
+    const handleBayar = () => {
+        tambahTransaksi.mutate(
+            {
+                items: items.map((item) => ({
+                    produkId: item.id,
+                    jumlah: item.jumlah,
+                    hargaSatuan: item.harga,
+                    hargaTotal: item.harga * item.jumlah,
+                    varianId: item.varianId,
+                    varianNama: item.varianNama,
+                })),
+                totalProduk: jumlahProduk,
+                totalHarga: totalProduk,
+            },
+            {
+                onSuccess: () => {
+                    clearCart();
+                    toast.success("Transaksi berhasil!");
+                },
+            }
+        );
+    };
 
     return (
         <div>
@@ -21,7 +47,7 @@ export const PaymentPage: NextPageWithLayout = () => {
 
             <p>Total Produk: {jumlahProduk}</p>
             <p>Total Harga: Rp {totalProduk}</p>
-            <Button>Bayar</Button>
+            <Button disabled={items.length === 0} onClick={handleBayar}>Bayar</Button>
         </div>
     )
 }
