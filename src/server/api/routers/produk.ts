@@ -1,13 +1,25 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { supabaseAccess } from "~/server/supabase-access";
+import { Bucket, BucketPath } from "~/server/bucket";
+import { TRPCError } from "@trpc/server";
+import type { Prisma } from "@prisma/client";
 
 export const produkRouter = createTRPCRouter({
     lihatProduk: publicProcedure
-        .input(z.object({}).optional())
-        .query(async ({ ctx }) => {
+        .input(z.object({
+            kategoriId: z.string().optional()
+        }).optional())
+        .query(async ({ ctx, input }) => {
             const { db } = ctx
 
+            const whereClause: Prisma.ProdukWhereInput = {}
+            if (input?.kategoriId && input.kategoriId !== "Semua") {
+                whereClause.kategoriId = input.kategoriId
+            }
+
             const produk = await db.produk.findMany({
+                where: whereClause,
                 select: {
                     id: true,
                     nama: true,
@@ -51,13 +63,13 @@ export const produkRouter = createTRPCRouter({
         .input(
             z.object({
                 nama: z.string(),
-                harga: z.number(),
-                stok: z.number(),
+                harga: z.coerce.number(),
+                stok: z.coerce.number(),
                 status: z.boolean(),
                 kategoriId: z.string(),
                 UMKMId: z.string(),
                 varianIds: z.array(z.string()).optional(),
-                gambar: z.string(),
+                gambar: z.string().url(),
             })
         )
         .mutation(async ({ ctx, input }) => {
@@ -87,13 +99,13 @@ export const produkRouter = createTRPCRouter({
         .input(
             z.object({
                 nama: z.string(),
-                harga: z.number(),
-                stok: z.number(),
+                harga: z.coerce.number(),
+                stok: z.coerce.number(),
                 status: z.boolean(),
                 kategoriId: z.string(),
                 UMKMId: z.string(),
                 varianIds: z.array(z.string()).optional(),
-                gambar: z.string(),
+                gambar: z.string().url(),
                 newVariants: z.array(z.object({
                     nama: z.string(),
                     status: z.boolean()
@@ -185,13 +197,13 @@ export const produkRouter = createTRPCRouter({
             z.object({
                 id: z.string(),
                 nama: z.string(),
-                harga: z.number(),
-                stok: z.number(),
+                harga: z.coerce.number(),
+                stok: z.coerce.number(),
                 status: z.boolean(),
                 kategoriId: z.string(),
                 UMKMId: z.string(),
                 varianIds: z.array(z.string()).optional(),
-                gambar: z.string(),
+                gambar: z.string().url(),
             })
         )
         .mutation(async ({ ctx, input }) => {
@@ -231,13 +243,13 @@ export const produkRouter = createTRPCRouter({
             z.object({
                 id: z.string(),
                 nama: z.string(),
-                harga: z.number(),
-                stok: z.number(),
+                harga: z.coerce.number(),
+                stok: z.coerce.number(),
                 status: z.boolean(),
                 kategoriId: z.string(),
                 UMKMId: z.string(),
                 varianIds: z.array(z.string()).optional(),
-                gambar: z.string(),
+                gambar: z.string().url(),
                 newVariants: z.array(z.object({
                     nama: z.string(),
                     status: z.boolean()
@@ -332,61 +344,110 @@ export const produkRouter = createTRPCRouter({
             })
         }),
 
-    hapusProduk: publicProcedure
-        .input(z.object({ id: z.string() }))
-        .mutation(async ({ ctx, input }) => {
-          const { db } = ctx
-
-          // Find all variant IDs linked to this product
-          const linkedVariants = await db.produkVarian.findMany({
-            where: { produkId: input.id },
-            select: { varianId: true }
-          })
-          const variantIds = linkedVariants.map(v => v.varianId)
-
-          // Delete product–variant relations
-          await db.produkVarian.deleteMany({
-            where: { produkId: input.id }
-          })
-
-          // Delete variants that are not linked to any other product
-          for (const varianId of variantIds) {
-            const count = await db.produkVarian.count({
-              where: { varianId }
-            })
-            if (count === 0) {
-              await db.varian.delete({
-                where: { id: varianId }
-              })
-            }
-          }
-
-          // Delete the product itself
-          await db.produk.delete({
-            where: { id: input.id }
-          })
-        }),
-
-
     tambahGambarProdukSignedUrl: publicProcedure
         .mutation(async () => {
-            // Your existing signed URL logic here
-            // This should return { path: string, token: string }
-            return {
-                path: `products/${Date.now()}_${Math.random()}.jpg`,
-                token: "your-signed-token-here"
+            const { data, error } = await supabaseAccess.storage.from(Bucket.ProductImages)
+                .createSignedUploadUrl(`${Date.now()}.jpeg`)
+
+            if (error) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: error.message
+                })
+            }
+
+            return data
+        }),
+
+    hapusGambarProduk: publicProcedure
+        .input(
+            z.object({
+                gambar: z.string().url()
+            })
+        )
+        .mutation(async ({ input }) => {
+            const imgUrl = input.gambar
+            const pathPrefix = BucketPath.ProductImages
+            const fileName = imgUrl.replace(pathPrefix, "")
+            const { error } = await supabaseAccess.storage.from(Bucket.ProductImages).remove([fileName])
+            if (error) {
+                console.error("Error removing image:", error)
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Gagal Menghapus gambar produk"
+                })
             }
         }),
 
     hapusGambarProdukMultiple: publicProcedure
         .input(
             z.object({
-                gambar: z.array(z.string())
+                gambar: z.array(z.string().url())
             })
         )
         .mutation(async ({ input }) => {
-            // Your existing image deletion logic here
-            // This should handle deleting multiple images from storage
-            console.log("Deleting images:", input.gambar)
-        })
+            const pathPrefix = BucketPath.ProductImages
+            const fileNames = input.gambar.map(imgUrl => imgUrl.replace(pathPrefix, ""))
+            const { error } = await supabaseAccess.storage.from(Bucket.ProductImages).remove(fileNames)
+            if (error) {
+                console.error("Error removing images:", error)
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Gagal Menghapus gambar produk"
+                })
+            }
+        }),
+
+    hapusProduk: publicProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const { db } = ctx
+
+            const produk = await db.produk.findUnique({
+                where: { id: input.id },
+                select: { gambar: true }
+            })
+
+            if (!produk) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Produk tidak ditemukan"
+                })
+            }
+
+            const linkedVariants = await db.produkVarian.findMany({
+                where: { produkId: input.id },
+                select: { varianId: true }
+            })
+            const variantIds = linkedVariants.map(v => v.varianId)
+
+            await db.produkVarian.deleteMany({
+                where: { produkId: input.id }
+            })
+
+            for (const varianId of variantIds) {
+                const count = await db.produkVarian.count({
+                    where: { varianId }
+                })
+                if (count === 0) {
+                    await db.varian.delete({
+                        where: { id: varianId }
+                    })
+                }
+            }
+
+            const imgUrl = produk.gambar
+            const pathPrefix = BucketPath.ProductImages
+            const fileName = imgUrl.replace(pathPrefix, "")
+
+            const { error } = await supabaseAccess.storage.from(Bucket.ProductImages).remove([fileName])
+
+            if (error) {
+                console.error("Error removing image:", error)
+            }
+
+            await db.produk.delete({
+                where: { id: input.id }
+            })
+        }),
 })
