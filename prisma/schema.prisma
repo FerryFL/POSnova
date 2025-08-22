@@ -38,34 +38,34 @@ model Varian {
     createdAt    DateTime       @default(now())
     status       Boolean        @default(false)
     updatedAt    DateTime       @default(now()) @updatedAt
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
-    UMKMId String?
+    UMKM         UMKM?          @relation(fields: [UMKMId], references: [id])
+    UMKMId       String?
     ProdukVarian ProdukVarian[]
 }
 
 model Produk {
-  id           String         @id @default(uuid())
-  nama         String
-  harga        Int
-  gambar       String
-  kategori     Kategori       @relation(fields: [kategoriId], references: [id])
-  stok         Int            @default(0)
-  status       Boolean        @default(false)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @default(now()) @updatedAt
+    id           String         @id @default(uuid())
+    nama         String
+    harga        Int
+    gambar       String
+    kategori     Kategori       @relation(fields: [kategoriId], references: [id])
+    stok         Int            @default(0)
+    status       Boolean        @default(false)
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @default(now()) @updatedAt
 
-  kategoriId   String
-  ProdukVarian ProdukVarian[]
+    kategoriId   String
+    ProdukVarian ProdukVarian[]
 
-  UMKM         UMKM?          @relation(fields: [UMKMId], references: [id])
-  UMKMId       String?
+    UMKM         UMKM?          @relation(fields: [UMKMId], references: [id])
+    UMKMId       String?
 }
 
 model ProdukVarian {
-    produk   Produk @relation(fields: [produkId], references: [id])
+    produk   Produk @relation(fields: [produkId], references: [id], onDelete: Cascade)
     produkId String
 
-    varian   Varian @relation(fields: [varianId], references: [id])
+    varian   Varian @relation(fields: [varianId], references: [id], onDelete: Cascade)
     varianId String
 
     @@id([produkId, varianId])

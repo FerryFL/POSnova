@@ -2,7 +2,6 @@ import { LoaderCircle, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState, type ChangeEvent, useCallback } from "react";
 import { useFormContext } from "react-hook-form";
-import { Checkbox } from "~/components/ui/checkbox";
 import { Switch } from "~/components/ui/switch";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
@@ -484,12 +483,14 @@ export const ProductForm = ({
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                {/* Status toggle checkbox */}
-                                                <Switch
-                                                    checked={currentStatus}
-                                                    onCheckedChange={() => handleToggleExistingVariantStatus(value)}
-                                                />
-                                                <span className="text-xs text-muted-foreground">Aktif</span>
+                                                {/* Status toggle switch */}
+                                                <div className="flex items-center gap-2">
+                                                    <Switch
+                                                        checked={currentStatus}
+                                                        onCheckedChange={() => handleToggleExistingVariantStatus(value)}
+                                                    />
+                                                    <span className="text-xs text-muted-foreground">Aktif</span>
+                                                </div>
                                                 {/* Delete button */}
                                                 <Button
                                                     type="button"
@@ -566,10 +567,13 @@ export const ProductForm = ({
                                             </Badge>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <Checkbox
-                                                checked={variant.status}
-                                                onCheckedChange={() => handleToggleNewVariantStatus(variant.tempId)}
-                                            />
+                                            <div className="flex items-center gap-2">
+                                                <Switch
+                                                    checked={variant.status}
+                                                    onCheckedChange={() => handleToggleNewVariantStatus(variant.tempId)}
+                                                />
+                                                <span className="text-xs text-muted-foreground">Aktif</span>
+                                            </div>
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -614,18 +618,24 @@ export const ProductForm = ({
                 </CardContent>
             </Card>
 
+            {/* Product Status Switch */}
             <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-2">
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                            <FormLabel className="text-base">Status Produk</FormLabel>
+                            <div className="text-sm text-muted-foreground">
+                                Aktifkan produk untuk menampilkannya di toko
+                            </div>
+                        </div>
                         <FormControl>
-                            <Checkbox
+                            <Switch
                                 checked={field.value ?? false}
                                 onCheckedChange={field.onChange}
                             />
                         </FormControl>
-                        <FormLabel>Aktif</FormLabel>
                         <FormMessage />
                     </FormItem>
                 )}
