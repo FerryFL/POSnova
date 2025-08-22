@@ -1,10 +1,7 @@
-
-import type { inferRouterOutputs } from '@trpc/server'
 import { toast } from 'sonner'
 import { create } from 'zustand'
-import type { AppRouter } from '~/server/api/root'
+import type { Produk } from '~/utils/api'
 
-type Produk = inferRouterOutputs<AppRouter>["produk"]["lihatProduk"][number]
 type ProdukKeranjang = Omit<Produk, "ProdukVarian"> & {
     jumlah: number
     varianId?: string

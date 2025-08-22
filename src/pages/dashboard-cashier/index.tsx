@@ -1,4 +1,3 @@
-import type { inferRouterOutputs } from "@trpc/server";
 import { Minus, Plus, ShoppingCart, Tags, Trash } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -12,16 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { Separator } from "~/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "~/components/ui/sheet";
 import { Skeleton } from "~/components/ui/skeleton";
-import type { AppRouter } from "~/server/api/root";
 import { useCartStore } from "~/store/cart";
-import { api } from "~/utils/api";
+import { api, type Produk } from "~/utils/api";
 import type { NextPageWithLayout } from "../_app";
 
 export const DashboardCashier: NextPageWithLayout = () => {
 
     const router = useRouter()
 
-    type Produk = inferRouterOutputs<AppRouter>["produk"]["lihatProduk"][number]
     type ProdukKeranjang = Omit<Produk, "ProdukVarian"> & {
         jumlah: number
         varianId?: string

@@ -9,6 +9,7 @@ export const transaksiRouter = createTRPCRouter({
             include: {
                 transaksiItem: {
                     select: {
+                        id: true,
                         varianNama: true,
                         hargaSatuan: true,
                         jumlah: true,

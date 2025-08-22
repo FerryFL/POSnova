@@ -66,3 +66,9 @@ export type RouterInputs = inferRouterInputs<AppRouter>;
  * @example type HelloOutput = RouterOutputs['example']['hello']
  */
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
+
+type LihatTransaksiOutput = RouterOutputs["transaksi"]["lihatTransaksi"]
+export type Transaksi = LihatTransaksiOutput[number]
+
+type ProdukOutput = RouterOutputs["produk"]["lihatProduk"]
+export type Produk = ProdukOutput[number]
