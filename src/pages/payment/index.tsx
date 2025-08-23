@@ -38,8 +38,8 @@ export const PaymentPage: NextPageWithLayout = () => {
         <div>
             <h1 className="text-xl font-bold">Halaman Pembayaran</h1>
             <ul className="mb-4">
-                {items.map((item, index) => (
-                    <li key={index}>
+                {items.map((item) => (
+                    <li key={`${item.id}-${item.varianId ?? "no-varian"}`}>
                         {item.nama} | {item.varianNama}— {item.jumlah} x {item.harga}
                     </li>
                 ))}

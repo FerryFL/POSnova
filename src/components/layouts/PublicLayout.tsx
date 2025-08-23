@@ -1,4 +1,4 @@
-import { Archive, Building, CopyPlus, Home, Moon, Package, Plus, ReceiptText, Sun } from "lucide-react";
+import { Archive, Building, CopyPlus, HandCoins, Home, Moon, Package, Plus, ReceiptText, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarSeparator, SidebarTrigger } from "~/components/ui/sidebar";
@@ -31,6 +31,11 @@ const item = [
         title: "Varian",
         url: "/variant",
         icon: CopyPlus
+    },
+    {
+        title: "Payment",
+        url: "/payment",
+        icon: HandCoins
     },
     {
         title: "Transaksi",

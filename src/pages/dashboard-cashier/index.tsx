@@ -300,7 +300,7 @@ export const DashboardCashier: NextPageWithLayout = () => {
                     <div className="space-y-2 p-3">
                         {
                             items.map((item) =>
-                                <div key={item.id} className="flex items-center justify-between bg-gray-100 text-black p-3 rounded-lg">
+                                <div key={`${item.id}-${item.varianId ?? "no-varian"}`} className="flex items-center justify-between bg-gray-100 text-black p-3 rounded-lg">
                                     <div className="flex flex-col">
                                         <span>
                                             {item.nama}
