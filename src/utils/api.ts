@@ -70,5 +70,8 @@ export type RouterOutputs = inferRouterOutputs<AppRouter>;
 type LihatTransaksiOutput = RouterOutputs["transaksi"]["lihatTransaksi"]
 export type Transaksi = LihatTransaksiOutput[number]
 
-type ProdukOutput = RouterOutputs["produk"]["lihatProduk"]
-export type Produk = ProdukOutput[number]
+type LihatProdukOutput = RouterOutputs["produk"]["lihatProduk"]
+export type Produk = LihatProdukOutput[number]
+
+type LihatKategoriOutput = RouterOutputs["kategori"]["lihatKategori"]
+export type Kategori = LihatKategoriOutput[number]

@@ -24,6 +24,7 @@ export const TransactionPage: NextPageWithLayout = () => {
             <h1 className="text-xl font-bold">Manajemen Transaksi</h1>
             <Button variant="outline" onClick={handleNavigate}><Plus />Tambah Transaksi</Button>
             <Card className="p-4">
+                <h1>Data Transaksi</h1>
                 <DataTable columns={columns} data={lihatTransaksi.data ?? []} />
             </Card>
         </div>

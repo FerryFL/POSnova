@@ -1,12 +1,7 @@
 import { toast } from 'sonner'
 import { create } from 'zustand'
+import type { ProdukKeranjang } from '~/types/cart'
 import type { Produk } from '~/utils/api'
-
-type ProdukKeranjang = Omit<Produk, "ProdukVarian"> & {
-    jumlah: number
-    varianId?: string
-    varianNama?: string
-}
 
 interface ItemState {
     items: ProdukKeranjang[]

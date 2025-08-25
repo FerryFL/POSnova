@@ -1,8 +1,9 @@
-import { Eye, ReceiptText, Tag } from "lucide-react"
+import { Eye, Package, ReceiptText, Tag } from "lucide-react"
 import { useState } from "react"
 import { Button } from "~/components/ui/button"
 import { Card } from "~/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+import { Separator } from "~/components/ui/separator"
 import type { Transaksi } from "~/utils/api"
 
 type DetailTransaksiDialogProps = {
@@ -30,23 +31,37 @@ export const DetailTransaksiDialog = (props: DetailTransaksiDialogProps) => {
                         <DialogDescription>Lihat rincian produk dalam transaksi ini</DialogDescription>
                     </DialogHeader>
 
-                    <div className="space-y-2">
+                    <Separator />
+
+                    <div className="flex justify-between">
+                        <div className="flex items-center gap-1">
+                            <Package className="size-4" />
+                            <span className="text-sm">Total Produk</span>
+                        </div>
+                        <span className="text-sm font-semibold">{transaksi.totalProduk} Produk / Rp {transaksi.totalHarga.toLocaleString()}</span>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
                         {
                             transaksi.transaksiItem.map((item) => {
                                 return (
-                                    <Card key={item.id} className="p-3 rounded gap-2">
+                                    <Card key={item.id} className="p-3 rounded-lg gap-2">
                                         <div className="flex justify-between">
                                             <h1 className="text-md font-bold">{item.produk.nama}</h1>
-                                            <p>{item.jumlah}x</p>
+                                            <p className="text-sm">{item.jumlah}x</p>
                                         </div>
-                                        {
-                                            item.varianNama && (
-                                                <p className="text-sm">Varian: {item.varianNama}</p>
-                                            )
-                                        }
-                                        <div className="flex items-center gap-2">
-                                            <Tag className="size-4" />
-                                            <span className="text-sm">{item.hargaSatuan.toLocaleString()}/pcs</span>
+
+                                        <p className="text-sm">Varian: {item.varianNama ?? "-"}</p>
+
+                                        <div className="flex justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <Tag className="size-4" />
+                                                <span className="text-sm">{item.hargaSatuan.toLocaleString()}/pcs</span>
+                                            </div>
+
+                                            <p className="text-md font-semibold">Rp {(item.jumlah * item.hargaSatuan).toLocaleString()}</p>
                                         </div>
 
                                     </Card>
