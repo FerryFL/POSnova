@@ -48,7 +48,7 @@ const ProductCards = (props: ProductCardsProps) => {
                                             <Tags className="size-4 shrink-0" />
                                             {item.kategori.nama}
                                         </span>
-                                        <p className="text-lg font-bold text-green-700">Rp {item.harga}</p>
+                                        <p className="text-lg font-bold text-green-700">Rp {item.harga.toLocaleString()}</p>
                                     </div>
 
                                     <div className="flex gap-2 flex-wrap grow h-fit">

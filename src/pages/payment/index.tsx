@@ -5,11 +5,16 @@ import { useCartStore } from "~/store/cart"
 import { api } from "~/utils/api"
 import { toast } from "sonner"
 import type { ReactElement } from "react"
+import { HandCoins, ShoppingCart } from "lucide-react"
+import { Card } from "~/components/ui/card"
+import { Badge } from "~/components/ui/badge"
 
 export const PaymentPage: NextPageWithLayout = () => {
 
     const { items, jumlahProduk, totalProduk, clearCart } = useCartStore()
     const tambahTransaksi = api.transaksi.tambahTransaksi.useMutation()
+
+    const pajak = totalProduk / 10
 
     const handleBayar = () => {
         tambahTransaksi.mutate(
@@ -35,19 +40,71 @@ export const PaymentPage: NextPageWithLayout = () => {
     };
 
     return (
-        <div>
-            <h1 className="text-xl font-bold">Halaman Pembayaran</h1>
-            <ul className="mb-4">
-                {items.map((item) => (
-                    <li key={`${item.id}-${item.varianId ?? "no-varian"}`}>
-                        {item.nama} | {item.varianNama}— {item.jumlah} x {item.harga}
-                    </li>
-                ))}
-            </ul>
+        <div className="space-y-4 max-w-[500px] mx-auto">
+            <Card className="p-4 gap-2">
+                <div className="flex gap-2">
+                    <ShoppingCart />
+                    <h1 className="text-xl font-bold">Halaman Pembayaran</h1>
+                </div>
+                <p className="text-gray-500 text-sm">Konfirmasi pesanan sebelum melanjutkan pembayaran</p>
+            </Card>
 
-            <p>Total Produk: {jumlahProduk}</p>
-            <p>Total Harga: Rp {totalProduk}</p>
-            <Button disabled={items.length === 0} onClick={handleBayar}>Bayar</Button>
+            <Card className="p-4 gap-4">
+                <div className="flex justify-between">
+                    <h1 className="text-lg font-semibold">Pesanan Anda</h1>
+                    <Badge variant="success">{jumlahProduk} Produk</Badge>
+                </div>
+
+                <div className="space-y-2">
+                    {items.map((item, index) => (
+                        <div key={index} className="rounded-lg bg-secondary px-4 py-3 space-y-1">
+                            <div className="flex justify-between">
+                                <p className="text-sm">{item.nama}</p>
+                                <p className="text-sm">{item.jumlah}x Rp {item.harga.toLocaleString()}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="text-sm text-gray-500">{item.varianNama}</p>
+                                <p className="text-md font-semibold">Rp {(item.jumlah * item.harga).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+
+            <Card className="p-4 gap-4">
+                <div className="space-y-4">
+                    <h1 className="text-lg font-semibold">Ringkasan Pesanan</h1>
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <p className="text-sm ">Total Produk </p>
+                            <p className="text-sm ">{jumlahProduk} Produk</p>
+                        </div>
+                        <div className="flex justify-between">
+                            <p className="text-sm ">Subtotal </p>
+                            <p className="text-sm ">Rp {totalProduk.toLocaleString()}</p>
+                        </div>
+                        <div className="flex justify-between">
+                            <p className="text-sm ">Pajak (10%) </p>
+                            <p className="text-sm ">Rp {pajak.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="text-base">Total Harga </p>
+                        <p className="text-base font-semibold">Rp {(totalProduk + pajak).toLocaleString()}</p>
+                    </div>
+                </div>
+            </Card>
+
+            <div className="space-y-2">
+                <Button disabled={items.length === 0} onClick={handleBayar} className="w-full">
+                    <HandCoins />
+                    Bayar Sekarang
+                </Button>
+
+                <Button variant="destructive" onClick={clearCart} className="w-full">
+                    Hapus Keranjang
+                </Button>
+            </div>
         </div>
     )
 }

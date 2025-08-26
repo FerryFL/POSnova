@@ -16,7 +16,7 @@ const CategoryCards = (props: CategoryProps) => {
             <Card className="hover:bg-gray-100 hover:text-black transition-colors p-3 shrink-0 gap-0 min-w-32 max-w-52 text-center flex justify-center items-center cursor-pointer"
                 onClick={() => onSelect("Semua", "Semua")}>
                 <h2 className="text-base font-semibold">Semua</h2>
-                <p className="text-sm">{totalProducts} Products</p>
+                <p className="text-sm">{totalProducts} Produk</p>
             </Card>
 
             {

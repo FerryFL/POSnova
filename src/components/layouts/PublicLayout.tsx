@@ -33,7 +33,7 @@ const item = [
         icon: CopyPlus
     },
     {
-        title: "Payment",
+        title: "Pembayaran",
         url: "/payment",
         icon: HandCoins
     },

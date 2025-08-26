@@ -1,4 +1,4 @@
-import { ShoppingCart, Tags } from "lucide-react";
+import { HandCoins, Package, ShoppingCart, Tags } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -20,8 +20,8 @@ const DialogRekomendasiProduk = (props: DialogRekomendasiProdukProps) => {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[90vw]">
                 <DialogHeader>
-                    <DialogTitle>Produk Rekomendasi</DialogTitle>
-                    <DialogDescription>Produk Rekomendasi</DialogDescription>
+                    <DialogTitle className="flex gap-2 items-center"><Package />Produk Rekomendasi</DialogTitle>
+                    <DialogDescription>Lihat produk rekomendasi berdasarkan riwayat transaksi</DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                     {
@@ -52,7 +52,7 @@ const DialogRekomendasiProduk = (props: DialogRekomendasiProdukProps) => {
                                                 <Tags className="size-4 shrink-0" />
                                                 {item.kategori.nama}
                                             </span>
-                                            <p className="text-lg font-bold text-green-700">Rp {item.harga}</p>
+                                            <p className="text-lg font-bold text-green-700">Rp {item.harga.toLocaleString()}</p>
                                         </div>
 
                                         <div className="flex gap-2 flex-wrap grow h-fit">
@@ -85,6 +85,7 @@ const DialogRekomendasiProduk = (props: DialogRekomendasiProdukProps) => {
                         <Button variant="outline">Tutup</Button>
                     </DialogClose>
                     <Button onClick={onNavigate}>
+                        <HandCoins />
                         Bayar Sekarang
                     </Button>
                 </DialogFooter>

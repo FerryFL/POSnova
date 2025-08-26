@@ -114,7 +114,8 @@ export const DashboardCashier: NextPageWithLayout = () => {
                 onSelectedVarianId={setSelectedVarianId}
                 selectedJumlah={selectedJumlah}
                 onSelectedJumlah={setSelectedJumlah}
-                onOpenDialogCart={setOpenDialogCart} />
+                onOpenDialogCart={setOpenDialogCart}
+                onOpenDialog={setOpenDialog} />
 
             <DialogDeleteProduk
                 open={confirmDelete}

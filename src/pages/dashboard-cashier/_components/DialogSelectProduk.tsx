@@ -1,4 +1,4 @@
-import { Minus, Plus } from "lucide-react"
+import { Minus, Plus, ShoppingCart } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
@@ -14,11 +14,22 @@ type DialogSelectProduk = {
     selectedJumlah: number
     onSelectedJumlah: (val: number) => void
     onOpenDialogCart: (open: boolean) => void
+    onOpenDialog: (open: boolean) => void
 }
 
 const DialogSelectProduk = (props: DialogSelectProduk) => {
     const { addToCart, items } = useCartStore()
-    const { open, onOpenChange, selectedProdukCart, selectedVarianId, onSelectedVarianId, selectedJumlah, onSelectedJumlah, onOpenDialogCart } = props
+    const {
+        open,
+        onOpenChange,
+        selectedProdukCart,
+        selectedVarianId,
+        onSelectedVarianId,
+        selectedJumlah,
+        onSelectedJumlah,
+        onOpenDialogCart,
+        onOpenDialog
+    } = props
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -75,10 +86,12 @@ const DialogSelectProduk = (props: DialogSelectProduk) => {
                             if (selectedProdukCart) {
                                 addToCart(selectedProdukCart, selectedVarianId, selectedJumlah)
                                 onOpenDialogCart(false)
+                                onOpenDialog(false)
                             }
                         }}
                         disabled={!selectedProdukCart || (selectedProdukCart?.ProdukVarian?.length > 0 && !selectedVarianId)}
                     >
+                        <ShoppingCart />
                         Masukan Keranjang
                     </Button>
                 </DialogFooter>

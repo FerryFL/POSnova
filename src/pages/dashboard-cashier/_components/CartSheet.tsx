@@ -1,4 +1,4 @@
-import { Minus, Plus, ShoppingCart, Trash } from "lucide-react";
+import { Minus, Plus, ShoppingBag, ShoppingCart, Trash } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "~/components/ui/sheet";
@@ -25,7 +25,10 @@ const CartSheet = (props: CartSheetProps) => {
             </SheetTrigger>
             <SheetContent>
                 <SheetHeader>
-                    <SheetTitle>Keranjang Belanja</SheetTitle>
+                    <SheetTitle className="flex gap-2 items-center">
+                        <ShoppingCart />
+                        Keranjang Belanja
+                    </SheetTitle>
                 </SheetHeader>
                 <Separator />
                 <div className="space-y-2 p-3 max-10/12 overflow-y-auto">
@@ -37,7 +40,7 @@ const CartSheet = (props: CartSheetProps) => {
                                         {item.nama}
                                         {item.varianNama ? ` - ${item.varianNama}` : ""}
                                     </span>
-                                    <span className="text-sm">Rp {item.harga} / Produk</span>
+                                    <span className="text-sm">Rp {item.harga.toLocaleString()} / Produk</span>
                                 </div>
                                 <div className="flex gap-2">
                                     <div className="flex items-center gap-2">
@@ -61,9 +64,12 @@ const CartSheet = (props: CartSheetProps) => {
                     <Separator />
                     <div className="flex justify-between py-2">
                         <span className="text-lg font-semibold">Total Harga</span>
-                        <span className="text-xl font-semibold">Rp {totalProduk}</span>
+                        <span className="text-xl font-semibold">Rp {totalProduk.toLocaleString()}</span>
                     </div>
-                    <Button type="submit" onClick={() => onOpenDialog(true)}>Pesan</Button>
+                    <Button disabled={jumlahProduk === 0} type="submit" onClick={() => onOpenDialog(true)}>
+                        <ShoppingBag />
+                        Pesan
+                    </Button>
                     <SheetClose asChild>
                         <Button variant="outline">Tutup</Button>
                     </SheetClose>
