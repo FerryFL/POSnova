@@ -1,21 +1,16 @@
 import { useState, type ReactElement } from "react"
 import type { NextPageWithLayout } from "../_app"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
-import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card"
 import { api } from "~/utils/api"
-import { Skeleton } from "~/components/ui/skeleton"
-import { Button } from "~/components/ui/button"
-import { LoaderCircle, Pencil, Plus, Tags, Trash } from "lucide-react"
-import Image from "next/image"
-import { Badge } from "~/components/ui/badge"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
-import { Form } from "~/components/ui/form"
 import { useForm } from "react-hook-form"
 import { productFormSchema, type ProductFormSchema } from "~/forms/product"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ProductForm } from "~/components/shared/product/ProductForm"
 import { toast } from "sonner"
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "~/components/ui/alert-dialog"
+import DialogAddProduct from "./_components/DialogAddProduct"
+import DialogEditProduct from "./_components/DialogEditProduct"
+import DialogDeleteProduct from "./_components/DialogDeleteProduct"
+import ProductSkeleton from "./_components/ProductSkeleton"
+import ProductCards from "./_components/ProductCards"
 
 interface ImageState {
     current: string | null
@@ -213,152 +208,42 @@ export const ProductPage: NextPageWithLayout = () => {
     return (
         <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen Produk</h1>
-            <Dialog open={addOpen} onOpenChange={handleAddDialogClose}>
-                <DialogTrigger asChild>
-                    <Button variant="outline"><Plus />Tambah Produk</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="text-lg font-semibold">Tambah Produk</DialogTitle>
-                    </DialogHeader>
-                    <Form {...addForm}>
-                        <ProductForm onSubmit={handleSubmit} onChangeImage={handleImageChange} imageUrl={imageState.current} />
-                    </Form>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Tutup</Button>
-                        </DialogClose>
-                        <Button type="submit" onClick={addForm.handleSubmit(handleSubmit)}>
-                            {tambahProdukIsPending && <LoaderCircle className="animate-spin" />}
-                            Simpan
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <DialogAddProduct
+                open={addOpen}
+                onOpenChange={handleAddDialogClose}
+                addForm={addForm}
+                handleImageChange={handleImageChange}
+                handleSubmit={handleSubmit}
+                imageUrl={imageState.current}
+                tambahProdukIsPending={tambahProdukIsPending}
+            />
 
-            <Dialog open={editOpen} onOpenChange={handleEditDialogClose}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle className="text-lg font-semibold">Ubah Produk</DialogTitle>
-                    </DialogHeader>
-                    <Form {...editForm}>
-                        <ProductForm onSubmit={handleSubmitEdit} onChangeImage={handleImageChange} imageUrl={imageState.current} />
-                    </Form>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Tutup</Button>
-                        </DialogClose>
-                        <Button type="submit" onClick={editForm.handleSubmit(handleSubmitEdit)}>
-                            {ubahProdukIsPending && <LoaderCircle className="animate-spin" />}
-                            Simpan
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <DialogEditProduct
+                open={editOpen}
+                onOpenChange={handleEditDialogClose}
+                editForm={editForm}
+                handleImageChange={handleImageChange}
+                handleSubmitEdit={handleSubmitEdit}
+                imageUrl={imageState.current}
+                ubahProdukIsPending={ubahProdukIsPending}
+            />
 
-            <AlertDialog
-                open={!!idToDelete}
-                onOpenChange={(open) => {
-                    if (!open) {
-                        setIdToDelete(null);
-                    }
-                }}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Hapus Produk</AlertDialogTitle>
-                    </AlertDialogHeader>
-                    <AlertDialogDescription>Apakah yakin anda akan menghapus produk ini? </AlertDialogDescription>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Tutup</AlertDialogCancel>
-                        <Button disabled={hapusProdukIsPending} variant="destructive" onClick={handleSubmitDelete}>
-                            {hapusProdukIsPending && <LoaderCircle className="animate-spin" />}
-                            Hapus
-                        </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DialogDeleteProduct
+                idToDelete={idToDelete}
+                setIdToDelete={setIdToDelete}
+                hapusProdukIsPending={hapusProdukIsPending}
+                handleSubmitDelete={handleSubmitDelete}
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {
                     produkIsLoading ?
-                        Array.from({ length: 20 }, (_, i) => (
-                            <Card key={i} className="h-72 flex flex-col gap-2 pt-0">
-                                <Skeleton className="w-full h-40" />
-                                <div className="p-3 flex flex-col gap-2">
-                                    <Skeleton className="w-3/4 h-5" />
-                                    <Skeleton className="w-1/2 h-5" />
-                                    <div className="flex flex-row gap-2">
-                                        <Skeleton className="w-1/2 h-9" />
-                                        <Skeleton className="w-1/2 h-9" />
-                                    </div>
-                                </div>
-                            </Card>
-                        ))
-                        :
-                        produkData?.map((item) => {
-                            return (
-                                <Card key={item.id} className="pt-0 gap-2 justify-between">
-                                    <CardHeader className="p-0">
-                                        <div className="relative h-40 w-full overflow-hidden">
-                                            {item.gambar ? (
-                                                <Image src={item.gambar} alt={item.nama} fill unoptimized className="rounded-t-lg object-cover" />
-                                            ) : (
-                                                <div className="bg-muted flex h-full w-full items-center justify-center">
-                                                    No image
-                                                </div>
-                                            )}
-                                        </div>
-
-                                    </CardHeader>
-                                    <CardContent className="flex flex-col gap-2.5 h-full">
-
-                                        <div className="flex justify-between">
-                                            <Badge variant={item.status ? "success" : "destructive"}>{item.status ? "Aktif" : "Inaktif"}</Badge>
-                                            <p className="text-sm text-destructive">{item.stok} Tersisa</p>
-                                        </div>
-                                        <div className="text-lg font-medium w-full ">
-                                            <span className="line-clamp-1 break-words font-bold">{item.nama}</span>
-                                            <span className="text-sm flex gap-1 items-center text-muted-foreground line-clamp-1 break-words">
-                                                <Tags className="size-4 shrink-0" />
-                                                {item.kategori.nama}
-                                            </span>
-                                            <p className="text-lg font-bold text-green-700">Rp. {item.harga}</p>
-                                        </div>
-
-                                        <div className="flex gap-2 flex-wrap grow h-fit">
-                                            {
-                                                item.ProdukVarian.map((varian) =>
-                                                    <Badge key={varian.varian.id} variant="outline" className="h-6 font-semibold max-w-full">
-                                                        <span className="line-clamp-1 break-words">{varian.varian.nama}</span>
-                                                    </Badge>
-                                                )
-                                            }
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="gap-2">
-                                        <Button className="flex-1" variant="secondary" size="icon" onClick={() => handleEdit(
-                                            {
-                                                id: item.id,
-                                                nama: item.nama,
-                                                harga: item.harga,
-                                                stok: item.stok,
-                                                status: item.status,
-                                                categoryId: item.kategori.id,
-                                                UMKMId: item.UMKM?.id ?? "",
-                                                varianIds: item.ProdukVarian.map((pv) => pv.varian.id),
-                                                gambar: item.gambar
-                                            }
-                                        )}>
-                                            <Pencil />
-                                        </Button>
-                                        <Button className="flex-1" variant="destructive" size="icon" onClick={() => handleDelete(item.id)}>
-                                            <Trash />
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            )
-                        })
+                        <ProductSkeleton /> :
+                        <ProductCards
+                            produk={produkData}
+                            handleEdit={handleEdit}
+                            handleDelete={handleDelete}
+                        />
                 }
             </div>
         </div>
