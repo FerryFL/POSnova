@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { useCartStore } from "~/store/cart"
 import type { Produk } from "~/utils/api"
 
-type DialogSelectProduk = {
+interface DialogSelectProduk {
     open: boolean
     onOpenChange: (open: boolean) => void
     selectedProdukCart?: Produk

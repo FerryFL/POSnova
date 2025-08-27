@@ -5,7 +5,7 @@ import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, 
 import { useCartStore } from "~/store/cart";
 import type { ProdukKeranjang } from "~/types/cart";
 
-type CartSheetProps = {
+interface CartSheetProps {
     onOpenDialog: (val: boolean) => void
     onRemoveProduct: (item: ProdukKeranjang) => void
 }

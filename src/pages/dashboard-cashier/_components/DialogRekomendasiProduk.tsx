@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import type { Produk } from "~/utils/api";
 
-type DialogRekomendasiProdukProps = {
+interface DialogRekomendasiProdukProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     filteredProducts: Produk[]

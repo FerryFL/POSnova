@@ -1,7 +1,7 @@
 import { Card } from "~/components/ui/card"
 import type { Kategori } from "~/utils/api"
 
-type CategoryProps = {
+interface CategoryProps {
     categories: Kategori[]
     totalProducts: number
     onSelect: (kategoriId: string, nama: string) => void

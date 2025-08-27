@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
 import type { Produk } from "~/utils/api";
 
-type ProductCardsProps = {
+interface ProductCardsProps {
     filteredProducts: Produk[]
     selectedKategori: string
     onAddToCart: (item: Produk) => void

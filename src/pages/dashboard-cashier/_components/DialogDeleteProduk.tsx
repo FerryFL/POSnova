@@ -4,7 +4,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { useCartStore } from "~/store/cart"
 import type { ProdukKeranjang } from "~/types/cart"
 
-type DialogDeleteProduk = {
+interface DialogDeleteProduk {
     open: boolean
     onOpenChange: (open: boolean) => void
     selectedProdukRemove?: ProdukKeranjang
