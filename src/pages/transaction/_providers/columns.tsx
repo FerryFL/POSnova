@@ -4,9 +4,11 @@ import type { ColumnDef } from "@tanstack/react-table"
 import type { Transaksi } from "~/utils/api"
 import { DetailTransaksiDialog } from "../_components/DetailTransaksiDialog"
 import { Button } from "~/components/ui/button"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, FileText } from "lucide-react"
 import dayjs from "dayjs"
 import "dayjs/locale/id"
+import { BlobProvider } from "@react-pdf/renderer"
+import PDFDocument from "~/components/shared/PDFDocument"
 
 export const columns: ColumnDef<Transaksi>[] = [
     {
@@ -60,5 +62,19 @@ export const columns: ColumnDef<Transaksi>[] = [
     {
         id: "actions",
         cell: ({ row }) => <DetailTransaksiDialog transaksi={row.original} />,
+    },
+    {
+        id: "actions2",
+        cell: ({ row }) => (
+            <BlobProvider document={<PDFDocument transaksi={row.original} />}>
+                {({ url }) =>
+                    url ? (
+                        <a href={url} download={`Invoice Transaksi.pdf`} target="_blank">
+                            <Button variant="outline"><FileText className="size-4" /></Button>
+                        </a>
+                    ) : null
+                }
+            </BlobProvider>
+        ),
     },
 ]

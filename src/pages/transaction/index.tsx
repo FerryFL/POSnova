@@ -27,6 +27,7 @@ export const TransactionPage: NextPageWithLayout = () => {
                 <h1>Data Transaksi</h1>
                 <DataTable columns={columns} data={lihatTransaksi.data ?? []} />
             </Card>
+
         </div>
     )
 }
