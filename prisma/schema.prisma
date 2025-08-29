@@ -35,10 +35,14 @@ model Kategori {
 model Varian {
     id           String         @id @default(uuid())
     nama         String
+    status       Boolean        @default(false)
     createdAt    DateTime       @default(now())
     updatedAt    DateTime       @default(now()) @updatedAt
     // Produk       Produk[]
     ProdukVarian ProdukVarian[]
+
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
 }
 
 model Produk {
@@ -80,6 +84,7 @@ model UMKM {
 
     Kategori Kategori[]
     Produk   Produk[]
+    Varian   Varian[]
 }
 
 model Transaksi {

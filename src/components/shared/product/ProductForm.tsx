@@ -27,10 +27,11 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
 
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
     const { data: umkmData } = api.umkm.lihatUMKM.useQuery()
-
-    const filteredKategori = currUMKM ? kategoriData?.filter((item) => item.UMKM?.id === currUMKM) : null
-
     const { data: varians = [] } = api.varian.lihatVarian.useQuery()
+
+    const filteredKategori = currUMKM ? kategoriData?.filter((item) => item.UMKM?.id === currUMKM && item.status === true) : null
+    const filteredVarian = currUMKM ? varians.filter((item) => item.UMKM?.id === currUMKM && item.status === true) : null
+
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
     // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
     const [isUploading, setIsUploading] = useState(false)
@@ -76,7 +77,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     }
 
 
-    const variantOptions = varians.map((v) => ({
+    const variantOptions = (filteredVarian ?? []).map((v) => ({
         value: v.id,
         label: v.nama,
     }))
@@ -206,7 +207,9 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                             <MultiSelectCombobox
                                 options={variantOptions}
                                 value={field.value ?? []}
-                                onChange={field.onChange}
+                                onChange={(value) => {
+                                    field.onChange(value)
+                                }}
                             />
                         </FormControl>
                     </FormItem>

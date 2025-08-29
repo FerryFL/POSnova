@@ -60,14 +60,18 @@ export const VariantPage: NextPageWithLayout = () => {
     const handleSubmit = (data: VariantFormSchema) => {
         tambahVarian({
             nama: data.nama,
+            status: data.status,
+            UMKMId: data.UMKMId
         })
     }
 
-    const handleEdit = (varian: { id: string, nama: string }) => {
+    const handleEdit = (varian: { id: string, nama: string, status: boolean, UMKMId: string }) => {
         setIdToEdit(varian.id)
         setEditOpen(true)
         editForm.reset({
             nama: varian.nama,
+            status: varian.status,
+            UMKMId: varian.UMKMId
         })
     }
 
@@ -77,6 +81,8 @@ export const VariantPage: NextPageWithLayout = () => {
         ubahVarian({
             id: idToEdit,
             nama: data.nama,
+            status: data.status,
+            UMKMId: data.UMKMId
         })
     }
 
@@ -100,7 +106,7 @@ export const VariantPage: NextPageWithLayout = () => {
 
     return (
         <div className="space-y-4 w-full">
-            <h1 className="text-xl fyont-bold">Manajemen Varian</h1>
+            <h1 className="text-xl font-bold">Manajemen Varian</h1>
 
             <DialogAddVarian
                 open={addOpen}
