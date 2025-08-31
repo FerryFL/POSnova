@@ -8,6 +8,7 @@ import { Card } from "~/components/ui/card"
 import { Button } from "~/components/ui/button"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/router"
+import { MonthlyReportDownload } from "./_components/MonthlyReportDownload"
 
 export const TransactionPage: NextPageWithLayout = () => {
 
@@ -23,6 +24,8 @@ export const TransactionPage: NextPageWithLayout = () => {
         <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen Transaksi</h1>
             <Button variant="outline" onClick={handleNavigate}><Plus />Tambah Transaksi</Button>
+
+            <MonthlyReportDownload transaksi={lihatTransaksi.data ?? []} />
             <Card className="p-4">
                 <h1>Data Transaksi</h1>
                 <DataTable columns={columns} data={lihatTransaksi.data ?? []} />
