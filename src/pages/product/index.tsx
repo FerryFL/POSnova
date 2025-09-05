@@ -11,6 +11,7 @@ import DialogEditProduct from "./_components/DialogEditProduct"
 import DialogDeleteProduct from "./_components/DialogDeleteProduct"
 import ProductSkeleton from "./_components/ProductSkeleton"
 import ProductCards from "./_components/ProductCards"
+import { useUserStore } from "~/store/user"
 
 interface ImageState {
     current: string | null
@@ -20,6 +21,7 @@ interface ImageState {
 
 export const ProductPage: NextPageWithLayout = () => {
     const apiUtils = api.useUtils()
+    const { profile } = useUserStore()
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
 
@@ -49,7 +51,12 @@ export const ProductPage: NextPageWithLayout = () => {
         resolver: zodResolver(productFormSchema),
     })
 
-    const { data: produkData, isLoading: produkIsLoading } = api.produk.lihatProduk.useQuery({})
+    const { data: produkData, isLoading: produkIsLoading } = api.produk.lihatProduk.useQuery(
+        { umkmId: profile?.umkm.id ?? "" },
+        {
+            enabled: !!profile?.umkm.id
+        }
+    )
     const { mutate: tambahProduk, isPending: tambahProdukIsPending } = api.produk.tambahProduk.useMutation({
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()

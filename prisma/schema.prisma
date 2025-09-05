@@ -111,10 +111,11 @@ model UMKM {
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 
-    Kategori Kategori[]
-    Produk   Produk[]
-    Varian   Varian[]
-    Profile  Profile[]
+    Kategori  Kategori[]
+    Produk    Produk[]
+    Varian    Varian[]
+    Profile   Profile[]
+    Transaksi Transaksi[]
 
     @@map("umkm")
 }
@@ -128,11 +129,14 @@ model Transaksi {
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @default(now()) @updatedAt
     transaksiItem TransaksiItem[]
+
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
 }
 
 model TransaksiItem {
     id          String    @id @default(uuid())
-    transaksi   Transaksi @relation(fields: [transaksiId], references: [id])
+    transaksi   Transaksi @relation(fields: [transaksiId], references: [id], onDelete: Cascade)
     transaksiId String
 
     produk   Produk @relation(fields: [produkId], references: [id])

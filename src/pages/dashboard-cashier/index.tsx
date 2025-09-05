@@ -33,9 +33,15 @@ export const DashboardCashier: NextPageWithLayout = () => {
 
     const [selectedProdukCart, setSelectedProdukCart] = useState<Produk>()
 
-    const { data: products, isLoading } = api.produk.lihatProduk.useQuery({
-        kategoriId: selectedKategoriId,
-    });
+    const { data: products, isLoading } = api.produk.lihatProduk.useQuery(
+        {
+            kategoriId: selectedKategoriId,
+            umkmId: profile?.umkm.id ?? ""
+        },
+        {
+            enabled: !!profile?.umkm.id
+        }
+    );
 
     const filteredProducts = products?.filter((product) => product.status && product.kategori.status) ?? [];
 
