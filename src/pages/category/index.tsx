@@ -11,6 +11,7 @@ import DialogEditCategory from "./_components/DialogEditCategory"
 import DialogDeleteCategory from "./_components/DialogDeleteCategory"
 import CategorySkeleton from "./_components/CategorySkeleton"
 import CategoryCards from "./_components/CategoryCards"
+import { useUserStore } from "~/store/user"
 
 export const CategoryPage: NextPageWithLayout = () => {
     const [addOpen, setAddOpen] = useState(false)
@@ -20,9 +21,13 @@ export const CategoryPage: NextPageWithLayout = () => {
 
     const apiUtils = api.useUtils()
 
+    const { profile } = useUserStore()
+
     const addForm = useForm<CategoryFormSchema>({
         resolver: zodResolver(categoryFormSchema),
         defaultValues: {
+            nama: "",
+            UMKMId: "",
             status: true
         }
     })
@@ -32,7 +37,12 @@ export const CategoryPage: NextPageWithLayout = () => {
     })
 
 
-    const { data: kategoriData, isLoading: kategoriIsLoading } = api.kategori.lihatKategori.useQuery()
+    const { data: kategoriData, isLoading: kategoriIsLoading } = api.kategori.lihatKategori.useQuery(
+        { umkmId: profile?.umkm.id ?? '' },
+        {
+            enabled: !!profile?.umkm.id
+        }
+    )
 
     const { mutate: tambahKategori, isPending: tambahKategoriIsPending } = api.kategori.tambahKategori.useMutation({
         onSuccess: async () => {

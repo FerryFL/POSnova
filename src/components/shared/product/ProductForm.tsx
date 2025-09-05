@@ -12,6 +12,7 @@ import { Bucket } from "~/server/bucket";
 import { api } from "~/utils/api";
 import { MultiSelectCombobox } from "../MultiSelectCombobox";
 import { createClient } from "~/utils/supabase/component";
+import { useUserStore } from "~/store/user";
 
 interface ProductFormProps {
     onSubmit: (data: ProductFormSchema) => void
@@ -22,13 +23,23 @@ interface ProductFormProps {
 export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormProps) => {
     const form = useFormContext<ProductFormSchema>()
     const supabase = createClient()
+    const { profile } = useUserStore()
 
     const initialUMKM = form.getValues("UMKMId")
     const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
 
-    const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
-    const { data: umkmData } = api.umkm.lihatUMKM.useQuery()
-    const { data: varians = [] } = api.varian.lihatVarian.useQuery()
+    const { data: kategoriData } = api.kategori.lihatKategori.useQuery(
+        { umkmId: profile?.umkm.id ?? "" },
+        {
+            enabled: !!profile?.umkm.id
+        }
+    )
+    const { data: varians = [] } = api.varian.lihatVarian.useQuery(
+        { umkmId: profile?.umkm.id ?? "" },
+        {
+            enabled: !!profile?.umkm.id
+        }
+    )
 
     const filteredKategori = currUMKM ? kategoriData?.filter((item) => item.UMKM?.id === currUMKM && item.status === true) : null
     const filteredVarian = currUMKM ? varians.filter((item) => item.UMKM?.id === currUMKM && item.status === true) : null
@@ -114,6 +125,12 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
         }
     }, [setCurrUMKM, form])
 
+    useEffect(() => {
+        if (profile?.umkm.id) {
+            form.setValue("UMKMId", profile.umkm.id)
+        }
+    }, [form, profile?.umkm.id])
+
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} id="category-form" className="space-y-4">
             <FormField
@@ -133,18 +150,32 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
             <FormField
                 control={form.control}
                 name="harga"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Harga</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder="10000" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
+                render={({ field }) => {
+                    const formattedValue =
+                        field.value !== undefined && field.value !== null
+                            ? Number(field.value).toLocaleString("id-ID")
+                            : "";
+
+                    return (
+                        <FormItem>
+                            <FormLabel>Harga</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="10.000"
+                                    value={formattedValue}
+                                    onChange={(e) => {
+                                        const numericValue = e.target.value.replace(/\D/g, "");
+                                        field.onChange(numericValue ? Number(numericValue) : 0);
+                                    }}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    );
+                }}
             />
 
-            <FormField
+            < FormField
                 control={form.control}
                 name="stok"
                 render={({ field }) => (
@@ -158,14 +189,14 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 )}
             />
 
-            <FormField
+            < FormField
                 control={form.control}
                 name="categoryId"
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Daftar Kategori</FormLabel>
                         <FormControl>
-                            <Select value={field.value} onValueChange={(value: string) => {
+                            <Select value={field.value ?? false} onValueChange={(value: string) => {
                                 field.onChange(value)
                             }}>
                                 <SelectTrigger className="w-[180px]">
@@ -185,35 +216,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 )}
             />
 
-            <FormField
-                control={form.control}
-                name="UMKMId"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>UMKM</FormLabel>
-                        <FormControl>
-                            <Select value={field.value} onValueChange={(value: string) => {
-                                field.onChange(value)
-                                setCurrUMKM(value)
-                            }}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="UMKM" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {
-                                        umkmData?.map((item) => {
-                                            return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
-                                        })
-                                    }
-                                </SelectContent>
-                            </Select>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-
-            <FormField
+            < FormField
                 control={form.control}
                 name="varianIds"
                 render={({ field }) => (
@@ -232,7 +235,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 )}
             />
 
-            <div className="space-y-2">
+            < div className="space-y-2" >
                 <Label>Gambar Produk</Label>
                 <Input onChange={changeImage} type="file" accept="image/*" placeholder="Gambar" />
 
@@ -253,7 +256,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                         )
                     )
                 }
-            </div>
+            </ div>
 
             <FormField
                 control={form.control}
@@ -271,7 +274,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                     </FormItem>
                 )}
             />
-        </form>
+        </form >
     )
 
 }

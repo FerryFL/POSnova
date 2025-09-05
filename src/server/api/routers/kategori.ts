@@ -1,9 +1,19 @@
+import type { Prisma } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
 
 export const kategoriRouter = createTRPCRouter({
-    lihatKategori: publicProcedure.query(async ({ ctx }) => {
+    lihatKategori: publicProcedure.input(
+        z.object({
+            umkmId: z.string()
+        })
+    ).query(async ({ ctx, input }) => {
         const { db } = ctx
+
+        const whereClause: Prisma.KategoriWhereInput = {}
+        if (input.umkmId) {
+            whereClause.UMKMId = input.umkmId
+        }
 
         const kategori = await db.kategori.findMany({
             select: {
@@ -22,7 +32,8 @@ export const kategoriRouter = createTRPCRouter({
                         nama: true
                     }
                 }
-            }
+            },
+            where: whereClause
         })
 
         return kategori

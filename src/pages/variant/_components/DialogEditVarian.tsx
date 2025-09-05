@@ -2,7 +2,7 @@ import { LoaderCircle } from "lucide-react"
 import type { UseFormReturn } from "react-hook-form"
 import { VariantForm } from "~/components/shared/variant/VariantForm"
 import { Button } from "~/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
 import type { VariantFormSchema } from "~/forms/variant"
 
@@ -21,7 +21,8 @@ const DialogEditVarian = (props: DialogEditVarianProps) => {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle><h1 className="text-lg font-semibold">Ubah Varian</h1></DialogTitle>
+                    <DialogTitle><p className="text-lg font-semibold">Ubah Varian</p></DialogTitle>
+                    <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Form {...editForm}>
                     <VariantForm onSubmit={handleSubmitEdit} />

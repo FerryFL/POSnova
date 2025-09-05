@@ -12,10 +12,12 @@ import CartSheet from "./_components/CartSheet";
 import DialogRekomendasiProduk from "./_components/DialogRekomendasiProduk";
 import DialogSelectProduk from "./_components/DialogSelectProduk";
 import DialogDeleteProduk from "./_components/DialogDeleteProduk";
+import { useUserStore } from "~/store/user";
 
 export const DashboardCashier: NextPageWithLayout = () => {
 
     const router = useRouter()
+    const { profile } = useUserStore()
 
     const [openDialog, setOpenDialog] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
@@ -37,7 +39,12 @@ export const DashboardCashier: NextPageWithLayout = () => {
 
     const filteredProducts = products?.filter((product) => product.status && product.kategori.status) ?? [];
 
-    const { data: categories, isLoading: isCategoriesLoading } = api.kategori.lihatKategori.useQuery();
+    const { data: categories, isLoading: isCategoriesLoading } = api.kategori.lihatKategori.useQuery(
+        { umkmId: profile?.umkm.id ?? "" },
+        {
+            enabled: !!profile?.umkm.id
+        }
+    );
 
     const totalProducts = categories?.reduce((a, b) => {
         if (b.status) {

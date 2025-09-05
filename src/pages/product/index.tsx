@@ -35,6 +35,11 @@ export const ProductPage: NextPageWithLayout = () => {
     const addForm = useForm<ProductFormSchema>({
         resolver: zodResolver(productFormSchema),
         defaultValues: {
+            nama: "",
+            harga: 0,
+            stok: 0,
+            categoryId: "",
+            UMKMId: "",
             status: true,
             varianIds: []
         }

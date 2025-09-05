@@ -1,9 +1,19 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import type { Prisma } from "@prisma/client";
 
 export const varianRouter = createTRPCRouter({
-    lihatVarian: publicProcedure.query(async ({ ctx }) => {
+    lihatVarian: publicProcedure.input(
+        z.object({
+            umkmId: z.string()
+        })
+    ).query(async ({ ctx, input }) => {
         const { db } = ctx
+
+        const whereClause: Prisma.VarianWhereInput = {}
+        if (input.umkmId) {
+            whereClause.UMKMId = input.umkmId
+        }
 
         const varian = await db.varian.findMany({
             select: {
@@ -16,7 +26,8 @@ export const varianRouter = createTRPCRouter({
                         nama: true
                     }
                 }
-            }
+            },
+            where: whereClause
         })
 
         return varian
