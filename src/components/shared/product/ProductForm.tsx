@@ -8,10 +8,10 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import type { ProductFormSchema } from "~/forms/product";
-import { uploadFileToSignedUrl } from "~/lib/supabase";
 import { Bucket } from "~/server/bucket";
 import { api } from "~/utils/api";
 import { MultiSelectCombobox } from "../MultiSelectCombobox";
+import { createClient } from "~/utils/supabase/component";
 
 interface ProductFormProps {
     onSubmit: (data: ProductFormSchema) => void
@@ -21,6 +21,7 @@ interface ProductFormProps {
 
 export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormProps) => {
     const form = useFormContext<ProductFormSchema>()
+    const supabase = createClient()
 
     const initialUMKM = form.getValues("UMKMId")
     const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
@@ -33,8 +34,31 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     const filteredVarian = currUMKM ? varians.filter((item) => item.UMKM?.id === currUMKM && item.status === true) : null
 
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
-    // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
     const [isUploading, setIsUploading] = useState(false)
+
+    const uploadFileToSignedUrl = async ({
+        file,
+        path,
+        token,
+        bucket
+    }: {
+        file: File,
+        path: string,
+        token: string,
+        bucket: Bucket
+    }) => {
+        try {
+            const { data, error } = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, file)
+            if (error) throw error
+            if (!data) throw new Error("No Data Returned from uploadToSignedUrl")
+            const fileUrl = supabase.storage.from(bucket).getPublicUrl(data.path)
+
+            return fileUrl.data.publicUrl
+
+        } catch (error) {
+            throw error
+        }
+    }
 
     const changeImage = async (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
@@ -46,14 +70,6 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 return
             }
 
-            // if (imageUrl) {
-            //     try {
-            //         await hapusGambarProduk({ gambar: imageUrl })
-            //     } catch (error) {
-            //         console.error("Gagal menghapus gambar produk:", error)
-            //         return
-            //     }
-            // }
             setIsUploading(true)
 
             try {

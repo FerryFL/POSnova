@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { supabaseAccess } from "~/server/supabase-access";
+import { supabaseAccess } from "~/utils/supabase/supabase-access";
 import { Bucket, BucketPath } from "~/server/bucket";
 import { TRPCError } from "@trpc/server";
 import type { Prisma } from "@prisma/client";

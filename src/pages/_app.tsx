@@ -7,6 +7,8 @@ import "~/styles/globals.css";
 import type { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import { ThemeProvider } from "~/providers/theme-provider";
+import { Toaster } from "~/components/ui/sonner";
+
 
 const geist = Geist({
   subsets: ["latin"],
@@ -32,6 +34,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
       <div className={geist.className}>
         {getLayout(<Component {...pageProps} />)}
       </div>
+      <Toaster />
     </ThemeProvider>
   );
 };

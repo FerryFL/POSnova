@@ -11,13 +11,42 @@ datasource db {
     directUrl = env("DIRECT_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Profile {
+    id        String     @id @default(uuid())
+    email     String?    @unique
+    name      String?
+    UMKM      UMKM?      @relation(fields: [UMKMId], references: [id])
+    UMKMId    String?    @map("umkm_id")
+    UserRole  UserRole[]
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @default(now()) @updatedAt
 
-    @@index([name])
+    @@map("profile")
+}
+
+model Role {
+    id        String     @id @default(uuid())
+    name      String
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @default(now()) @updatedAt
+    UserRole  UserRole[]
+
+    @@map("role")
+}
+
+model UserRole {
+    id     String @id @default(uuid())
+    userId String @map("user_id")
+    role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    roleId String @map("role_id")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+    Profile   Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId String?  @map("profile_id")
+
+    @@unique([userId, roleId])
+    @@map("user_role")
 }
 
 model Kategori {
@@ -85,6 +114,9 @@ model UMKM {
     Kategori Kategori[]
     Produk   Produk[]
     Varian   Varian[]
+    Profile  Profile[]
+
+    @@map("umkm")
 }
 
 model Transaksi {
