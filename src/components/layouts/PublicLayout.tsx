@@ -65,7 +65,7 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
             menu = [...menu]
         }
         if (hasRole('RL002')) {
-            const filter = item.filter((menu) => menu.title !== "UMKM")
+            const filter = item.filter((menu) => menu.title !== "UMKM" && menu.title !== "Pembayaran")
             menu = [...menu, ...filter]
         }
         if (hasRole('RL003')) {

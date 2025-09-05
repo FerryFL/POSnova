@@ -26,16 +26,66 @@ export const updateSession = async (request: NextRequest) => {
     )
 
     const { data: { user } } = await supabase.auth.getUser()
+
     const pathName = request.nextUrl.pathname
     const isLogin = pathName.startsWith("/login")
     const isPublic = pathName.startsWith("/login") || pathName.startsWith("/register")
 
+    console.log("=========================TEST========================")
+
+    const cashierRoute =
+        pathName.startsWith("/dashboard-cashier") ||
+        pathName.startsWith("/payment")
+
+    const ownerRoute =
+        pathName.startsWith("/category") ||
+        pathName.startsWith("/variant") ||
+        pathName.startsWith("/transaction") ||
+        pathName === "/dashboard" ||
+        pathName.startsWith("/product")
+
+    const adminRoute =
+        pathName.startsWith("/UMKM")
+
+    // Cek kalau gk ada user, gk boleh ke page selain login/register
     if (!user && !isPublic) {
         return NextResponse.redirect(new URL("/login", request.url))
     }
 
+    // Cek kalau ada user, gk boleh ke login
     if (user && isLogin) {
         return NextResponse.redirect(new URL("/", request.url))
+    }
+
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profile')
+            .select('user_role(role_id)')
+            .eq('id', user.id)
+            .single()
+
+        const hasCashier = profile?.user_role.some((r) => r.role_id === "RL001")
+        const hasOwner = profile?.user_role.some((r) => r.role_id === "RL002")
+        const hasAdmin = profile?.user_role.some((r) => r.role_id === "RL003")
+
+        // Ke route kasir, tapi gk punya kasir 
+        if (cashierRoute && !hasCashier) {
+            console.log("No Cashier", pathName)
+            return NextResponse.redirect(new URL("/", request.url))
+        }
+
+        // Ke route owner, tapi gk punya owner 
+        if (ownerRoute && !hasOwner) {
+            console.log("No Owner", pathName)
+            return NextResponse.redirect(new URL("/", request.url))
+        }
+
+        // Ke route admin, tapi gk punya admin
+        if (adminRoute && !hasAdmin) {
+            console.log("No Admin", pathName)
+            return NextResponse.redirect(new URL("/", request.url))
+        }
+
     }
 
     return response
