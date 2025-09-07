@@ -74,19 +74,19 @@ export const updateSession = async (request: NextRequest) => {
 
         // Ke route kasir, tapi gk punya kasir 
         if (cashierRoute && !hasCashier) {
-            console.log("No Cashier", pathName)
+            // console.log("No Cashier", pathName)
             return NextResponse.redirect(new URL("/", request.url))
         }
 
         // Ke route owner, tapi gk punya owner 
         if (ownerRoute && !hasOwner) {
-            console.log("No Owner", pathName)
+            // console.log("No Owner", pathName)
             return NextResponse.redirect(new URL("/", request.url))
         }
 
         // Ke route admin, tapi gk punya admin
         if (adminRoute && !hasAdmin) {
-            console.log("No Admin", pathName)
+            // console.log("No Admin", pathName)
             return NextResponse.redirect(new URL("/", request.url))
         }
 
