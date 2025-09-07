@@ -1,13 +1,13 @@
 import { persist } from 'zustand/middleware'
 import { create } from "zustand";
-import type { ProfileWithUMKM, UserRoleWithRole } from "~/types/mapping";
+import type { Profile, UserRole } from '~/utils/api';
 
 interface UserState {
-    profile: ProfileWithUMKM | null
-    roles: UserRoleWithRole[]
+    profile: Profile | null
+    roles: UserRole[]
 
-    setProfile: (profile: ProfileWithUMKM) => void
-    setRoles: (roles: UserRoleWithRole[]) => void
+    setProfile: (profile: Profile | null) => void
+    setRoles: (roles: UserRole[]) => void
     clearUser: () => void
 
     isAuthenticated: () => boolean
@@ -35,7 +35,7 @@ export const useUserStore = create<UserState>()(
 
             hasRole: (roleId: string) => {
                 const { roles } = get()
-                return roles.some(r => r.role?.id === roleId)
+                return roles ? roles.some(r => r.roleId === roleId) : false
             }
         }),
         {

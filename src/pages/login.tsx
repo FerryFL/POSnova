@@ -3,14 +3,12 @@ import { createClient } from "../utils/supabase/component";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Mail, Lock, LogIn } from "lucide-react";
-import { Checkbox } from "~/components/ui/checkbox";
 import { useUserData } from "~/hooks/use-user-data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { toast } from "sonner";
 import { loginFormSchema, type LoginFormSchema } from "~/lib/schemas/login";
-import { Label } from "~/components/ui/label";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -112,7 +110,7 @@ export default function LoginPage() {
                             )}
                         />
 
-                        <div className="flex items-center justify-between text-sm">
+                        {/* <div className="flex items-center justify-between text-sm">
                             <FormField
                                 control={form.control}
                                 name="remember"
@@ -136,7 +134,7 @@ export default function LoginPage() {
                                 )}
                             />
                             <a href="#" className="text-red-500 hover:underline">Lupa Password?</a>
-                        </div>
+                        </div> */}
 
                         <Button
                             type="submit"

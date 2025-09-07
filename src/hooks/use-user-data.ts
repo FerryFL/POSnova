@@ -1,6 +1,7 @@
 import type { User } from "@supabase/supabase-js"
+import { toast } from "sonner"
 import { useUserStore } from "~/store/user"
-import type { ProfileWithUMKM, UserRoleWithRole } from "~/types/mapping"
+import { api } from "~/utils/api"
 import { createClient } from "~/utils/supabase/component"
 
 export const useUserData = () => {
@@ -11,49 +12,26 @@ export const useUserData = () => {
     } = useUserStore()
 
     const supabase = createClient()
+    const utils = api.useUtils()
 
     const fetchUserData = async (authUser: User) => {
         try {
-            console.log('Manually fetching user data for:', authUser.id)
-
-            //Query buat profile
-            const profileWithUMKMQuery = supabase
-                .from('profile')
-                .select(`id, email, name, umkm (id, nama)`)
-                .eq('id', authUser.id)
-                .single()
-
-            const { data: profileData, error: profileError } = await profileWithUMKMQuery
-
-            if (profileError) {
-                console.error('Error fetching profile', profileError)
-                return
-            }
-
-            // Query buat user roles
-            const userroleWithRoleQuery = supabase
-                .from('user_role')
-                .select(`id, user_id, profile_id, role (id, name)`)
-                .eq('user_id', authUser.id)
-
-            const { data: rolesData, error: rolesError } = await userroleWithRoleQuery
-
-            if (rolesError) {
-                console.error('Error fetching roles', rolesError)
-                return
-            }
-
-            // Biarin error type, fungsionalitas aman
-            const profileMapping: ProfileWithUMKM = profileData
-            const rolesMapping: UserRoleWithRole[] = rolesData
+            const [profile, userRole] = await Promise.all([
+                utils.user.lihatProfile.fetch({ userId: authUser.id }),
+                utils.user.lihatUserRole.fetch({ userId: authUser.id })
+            ])
 
             // Set ke zustand
-            setProfile(profileMapping)
-            setRoles(rolesMapping)
+            setProfile(profile ?? null)
+            setRoles(userRole ?? [])
 
-            return { profile: profileData, roles: rolesData }
-        } catch (error) {
+            return { profile, roles: userRole }
+        } catch (e) {
+            const error = e instanceof Error ? e.message : "Error fetching data, silahkan coba lagi!"
+
             console.error('Error in fetchUserData', error)
+            toast.error(error)
+
             return null
         }
     }
@@ -65,6 +43,7 @@ export const useUserData = () => {
 
             if (error) {
                 console.error('Error getting user:', error)
+                toast.error("Error load user, silahkan refresh/coba lagi!")
                 return false
             }
 

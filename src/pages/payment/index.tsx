@@ -31,7 +31,7 @@ export const PaymentPage: NextPageWithLayout = () => {
                 })),
                 totalProduk: jumlahProduk,
                 totalHarga: totalProduk,
-                umkmId: profile?.umkm.id ?? ""
+                umkmId: profile?.UMKM?.id ?? ""
             },
             {
                 onSuccess: () => {

@@ -36,9 +36,9 @@ export const VariantPage: NextPageWithLayout = () => {
     })
 
     const { data: varianData, isLoading: varianIsLoading } = api.varian.lihatVarian.useQuery(
-        { umkmId: profile?.umkm.id ?? "" },
+        { umkmId: profile?.UMKM?.id ?? "" },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     )
 

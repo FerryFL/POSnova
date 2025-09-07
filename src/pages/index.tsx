@@ -15,9 +15,9 @@ export const Home: NextPageWithLayout = () => {
                 profile ? (
                     <div>
                         <h1>Selamat datang, {profile?.name}</h1>
-                        <p>(PROFILE){profile?.id} === (ROLE){roles[0]?.profile_id}</p>
+                        <p>(PROFILE){profile?.id} === (ROLE){roles[0]?.profileId}</p>
                         <p>(PROFILE){profile?.email}</p>
-                        <p>UMKM: {profile?.umkm.nama}</p>
+                        <p>UMKM: {profile?.UMKM?.nama}</p>
                         <p>Roles: {roles.map((item) => item.role.name)}</p>
                         {
                             roles.map((role) => role.role.id)

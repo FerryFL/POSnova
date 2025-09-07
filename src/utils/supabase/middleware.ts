@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { supabaseAccess } from './supabase-access'
 
 export const updateSession = async (request: NextRequest) => {
     const response = NextResponse.next({
@@ -9,8 +10,8 @@ export const updateSession = async (request: NextRequest) => {
     })
 
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
         {
             cookies: {
                 getAll() {
@@ -31,7 +32,7 @@ export const updateSession = async (request: NextRequest) => {
     const isLogin = pathName.startsWith("/login")
     const isPublic = pathName.startsWith("/login") || pathName.startsWith("/register")
 
-    console.log("=========================TEST========================")
+    // console.log("=========================TEST========================")
 
     const cashierRoute =
         pathName.startsWith("/dashboard-cashier") ||
@@ -58,15 +59,18 @@ export const updateSession = async (request: NextRequest) => {
     }
 
     if (user) {
-        const { data: profile } = await supabase
-            .from('profile')
-            .select('user_role(role_id)')
+        const { data: profile } = await supabaseAccess
+            .from('Profile')
+            .select('UserRole(roleId)')
             .eq('id', user.id)
             .single()
 
-        const hasCashier = profile?.user_role.some((r) => r.role_id === "RL001")
-        const hasOwner = profile?.user_role.some((r) => r.role_id === "RL002")
-        const hasAdmin = profile?.user_role.some((r) => r.role_id === "RL003")
+        // console.log("Profile: ", profile)
+        // console.log("Errror: ", error)
+
+        const hasCashier = profile?.UserRole.some((r) => r.roleId === "RL001")
+        const hasOwner = profile?.UserRole.some((r) => r.roleId === "RL002")
+        const hasAdmin = profile?.UserRole.some((r) => r.roleId === "RL003")
 
         // Ke route kasir, tapi gk punya kasir 
         if (cashierRoute && !hasCashier) {

@@ -1,7 +1,7 @@
 import { Archive, Building, CopyPlus, HandCoins, Home, LogOut, Moon, Package, Plus, ReceiptText, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Suspense, useEffect, useState, type ReactNode } from "react";
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarSeparator, SidebarTrigger } from "~/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarSeparator, SidebarTrigger } from "~/components/ui/sidebar";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { createClient } from "~/utils/supabase/component";
@@ -62,7 +62,8 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
         let menu: typeof item = []
 
         if (hasRole('RL001')) {
-            menu = [...menu]
+            const items = item.filter((menu) => menu.title === "Pembayaran")
+            menu = [...menu, ...items]
         }
         if (hasRole('RL002')) {
             const filter = item.filter((menu) => menu.title !== "UMKM" && menu.title !== "Pembayaran")
@@ -84,10 +85,19 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
     };
 
     const handleLogout = async () => {
-        await supabase.auth.signOut()
-        clearUserData()
-        toast.success("Berhasil Logout")
-        await router.push("/login")
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error
+
+            await supabase.auth.signOut()
+            clearUserData()
+
+            toast.success("Berhasil Logout")
+            await router.push("/login")
+        } catch (e) {
+            const error = e instanceof Error ? e.message : "Logout Gagal"
+            toast.error(error)
+        }
     };
 
     return (
@@ -97,7 +107,11 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
                     <Button variant="ghost" onClick={toggleTheme}>
                         {mounted && resolvedTheme === "dark" ? <Moon /> : <Sun />}
                     </Button>
-                    <h2 className="text-lg font-bold">POSnova</h2>
+
+                    <div>
+                        <h2 className="font-bold">{profile?.name}</h2>
+                        <h2 className="text-sm">{profile?.email}</h2>
+                    </div>
                 </SidebarHeader>
                 <SidebarContent>
                     {mounted && profile && (
@@ -146,6 +160,9 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
                         </SidebarMenu>
                     )}
                 </SidebarContent>
+                <SidebarFooter>
+                    <h2 className="text-lg font-semibold">POSNova</h2>
+                </SidebarFooter>
             </Sidebar>
             <main className="w-full">
                 <SidebarTrigger />

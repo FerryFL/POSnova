@@ -1,4 +1,3 @@
-import { createClient } from "../utils/supabase/component";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
@@ -14,7 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { useRouter } from "next/router";
 
 export const RegisterPage = () => {
-    const supabase = createClient();
     const route = useRouter()
 
     const form = useForm<RegisterFormSchema>({
@@ -32,47 +30,20 @@ export const RegisterPage = () => {
 
     const onSubmit = async (data: RegisterFormSchema) => {
         try {
-            console.log("Hello1")
             const result = await mutation.mutateAsync({
+                name: data.name,
                 email: data.email,
-                password: data.password
+                password: data.password,
+                umkmId: data.umkmId,
+                role: data.role
             });
 
-            if (!result.success && !result.user) {
+            if (!result.success) {
                 toast.error(result.message)
                 return
             }
 
-            console.log("User created:", result.user);
-
-            const { error: profileError } = await supabase.from("profile").insert({
-                id: result.user?.id,
-                name: data.name,
-                email: result.user?.email,
-                umkm_id: data.umkmId,
-            })
-
-            if (profileError) {
-                console.error("Gagal membuat profile", profileError)
-                toast.error("Gagal membuat profile")
-                return
-            }
-
-            if (data.role && data.role.length > 0) {
-                const userRoles = data.role.map((roleId) => ({
-                    user_id: result.user?.id,
-                    role_id: roleId,
-                    profile_id: result.user?.id
-                }))
-
-                const { error: roleError } = await supabase.from("user_role").insert(userRoles)
-                if (roleError) {
-                    console.error("Gagal membuat role", roleError)
-                    toast.error("Gagal membuat role")
-                    return
-                }
-            }
-
+            // console.log("User created:", result.user);
             toast.success("Registrasi Berhasil!");
             form.reset()
         } catch (error) {

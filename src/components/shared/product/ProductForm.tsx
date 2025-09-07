@@ -13,6 +13,7 @@ import { api } from "~/utils/api";
 import { MultiSelectCombobox } from "../MultiSelectCombobox";
 import { createClient } from "~/utils/supabase/component";
 import { useUserStore } from "~/store/user";
+import { toast } from "sonner";
 
 interface ProductFormProps {
     onSubmit: (data: ProductFormSchema) => void
@@ -29,15 +30,15 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
 
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery(
-        { umkmId: profile?.umkm.id ?? "" },
+        { umkmId: profile?.UMKM?.id ?? "" },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     )
     const { data: varians = [] } = api.varian.lihatVarian.useQuery(
-        { umkmId: profile?.umkm.id ?? "" },
+        { umkmId: profile?.UMKM?.id ?? "" },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     )
 
@@ -94,8 +95,10 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 })
 
                 onChangeImage(img)
-            } catch (error) {
+            } catch (e) {
+                const error = e instanceof Error ? e.message : "Gagal mengupload gambar produk"
                 console.error("Gagal mengupload gambar produk:", error)
+                toast.error(error)
             } finally {
                 setIsUploading(false)
             }
@@ -126,10 +129,10 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     }, [setCurrUMKM, form])
 
     useEffect(() => {
-        if (profile?.umkm.id) {
-            form.setValue("UMKMId", profile.umkm.id)
+        if (profile?.UMKM?.id) {
+            form.setValue("UMKMId", profile.UMKM.id)
         }
-    }, [form, profile?.umkm.id])
+    }, [form, profile?.UMKM?.id])
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} id="category-form" className="space-y-4">

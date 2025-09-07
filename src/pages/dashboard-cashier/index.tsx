@@ -36,19 +36,19 @@ export const DashboardCashier: NextPageWithLayout = () => {
     const { data: products, isLoading } = api.produk.lihatProduk.useQuery(
         {
             kategoriId: selectedKategoriId,
-            umkmId: profile?.umkm.id ?? ""
+            umkmId: profile?.UMKM?.id ?? ""
         },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     );
 
     const filteredProducts = products?.filter((product) => product.status && product.kategori.status) ?? [];
 
     const { data: categories, isLoading: isCategoriesLoading } = api.kategori.lihatKategori.useQuery(
-        { umkmId: profile?.umkm.id ?? "" },
+        { umkmId: profile?.UMKM?.id ?? "" },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     );
 

@@ -20,9 +20,9 @@ export const TransactionPage: NextPageWithLayout = () => {
     }
 
     const lihatTransaksi = api.transaksi.lihatTransaksi.useQuery(
-        { umkmId: profile?.umkm.id ?? "" },
+        { umkmId: profile?.UMKM?.id ?? "" },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     )
 

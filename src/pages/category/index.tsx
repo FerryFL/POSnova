@@ -38,9 +38,9 @@ export const CategoryPage: NextPageWithLayout = () => {
 
 
     const { data: kategoriData, isLoading: kategoriIsLoading } = api.kategori.lihatKategori.useQuery(
-        { umkmId: profile?.umkm.id ?? '' },
+        { umkmId: profile?.UMKM?.id ?? '' },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     )
 

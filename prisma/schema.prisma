@@ -12,41 +12,41 @@ datasource db {
 }
 
 model Profile {
-    id        String     @id @default(uuid())
-    email     String?    @unique
+    id        String   @id @default(uuid())
+    email     String?  @unique
     name      String?
-    UMKM      UMKM?      @relation(fields: [UMKMId], references: [id])
-    UMKMId    String?    @map("umkm_id")
-    UserRole  UserRole[]
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @default(now()) @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
 
-    @@map("profile")
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
+
+    UserRole UserRole[]
 }
 
 model Role {
-    id        String     @id @default(uuid())
+    id        String   @id @default(uuid())
     name      String
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @default(now()) @updatedAt
-    UserRole  UserRole[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
 
-    @@map("role")
+    UserRole UserRole[]
 }
 
 model UserRole {
     id     String @id @default(uuid())
-    userId String @map("user_id")
-    role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-    roleId String @map("role_id")
+    userId String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
+
+    role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    roleId String
+
     Profile   Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
-    profileId String?  @map("profile_id")
+    profileId String?
 
     @@unique([userId, roleId])
-    @@map("user_role")
 }
 
 model Kategori {
@@ -55,18 +55,20 @@ model Kategori {
     status    Boolean  @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
-    Produk    Produk[]
+
+    Produk Produk[]
 
     UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
     UMKMId String?
 }
 
 model Varian {
-    id           String         @id @default(uuid())
-    nama         String
-    status       Boolean        @default(false)
-    createdAt    DateTime       @default(now())
-    updatedAt    DateTime       @default(now()) @updatedAt
+    id        String   @id @default(uuid())
+    nama      String
+    status    Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
     // Produk       Produk[]
     ProdukVarian ProdukVarian[]
 
@@ -75,21 +77,24 @@ model Varian {
 }
 
 model Produk {
-    id           String         @id @default(uuid())
-    nama         String
-    harga        Int
-    gambar       String
-    kategori     Kategori       @relation(fields: [kategoriId], references: [id])
+    id        String   @id @default(uuid())
+    nama      String
+    harga     Int
+    gambar    String
+    stok      Int      @default(0)
+    status    Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    kategoriId String
+    kategori   Kategori @relation(fields: [kategoriId], references: [id])
     // varian       Varian         @relation(fields: [varianId], references: [id])
-    stok         Int            @default(0)
-    status       Boolean        @default(false)
-    createdAt    DateTime       @default(now())
-    updatedAt    DateTime       @default(now()) @updatedAt
-    kategoriId   String
+
     ProdukVarian ProdukVarian[]
 
-    UMKM          UMKM?           @relation(fields: [UMKMId], references: [id])
-    UMKMId        String?
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKMId String?
+
     TransaksiItem TransaksiItem[]
 }
 
@@ -116,8 +121,6 @@ model UMKM {
     Varian    Varian[]
     Profile   Profile[]
     Transaksi Transaksi[]
-
-    @@map("umkm")
 }
 
 model Transaksi {
@@ -125,9 +128,9 @@ model Transaksi {
     tanggalTransaksi DateTime @default(now())
     totalHarga       Int
     totalProduk      Int
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @default(now()) @updatedAt
 
-    createdAt     DateTime        @default(now())
-    updatedAt     DateTime        @default(now()) @updatedAt
     transaksiItem TransaksiItem[]
 
     UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
@@ -135,18 +138,17 @@ model Transaksi {
 }
 
 model TransaksiItem {
-    id          String    @id @default(uuid())
+    id          String   @id @default(uuid())
+    jumlah      Int
+    hargaSatuan Int
+    hargaTotal  Int
+    varianId    String?
+    varianNama  String?
+    createdAt   DateTime @default(now())
+
     transaksi   Transaksi @relation(fields: [transaksiId], references: [id], onDelete: Cascade)
     transaksiId String
 
     produk   Produk @relation(fields: [produkId], references: [id])
     produkId String
-
-    jumlah      Int
-    hargaSatuan Int
-    hargaTotal  Int
-
-    varianId   String?
-    varianNama String?
-    createdAt  DateTime @default(now())
 }

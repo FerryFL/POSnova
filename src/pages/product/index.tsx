@@ -52,9 +52,9 @@ export const ProductPage: NextPageWithLayout = () => {
     })
 
     const { data: produkData, isLoading: produkIsLoading } = api.produk.lihatProduk.useQuery(
-        { umkmId: profile?.umkm.id ?? "" },
+        { umkmId: profile?.UMKM?.id ?? "" },
         {
-            enabled: !!profile?.umkm.id
+            enabled: !!profile?.UMKM?.id
         }
     )
     const { mutate: tambahProduk, isPending: tambahProdukIsPending } = api.produk.tambahProduk.useMutation({

@@ -16,10 +16,10 @@ export const CategoryForm = ({ onSubmit }: CategoryFormProps) => {
     const form = useFormContext<CategoryFormSchema>();
 
     useEffect(() => {
-        if (profile?.umkm.id) {
-            form.setValue("UMKMId", profile.umkm.id)
+        if (profile?.UMKM?.id) {
+            form.setValue("UMKMId", profile.UMKM.id)
         }
-    }, [form, profile?.umkm.id])
+    }, [form, profile?.UMKM?.id])
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
