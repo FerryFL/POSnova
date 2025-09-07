@@ -8,10 +8,12 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import type { ProductFormSchema } from "~/forms/product";
-import { uploadFileToSignedUrl } from "~/lib/supabase";
 import { Bucket } from "~/server/bucket";
 import { api } from "~/utils/api";
 import { MultiSelectCombobox } from "../MultiSelectCombobox";
+import { createClient } from "~/utils/supabase/component";
+import { useUserStore } from "~/store/user";
+import { toast } from "sonner";
 
 interface ProductFormProps {
     onSubmit: (data: ProductFormSchema) => void
@@ -21,20 +23,54 @@ interface ProductFormProps {
 
 export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormProps) => {
     const form = useFormContext<ProductFormSchema>()
+    const supabase = createClient()
+    const { profile } = useUserStore()
 
     const initialUMKM = form.getValues("UMKMId")
     const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
 
-    const { data: kategoriData } = api.kategori.lihatKategori.useQuery()
-    const { data: umkmData } = api.umkm.lihatUMKM.useQuery()
-    const { data: varians = [] } = api.varian.lihatVarian.useQuery()
+    const { data: kategoriData } = api.kategori.lihatKategori.useQuery(
+        { umkmId: profile?.UMKM?.id ?? "" },
+        {
+            enabled: !!profile?.UMKM?.id
+        }
+    )
+    const { data: varians = [] } = api.varian.lihatVarian.useQuery(
+        { umkmId: profile?.UMKM?.id ?? "" },
+        {
+            enabled: !!profile?.UMKM?.id
+        }
+    )
 
     const filteredKategori = currUMKM ? kategoriData?.filter((item) => item.UMKM?.id === currUMKM && item.status === true) : null
     const filteredVarian = currUMKM ? varians.filter((item) => item.UMKM?.id === currUMKM && item.status === true) : null
 
     const { mutateAsync: tambahImageSignedUrl } = api.produk.tambahGambarProdukSignedUrl.useMutation()
-    // const { mutateAsync: hapusGambarProduk } = api.produk.hapusGambarProduk.useMutation()
     const [isUploading, setIsUploading] = useState(false)
+
+    const uploadFileToSignedUrl = async ({
+        file,
+        path,
+        token,
+        bucket
+    }: {
+        file: File,
+        path: string,
+        token: string,
+        bucket: Bucket
+    }) => {
+        try {
+            const { data, error } = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, file)
+            if (error) throw error
+            if (!data) throw new Error("No Data Returned from uploadToSignedUrl")
+            const fileUrl = supabase.storage.from(bucket).getPublicUrl(data.path)
+
+            return fileUrl.data.publicUrl
+
+        } catch (error) {
+            throw error
+        }
+    }
 
     const changeImage = async (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
@@ -46,14 +82,6 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 return
             }
 
-            // if (imageUrl) {
-            //     try {
-            //         await hapusGambarProduk({ gambar: imageUrl })
-            //     } catch (error) {
-            //         console.error("Gagal menghapus gambar produk:", error)
-            //         return
-            //     }
-            // }
             setIsUploading(true)
 
             try {
@@ -67,8 +95,10 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 })
 
                 onChangeImage(img)
-            } catch (error) {
+            } catch (e) {
+                const error = e instanceof Error ? e.message : "Gagal mengupload gambar produk"
                 console.error("Gagal mengupload gambar produk:", error)
+                toast.error(error)
             } finally {
                 setIsUploading(false)
             }
@@ -98,6 +128,12 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
         }
     }, [setCurrUMKM, form])
 
+    useEffect(() => {
+        if (profile?.UMKM?.id) {
+            form.setValue("UMKMId", profile.UMKM.id)
+        }
+    }, [form, profile?.UMKM?.id])
+
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} id="category-form" className="space-y-4">
             <FormField
@@ -117,18 +153,32 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
             <FormField
                 control={form.control}
                 name="harga"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Harga</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder="10000" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
+                render={({ field }) => {
+                    const formattedValue =
+                        field.value !== undefined && field.value !== null
+                            ? Number(field.value).toLocaleString("id-ID")
+                            : "";
+
+                    return (
+                        <FormItem>
+                            <FormLabel>Harga</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="10.000"
+                                    value={formattedValue}
+                                    onChange={(e) => {
+                                        const numericValue = e.target.value.replace(/\D/g, "");
+                                        field.onChange(numericValue ? Number(numericValue) : 0);
+                                    }}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    );
+                }}
             />
 
-            <FormField
+            < FormField
                 control={form.control}
                 name="stok"
                 render={({ field }) => (
@@ -142,14 +192,14 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 )}
             />
 
-            <FormField
+            < FormField
                 control={form.control}
                 name="categoryId"
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Daftar Kategori</FormLabel>
                         <FormControl>
-                            <Select value={field.value} onValueChange={(value: string) => {
+                            <Select value={field.value ?? false} onValueChange={(value: string) => {
                                 field.onChange(value)
                             }}>
                                 <SelectTrigger className="w-[180px]">
@@ -169,35 +219,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 )}
             />
 
-            <FormField
-                control={form.control}
-                name="UMKMId"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>UMKM</FormLabel>
-                        <FormControl>
-                            <Select value={field.value} onValueChange={(value: string) => {
-                                field.onChange(value)
-                                setCurrUMKM(value)
-                            }}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="UMKM" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {
-                                        umkmData?.map((item) => {
-                                            return <SelectItem value={item.id} key={item.id}>{item.nama}</SelectItem>
-                                        })
-                                    }
-                                </SelectContent>
-                            </Select>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-
-            <FormField
+            < FormField
                 control={form.control}
                 name="varianIds"
                 render={({ field }) => (
@@ -216,7 +238,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                 )}
             />
 
-            <div className="space-y-2">
+            < div className="space-y-2" >
                 <Label>Gambar Produk</Label>
                 <Input onChange={changeImage} type="file" accept="image/*" placeholder="Gambar" />
 
@@ -237,7 +259,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                         )
                     )
                 }
-            </div>
+            </ div>
 
             <FormField
                 control={form.control}
@@ -255,7 +277,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                     </FormItem>
                 )}
             />
-        </form>
+        </form >
     )
 
 }

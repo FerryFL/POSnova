@@ -78,3 +78,9 @@ export type Produk = LihatProdukOutput[number]
 
 type LihatKategoriOutput = RouterOutputs["kategori"]["lihatKategori"]
 export type Kategori = LihatKategoriOutput[number]
+
+type LihatProfileOutput = RouterOutputs["user"]["lihatProfile"]
+export type Profile = LihatProfileOutput
+
+type LihatUserRoleOutput = RouterOutputs["user"]["lihatUserRole"]
+export type UserRole = LihatUserRoleOutput[number]

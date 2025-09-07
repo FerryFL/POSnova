@@ -6,7 +6,7 @@ import { api } from "~/utils/api"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { LoaderCircle, Pencil, Plus, Trash, Search } from "lucide-react"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
 import { useForm } from "react-hook-form"
 import { umkmFormSchema, type UmkmFormSchema } from "~/forms/umkm"
@@ -156,6 +156,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                 <DialogContent className="w-[95%] max-w-md mx-auto">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-semibold">Ubah UMKM</DialogTitle>
+                        <DialogDescription></DialogDescription>
                     </DialogHeader>
                     <Form {...editForm}>
                         <UMKMForm onSubmit={handleSubmitEdit} />
@@ -242,6 +243,7 @@ export const UMKMPage: NextPageWithLayout = () => {
                                 <DialogContent className="w-[95%] max-w-md mx-auto">
                                     <DialogHeader>
                                         <DialogTitle className="text-lg font-semibold">Tambah UMKM</DialogTitle>
+                                        <DialogDescription></DialogDescription>
                                     </DialogHeader>
                                     <Form {...addForm}>
                                         <UMKMForm onSubmit={handleSubmit} />

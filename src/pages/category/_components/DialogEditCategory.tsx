@@ -2,7 +2,7 @@ import { LoaderCircle } from "lucide-react"
 import type { UseFormReturn } from "react-hook-form"
 import { CategoryForm } from "~/components/shared/category/CategoryForm"
 import { Button } from "~/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
 import type { CategoryFormSchema } from "~/forms/category"
 
@@ -20,7 +20,8 @@ const DialogEditCategory = (props: DialogEditCategoryProps) => {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle><h1 className="text-lg font-semibold">Ubah Kategori</h1></DialogTitle>
+                    <DialogTitle><p className="text-lg font-semibold">Ubah Kategori</p></DialogTitle>
+                    <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Form {...editForm}>
                     <CategoryForm onSubmit={handleSubmitEdit} />

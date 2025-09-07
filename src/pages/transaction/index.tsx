@@ -8,17 +8,24 @@ import { Card } from "~/components/ui/card"
 import { Button } from "~/components/ui/button"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/router"
+import { useUserStore } from "~/store/user"
 import { MonthlyReportDownload } from "./_components/MonthlyReportDownload"
 
 export const TransactionPage: NextPageWithLayout = () => {
 
     const router = useRouter()
+    const { profile } = useUserStore()
 
     const handleNavigate = () => {
         void router.push("/dashboard-cashier")
     }
 
-    const lihatTransaksi = api.transaksi.lihatTransaksi.useQuery()
+    const lihatTransaksi = api.transaksi.lihatTransaksi.useQuery(
+        { umkmId: profile?.UMKM?.id ?? "" },
+        {
+            enabled: !!profile?.UMKM?.id
+        }
+    )
 
     return (
         <div className="space-y-4 w-full">

@@ -8,10 +8,12 @@ import type { ReactElement } from "react"
 import { HandCoins, ShoppingCart } from "lucide-react"
 import { Card } from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
+import { useUserStore } from "~/store/user"
 
 export const PaymentPage: NextPageWithLayout = () => {
 
     const { items, jumlahProduk, totalProduk, clearCart } = useCartStore()
+    const { profile } = useUserStore()
     const tambahTransaksi = api.transaksi.tambahTransaksi.useMutation()
 
     const pajak = totalProduk / 10
@@ -29,6 +31,7 @@ export const PaymentPage: NextPageWithLayout = () => {
                 })),
                 totalProduk: jumlahProduk,
                 totalHarga: totalProduk,
+                umkmId: profile?.UMKM?.id ?? ""
             },
             {
                 onSuccess: () => {

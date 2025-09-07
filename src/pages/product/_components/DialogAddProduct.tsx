@@ -2,7 +2,7 @@ import { LoaderCircle, Plus } from "lucide-react"
 import type { UseFormReturn } from "react-hook-form"
 import { ProductForm } from "~/components/shared/product/ProductForm"
 import { Button } from "~/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
 import type { ProductFormSchema } from "~/forms/product"
 
@@ -26,6 +26,7 @@ const DialogAddProduct = (props: DialogAddProductProps) => {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="text-lg font-semibold">Tambah Produk</DialogTitle>
+                    <DialogDescription></DialogDescription >
                 </DialogHeader>
                 <Form {...addForm}>
                     <ProductForm onSubmit={handleSubmit} onChangeImage={handleImageChange} imageUrl={imageUrl} />

@@ -1,12 +1,32 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import type { Prisma } from "@prisma/client";
 
 export const transaksiRouter = createTRPCRouter({
-    lihatTransaksi: publicProcedure.query(async ({ ctx }) => {
+    lihatTransaksi: publicProcedure.input(
+        z.object({
+            umkmId: z.string()
+        })
+    ).query(async ({ ctx, input }) => {
         const { db } = ctx
 
+        const whereClause: Prisma.TransaksiWhereInput = {}
+        if (input.umkmId) {
+            whereClause.UMKMId = input.umkmId
+        }
+
         const transaksi = await db.transaksi.findMany({
-            include: {
+            select: {
+                id: true,
+                totalHarga: true,
+                totalProduk: true,
+                UMKM: {
+                    select: {
+                        id: true,
+                        nama: true
+                    }
+                },
+                tanggalTransaksi: true,
                 transaksiItem: {
                     select: {
                         id: true,
@@ -20,7 +40,8 @@ export const transaksiRouter = createTRPCRouter({
                         }
                     }
                 }
-            }
+            },
+            where: whereClause
         })
         return transaksi
     }),
@@ -40,6 +61,7 @@ export const transaksiRouter = createTRPCRouter({
                 ),
                 totalProduk: z.number().min(1),
                 totalHarga: z.number().min(0),
+                umkmId: z.string()
             })
         )
         .mutation(async ({ ctx, input }) => {
@@ -49,6 +71,7 @@ export const transaksiRouter = createTRPCRouter({
                 data: {
                     totalProduk: input.totalProduk,
                     totalHarga: input.totalHarga,
+                    UMKMId: input.umkmId,
                     transaksiItem: {
                         create: input.items.map((item) => ({
                             produkId: item.produkId,

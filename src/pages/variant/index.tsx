@@ -11,6 +11,7 @@ import DialogEditVarian from "./_components/DialogEditVarian";
 import DialogDeleteVarian from "./_components/DialogDeleteVarian";
 import VarianSkeleton from "./_components/VarianSkeleton";
 import VarianCard from "./_components/VarianCard";
+import { useUserStore } from "~/store/user";
 
 export const VariantPage: NextPageWithLayout = () => {
     const [addOpen, setAddOpen] = useState(false)
@@ -19,16 +20,27 @@ export const VariantPage: NextPageWithLayout = () => {
     const [idToDelete, setIdToDelete] = useState<string | null>(null)
 
     const apiUtils = api.useUtils()
+    const { profile } = useUserStore()
 
     const addForm = useForm<VariantFormSchema>({
         resolver: zodResolver(variantFormSchema),
+        defaultValues: {
+            nama: "",
+            status: true,
+            UMKMId: "",
+        }
     })
 
     const editForm = useForm<VariantFormSchema>({
-        resolver: zodResolver(variantFormSchema)
+        resolver: zodResolver(variantFormSchema),
     })
 
-    const { data: varianData, isLoading: varianIsLoading } = api.varian.lihatVarian.useQuery()
+    const { data: varianData, isLoading: varianIsLoading } = api.varian.lihatVarian.useQuery(
+        { umkmId: profile?.UMKM?.id ?? "" },
+        {
+            enabled: !!profile?.UMKM?.id
+        }
+    )
 
     const { mutate: tambahVarian, isPending: tambahVarianIsPending } = api.varian.tambahVarian.useMutation({
         onSuccess: async () => {
