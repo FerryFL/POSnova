@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Area, AreaChart } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts"
 import {
   Card,
   CardContent,
@@ -18,7 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select"
-import { salesData, formatRupiah } from "~/data/chartData"
+import type { Transaksi } from "~/utils/api"
+
+// Format Rupiah
+const formatRupiah = (amount: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
 
 const chartConfig: ChartConfig = {
   sales: {
@@ -34,34 +44,64 @@ const chartConfig: ChartConfig = {
   },
 }
 
-export function SalesChart() {
+interface SalesChartProps {
+  transaksiData: Transaksi[]
+}
+
+export function SalesChart({ transaksiData }: SalesChartProps) {
   const [timeRange, setTimeRange] = React.useState("30d")
 
-  const filteredData = React.useMemo(() => {
-    return salesData.filter((item) => {
-      const date = new Date(item.date)
-      const referenceDate = new Date("2024-06-30")
-      let daysToSubtract = 30
-      if (timeRange === "7d") {
-        daysToSubtract = 7
-      } else if (timeRange === "14d") {
-        daysToSubtract = 14
-      }
-      const startDate = new Date(referenceDate)
-      startDate.setDate(startDate.getDate() - daysToSubtract)
-      return date >= startDate
+  // convert data ke chart
+  const chartData = React.useMemo(() => {
+    if (!transaksiData.length) return []
+
+    // date range
+    const now = new Date()
+    let daysToSubtract = 30
+    if (timeRange === "7d") {
+      daysToSubtract = 7
+    } else if (timeRange === "14d") {
+      daysToSubtract = 14
+    }
+
+    const startDate = new Date(now)
+    startDate.setDate(startDate.getDate() - daysToSubtract)
+
+    // filter transaksi berdasarkan range waktu
+    const filteredTransactions = transaksiData.filter(transaction => {
+      const transactionDate = new Date(transaction.tanggalTransaksi)
+      return transactionDate >= startDate && transactionDate <= now
     })
-  }, [timeRange])
 
-  // Calculate totals for display
-  const totalTransactions = filteredData.reduce((sum, item) => sum + item.totalTransactions, 0)
-  const totalRevenue = filteredData.reduce((sum, item) => sum + item.totalRevenue, 0)
+    const groupedByDate: Record<string, { transactions: number; revenue: number }> = {}
 
-  // Convert revenue to millions for better chart display
-  const chartData = filteredData.map(item => ({
-    ...item,
-    totalRevenueMillion: item.totalRevenue / 1000000, // Convert to millions
-  }))
+    for (let d = new Date(startDate); d <= now; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0]!
+      groupedByDate[dateStr] = { transactions: 0, revenue: 0 }
+    }
+
+    filteredTransactions.forEach(transaction => {
+      const dateStr = new Date(transaction.tanggalTransaksi).toISOString().split('T')[0]!
+      if (groupedByDate[dateStr]) {
+        groupedByDate[dateStr]!.transactions += 1
+        groupedByDate[dateStr]!.revenue += transaction.totalHarga
+      }
+    })
+
+    // ubah ke format chart
+    return Object.entries(groupedByDate)
+      .map(([date, data]) => ({
+        date,
+        totalTransactions: data.transactions,
+        totalRevenue: data.revenue,
+        totalRevenueMillion: data.revenue / 1000000, // Convert jutaan
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  }, [transaksiData, timeRange])
+
+  // hitung total transaksi dan pemasukan
+  const totalTransactions = chartData.reduce((sum, item) => sum + item.totalTransactions, 0)
+  const totalRevenue = chartData.reduce((sum, item) => sum + item.totalRevenue, 0)
 
   return (
     <Card className="w-full">

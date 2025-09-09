@@ -2,8 +2,100 @@ import type { ReactElement } from "react"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
 import { SalesChart } from "~/components/SalesChart"
 import type { NextPageWithLayout } from "../_app"
+import { api } from "~/utils/api"
+import { useUserStore } from "~/store/user"
+import { useMemo } from "react"
+
+// format Rupiah
+const formatRupiah = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(amount)
+}
+
+// method buat ngitung persentase
+const calculatePercentageChange = (current: number, previous: number) => {
+    if (previous === 0) return 0
+    return ((current - previous) / previous) * 100
+}
 
 export const DashboardPage: NextPageWithLayout = () => {
+    const { profile } = useUserStore()
+
+    const lihatTransaksi = api.transaksi.lihatTransaksi.useQuery(
+        { umkmId: profile?.UMKM?.id ?? "" },
+        {
+            enabled: !!profile?.UMKM?.id
+        }
+    )
+
+    // Hitung statistik dashboard
+    const dashboardStats = useMemo(() => {
+        if (!lihatTransaksi.data?.length) {
+            return {
+                totalOmzet: 0,
+                totalTransaksi: 0,
+                rataRataTransaksi: 0,
+                recentTransactions: [],
+                monthlyChange: {
+                    omzet: 0,
+                    transaksi: 0,
+                    average: 0
+                }
+            }
+        }
+
+        const now = new Date()
+        const currentMonth = now.getMonth()
+        const currentYear = now.getFullYear()
+        const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
+        const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
+
+        // filter transaksi bulan ini
+        const currentMonthTransactions = lihatTransaksi.data.filter(t => {
+            const transactionDate = new Date(t.tanggalTransaksi)
+            return transactionDate.getMonth() === currentMonth && 
+                   transactionDate.getFullYear() === currentYear
+        })
+
+        // filter transaksi bulan lalu
+        const lastMonthTransactions = lihatTransaksi.data.filter(t => {
+            const transactionDate = new Date(t.tanggalTransaksi)
+            return transactionDate.getMonth() === lastMonth && 
+                   transactionDate.getFullYear() === lastMonthYear
+        })
+
+        // data bulan ini (omzet, bnyk transaksi, rata2 transaksi)
+        const currentMonthOmzet = currentMonthTransactions.reduce((sum, t) => sum + t.totalHarga, 0)
+        const currentMonthCount = currentMonthTransactions.length
+        const currentMonthAverage = currentMonthCount > 0 ? currentMonthOmzet / currentMonthCount : 0
+
+        // data bulan lalu (omzet, bnyk transaksi, rata2 transaksi)
+        const lastMonthOmzet = lastMonthTransactions.reduce((sum, t) => sum + t.totalHarga, 0)
+        const lastMonthCount = lastMonthTransactions.length
+        const lastMonthAverage = lastMonthCount > 0 ? lastMonthOmzet / lastMonthCount : 0
+
+        // last 4 transaksi
+        const recentTransactions = [...lihatTransaksi.data]
+            .sort((a, b) => new Date(b.tanggalTransaksi).getTime() - new Date(a.tanggalTransaksi).getTime())
+            .slice(0, 4)
+
+        return {
+            totalOmzet: currentMonthOmzet,
+            totalTransaksi: currentMonthCount,
+            rataRataTransaksi: currentMonthAverage,
+            recentTransactions,
+            monthlyChange: {
+                omzet: calculatePercentageChange(currentMonthOmzet, lastMonthOmzet),
+                transaksi: calculatePercentageChange(currentMonthCount, lastMonthCount),
+                average: calculatePercentageChange(currentMonthAverage, lastMonthAverage)
+            }
+        }
+    }, [lihatTransaksi.data])
+
     return (
         <div className="space-y-6 p-6">
             {/* Header Section */}
@@ -34,9 +126,9 @@ export const DashboardPage: NextPageWithLayout = () => {
                             <path d="M12 2v20m9-9H3" />
                         </svg>
                     </div>
-                    <div className="text-2xl font-bold">Rp 87.450.000</div>
+                    <div className="text-2xl font-bold">{formatRupiah(dashboardStats.totalOmzet)}</div>
                     <p className="text-xs text-muted-foreground">
-                        +15.2% dari bulan lalu
+                        {dashboardStats.monthlyChange.omzet >= 0 ? '+' : ''}{dashboardStats.monthlyChange.omzet.toFixed(1)}% dari bulan lalu
                     </p>
                 </div>
                 
@@ -57,9 +149,9 @@ export const DashboardPage: NextPageWithLayout = () => {
                             <path d="M2 10h20" />
                         </svg>
                     </div>
-                    <div className="text-2xl font-bold">1,847</div>
+                    <div className="text-2xl font-bold">{dashboardStats.totalTransaksi.toLocaleString('id-ID')}</div>
                     <p className="text-xs text-muted-foreground">
-                        +12.3% dari bulan lalu
+                        {dashboardStats.monthlyChange.transaksi >= 0 ? '+' : ''}{dashboardStats.monthlyChange.transaksi.toFixed(1)}% dari bulan lalu
                     </p>
                 </div>
                 
@@ -81,15 +173,15 @@ export const DashboardPage: NextPageWithLayout = () => {
                             <path d="m22 2-5 10-5-5-5 10" />
                         </svg>
                     </div>
-                    <div className="text-2xl font-bold">Rp 47.350</div>
+                    <div className="text-2xl font-bold">{formatRupiah(dashboardStats.rataRataTransaksi)}</div>
                     <p className="text-xs text-muted-foreground">
-                        +2.8% dari bulan lalu
+                        {dashboardStats.monthlyChange.average >= 0 ? '+' : ''}{dashboardStats.monthlyChange.average.toFixed(1)}% dari bulan lalu
                     </p>
                 </div>
             </div>
 
             {/* Sales Chart */}
-            <SalesChart />
+            <SalesChart transaksiData={lihatTransaksi.data ?? []} />
 
             {/* Recent Activity Section */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -103,50 +195,25 @@ export const DashboardPage: NextPageWithLayout = () => {
                         </div>
                         <div className="p-6 pt-0">
                             <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <div className="ml-4 space-y-1">
-                                        <p className="text-sm font-medium leading-none">
-                                            Transaksi #TR001234
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            3 item • Nasi Gudeg + Es Teh
-                                        </p>
+                                {dashboardStats.recentTransactions.length > 0 ? (
+                                    dashboardStats.recentTransactions.map((transaction) => (
+                                        <div key={transaction.id} className="flex items-center">
+                                            <div className="ml-4 space-y-1">
+                                                <p className="text-sm font-medium leading-none">
+                                                    Transaksi #{transaction.id.toUpperCase()}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {transaction.totalProduk} item • {transaction.transaksiItem.map(item => item.produk.nama).join(', ')}
+                                                </p>
+                                            </div>
+                                            <div className="ml-auto font-medium">{formatRupiah(transaction.totalHarga)}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <p>Belum ada transaksi</p>
                                     </div>
-                                    <div className="ml-auto font-medium">Rp 45.000</div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="ml-4 space-y-1">
-                                        <p className="text-sm font-medium leading-none">
-                                            Transaksi #TR001235
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            1 item • Kopi Tubruk
-                                        </p>
-                                    </div>
-                                    <div className="ml-auto font-medium">Rp 12.000</div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="ml-4 space-y-1">
-                                        <p className="text-sm font-medium leading-none">
-                                            Transaksi #TR001236
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            5 item • Paket Nasi + Lauk
-                                        </p>
-                                    </div>
-                                    <div className="ml-auto font-medium">Rp 85.000</div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="ml-4 space-y-1">
-                                        <p className="text-sm font-medium leading-none">
-                                            Transaksi #TR001237
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            2 item • Gado-gado + Jus Jeruk
-                                        </p>
-                                    </div>
-                                    <div className="ml-auto font-medium">Rp 32.000</div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -163,7 +230,7 @@ export const DashboardPage: NextPageWithLayout = () => {
                         <div className="p-6 pt-0">
                             <div className="space-y-3">
                                 <button 
-                                    onClick={() => window.location.href = '/transactions'}
+                                    onClick={() => window.location.href = '/transaction'}
                                     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full cursor-pointer"
                                 >
                                     Lihat Transaksi
@@ -175,10 +242,10 @@ export const DashboardPage: NextPageWithLayout = () => {
                                     Transaksi Baru
                                 </button>
                                 <button 
-                                    onClick={() => window.location.href = '/reports'}
+                                    onClick={() => window.location.href = '/transaction'}
                                     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full cursor-pointer"
                                 >
-                                    Laporan Harian
+                                    Laporan Bulanan
                                 </button>
                             </div>
                         </div>
