@@ -20,16 +20,6 @@ import {
 } from "~/components/ui/select"
 import type { Transaksi } from "~/utils/api"
 
-// Format Rupiah
-const formatRupiah = (amount: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
 const chartConfig: ChartConfig = {
   sales: {
     label: "Penjualan",
@@ -83,8 +73,8 @@ export function SalesChart({ transaksiData }: SalesChartProps) {
     filteredTransactions.forEach(transaction => {
       const dateStr = new Date(transaction.tanggalTransaksi).toISOString().split('T')[0]!
       if (groupedByDate[dateStr]) {
-        groupedByDate[dateStr]!.transactions += 1
-        groupedByDate[dateStr]!.revenue += transaction.totalHarga
+        groupedByDate[dateStr].transactions += 1
+        groupedByDate[dateStr].revenue += transaction.totalHarga
       }
     })
 
@@ -109,7 +99,7 @@ export function SalesChart({ transaksiData }: SalesChartProps) {
         <div className="grid flex-1 gap-1">
           <CardTitle>Grafik Transaksi</CardTitle>
           <CardDescription>
-            Total Transaksi: {totalTransactions.toLocaleString('id-ID')} | Total Omzet: {formatRupiah(totalRevenue)}
+            Total Transaksi: {totalTransactions.toLocaleString('id-ID')} | Total Omzet: Rp {totalRevenue.toLocaleString()}
           </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
@@ -140,12 +130,12 @@ export function SalesChart({ transaksiData }: SalesChartProps) {
           <AreaChart data={chartData} margin={{ top: 20, right: 50, left: 20, bottom: 5 }}>
             <defs>
               <linearGradient id="transactionGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.1}/>
+                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.1} />
               </linearGradient>
               <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.1}/>
+                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.1} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
@@ -164,32 +154,32 @@ export function SalesChart({ transaksiData }: SalesChartProps) {
               }}
             />
             {/* Left Y-axis for Transactions */}
-            <YAxis 
-              yAxisId="transactions" 
+            <YAxis
+              yAxisId="transactions"
               orientation="left"
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 12, fill: "hsl(var(--chart-1))" }}
               width={60}
-              label={{ 
-                value: 'Transaksi', 
-                angle: -90, 
+              label={{
+                value: 'Transaksi',
+                angle: -90,
                 position: 'insideLeft',
                 style: { textAnchor: 'middle', fill: "hsl(var(--chart-1))" }
               }}
             />
             {/* Right Y-axis for Revenue (in millions) */}
-            <YAxis 
-              yAxisId="revenue" 
+            <YAxis
+              yAxisId="revenue"
               orientation="right"
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 12, fill: "hsl(var(--chart-2))" }}
               width={80}
               tickFormatter={(value: number) => `${value.toFixed(1)}JT`}
-              label={{ 
-                value: 'Pemasukan (Juta Rp)', 
-                angle: 90, 
+              label={{
+                value: 'Pemasukan (Juta Rp)',
+                angle: 90,
                 position: 'insideRight',
                 style: { textAnchor: 'middle', fill: "hsl(var(--chart-2))" }
               }}
@@ -205,13 +195,13 @@ export function SalesChart({ transaksiData }: SalesChartProps) {
                       year: "numeric",
                     })
                   }}
-                  formatter={(value, name, props) => {
+                  formatter={(value, name) => {
                     if (name === "totalTransactions") {
-                      return [ "Total Transaksi: ", `${value} transaksi`]
+                      return ["Total Transaksi: ", `${value} transaksi`]
                     }
                     if (name === "totalRevenueMillion") {
                       const actualRevenue = (value as number) * 1000000
-                      return ["Pemasukan: ", formatRupiah(actualRevenue)]
+                      return ["Pemasukan: ", `Rp ${actualRevenue.toLocaleString()}`]
                     }
                     return [value, name]
                   }}
@@ -247,9 +237,9 @@ export function SalesChart({ transaksiData }: SalesChartProps) {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            <Legend 
+            <Legend
               content={
-                <ChartLegendContent 
+                <ChartLegendContent
                   config={{
                     totalTransactions: {
                       label: "Total Transaksi",
