@@ -4,18 +4,18 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import type { Produk } from "~/utils/api";
+import type { Produk, RekomendasiProduk } from "~/utils/api";
 
 interface DialogRekomendasiProdukProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    filteredProducts: Produk[]
+    rekomendasi: RekomendasiProduk[]
     onAddToCart: (item: Produk) => void
     onNavigate: () => void
 }
 
 const DialogRekomendasiProduk = (props: DialogRekomendasiProdukProps) => {
-    const { filteredProducts, onAddToCart, open, onOpenChange, onNavigate } = props
+    const { rekomendasi, onAddToCart, open, onOpenChange, onNavigate } = props
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[90vw]">
@@ -25,8 +25,8 @@ const DialogRekomendasiProduk = (props: DialogRekomendasiProdukProps) => {
                 </DialogHeader>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                     {
-                        filteredProducts.length > 0 ? (
-                            filteredProducts?.map((item) => (
+                        rekomendasi.length > 0 ? (
+                            rekomendasi?.map((item) => (
                                 <Card key={item.id} className="pt-0 gap-2 justify-between">
                                     <CardHeader className="p-0">
                                         <div className="relative h-40 w-full overflow-hidden">
@@ -75,7 +75,7 @@ const DialogRekomendasiProduk = (props: DialogRekomendasiProdukProps) => {
                             ))
                         ) : (
                             <div className="col-span-4 text-center p-4">
-                                <p className="text-muted-foreground">Tidak ada produk yang tersedia di kategori ini</p>
+                                <p className="text-muted-foreground">Tidak ada produk rekomendasi yang tersedia</p>
                             </div>
                         )
                     }
