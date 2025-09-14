@@ -1,4 +1,5 @@
 import { Pencil, Trash } from "lucide-react"
+import NotFound from "~/components/shared/NotFound"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
@@ -13,7 +14,7 @@ interface VarianCardProps {
 const VarianCard = (props: VarianCardProps) => {
     const { varian, handleEdit, handleDelete } = props
     return (
-        varian?.map((item) => {
+        varian && varian.length > 0 ? varian.map((item) => {
             return (
                 <Card key={item.id} className="">
                     <CardHeader>
@@ -31,7 +32,9 @@ const VarianCard = (props: VarianCardProps) => {
                     </CardFooter>
                 </Card>
             )
-        })
+        }) : (
+            <NotFound>Varian</NotFound>
+        )
     )
 }
 

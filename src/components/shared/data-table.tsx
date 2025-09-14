@@ -83,7 +83,7 @@ export function DataTable<TData, TValue>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                    Tidak ada data.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="text-muted-foreground flex-1 text-sm">
-                    {table.getRowModel().rows.length} of {data.length} row(s) shows.
+                    Menampilkan {table.getRowModel().rows.length} dari {data.length} data
                 </div>
                 <div className="space-x-2">
                     <Button
@@ -101,7 +101,7 @@ export function DataTable<TData, TValue>({
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        Previous
+                        Sebelumnya
                     </Button>
                     <Button
                         variant="outline"
@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
-                        Next
+                        Selanjutnya
                     </Button>
                 </div>
             </div>

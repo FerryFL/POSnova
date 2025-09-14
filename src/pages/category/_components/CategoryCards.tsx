@@ -1,4 +1,5 @@
 import { Pencil, Trash } from "lucide-react"
+import NotFound from "~/components/shared/NotFound"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
@@ -14,7 +15,7 @@ const CategoryCards = (props: CategoryCardsProps) => {
     const { kategori, handleEdit, handleDelete } = props
 
     return (
-        kategori?.map((item) => {
+        kategori && kategori.length > 0 ? kategori.map((item) => {
             return (
                 <Card key={item.id} className="">
                     <CardHeader>
@@ -32,7 +33,9 @@ const CategoryCards = (props: CategoryCardsProps) => {
                     </CardFooter>
                 </Card>
             )
-        })
+        }) : (
+            <NotFound>Kategori</NotFound>
+        )
     )
 }
 

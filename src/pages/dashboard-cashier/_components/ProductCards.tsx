@@ -1,5 +1,6 @@
 import { ShoppingCart, Tags } from "lucide-react";
 import Image from "next/image";
+import NotFound from "~/components/shared/NotFound";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
@@ -69,9 +70,7 @@ const ProductCards = (props: ProductCardsProps) => {
                             </Card>
                         ))
                     ) : (
-                        <div className="col-span-4 text-center p-4">
-                            <p className="text-muted-foreground">Tidak ada produk yang tersedia di kategori ini</p>
-                        </div>
+                        <NotFound>Produk</NotFound>
                     )
                 }
             </div>

@@ -1,5 +1,6 @@
 import { Pencil, Tags, Trash } from "lucide-react"
 import Image from "next/image"
+import NotFound from "~/components/shared/NotFound"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card"
@@ -15,7 +16,7 @@ const ProductCards = (props: ProductCardsProps) => {
     const { produk, handleEdit, handleDelete } = props
 
     return (
-        produk?.map((item) => {
+        produk && produk.length > 0 ? produk.map((item) => {
             return (
                 <Card key={item.id} className="pt-0 gap-2 justify-between">
                     <CardHeader className="p-0">
@@ -77,7 +78,9 @@ const ProductCards = (props: ProductCardsProps) => {
                     </CardFooter>
                 </Card>
             )
-        })
+        }) : (
+            <NotFound>Produk</NotFound>
+        )
     )
 }
 
