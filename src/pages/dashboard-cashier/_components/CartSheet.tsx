@@ -1,7 +1,7 @@
 import { Minus, Plus, ShoppingBag, ShoppingCart, Trash } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
-import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "~/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "~/components/ui/sheet";
 import { useCartStore } from "~/store/cart";
 import type { ProdukKeranjang } from "~/types/cart";
 
@@ -29,6 +29,7 @@ const CartSheet = (props: CartSheetProps) => {
                         <ShoppingCart />
                         Keranjang Belanja
                     </SheetTitle>
+                    <SheetDescription></SheetDescription>
                 </SheetHeader>
                 <Separator />
                 <div className="space-y-2 p-3 max-10/12 overflow-y-auto">

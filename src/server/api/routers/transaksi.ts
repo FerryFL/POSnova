@@ -73,7 +73,7 @@ export const transaksiRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const { db } = ctx
 
-            return db.transaksi.create({
+            const transaksi = db.transaksi.create({
                 data: {
                     totalProduk: input.totalProduk,
                     totalHarga: input.totalHarga,
@@ -93,5 +93,18 @@ export const transaksiRouter = createTRPCRouter({
                     },
                 },
             });
+
+            for (const item of input.items) {
+                await db.produk.update({
+                    where: { id: item.produkId },
+                    data: {
+                        stok: {
+                            decrement: item.jumlah
+                        }
+                    }
+                })
+            }
+
+            return transaksi
         }),
 })
