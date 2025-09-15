@@ -54,9 +54,16 @@ export const DashboardCashier: NextPageWithLayout = () => {
         }
     );
 
-    const { data: rekomendasi } = api.transaksi.rekomendasiProduk.useQuery({
+    // const { data: rekomendasi } = api.transaksi.rekomendasiProduk.useQuery({
+    //     umkmId: profile?.UMKM?.id ?? "",
+    //     produkIds: items.map((item) => item.id),
+    // });
+
+    const { data: rekomendasi } = api.rekomendasi.rekomendasiProduk.useQuery({
         umkmId: profile?.UMKM?.id ?? "",
         produkIds: items.map((item) => item.id),
+        }, {
+        enabled: openDialog && !!profile?.UMKM?.id && items.length > 0,
     });
 
     const totalProducts = categories?.reduce((a, b) => {
