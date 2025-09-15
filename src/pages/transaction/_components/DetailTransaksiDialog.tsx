@@ -1,4 +1,4 @@
-import { Eye, Package, ReceiptText, Tag } from "lucide-react"
+import { Eye, HandCoins, Package, ReceiptText, Tag } from "lucide-react"
 import { useState } from "react"
 import { Button } from "~/components/ui/button"
 import { Card } from "~/components/ui/card"
@@ -33,12 +33,22 @@ export const DetailTransaksiDialog = (props: DetailTransaksiDialogProps) => {
 
                     <Separator />
 
-                    <div className="flex justify-between">
-                        <div className="flex items-center gap-1">
-                            <Package className="size-4" />
-                            <span className="text-sm">Total Produk</span>
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <div className="flex items-center gap-1">
+                                <HandCoins className="size-4" />
+                                <span className="text-sm">Grand Total</span>
+                            </div>
+                            <span className="text-base font-semibold">Rp {transaksi.grandTotal ? transaksi.grandTotal.toLocaleString() : transaksi.totalHarga.toLocaleString()}</span>
                         </div>
-                        <span className="text-sm font-semibold">{transaksi.totalProduk} Produk / Rp {transaksi.totalHarga.toLocaleString()}</span>
+
+                        <div className="flex justify-between">
+                            <div className="flex items-center gap-1">
+                                <Package className="size-4" />
+                                <span className="text-sm">Total Produk</span>
+                            </div>
+                            <span className="text-sm font-semibold">{transaksi.totalProduk} Produk / Rp {transaksi.totalHarga.toLocaleString()}</span>
+                        </div>
                     </div>
 
                     <Separator />

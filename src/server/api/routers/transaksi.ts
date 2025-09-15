@@ -20,6 +20,9 @@ export const transaksiRouter = createTRPCRouter({
                 id: true,
                 totalHarga: true,
                 totalProduk: true,
+                pajakPersen: true,
+                pajakNominal: true,
+                grandTotal: true,
                 UMKM: {
                     select: {
                         id: true,
@@ -59,6 +62,9 @@ export const transaksiRouter = createTRPCRouter({
                         varianNama: z.string().nullable().optional(),
                     })
                 ),
+                pajakPersen: z.number().default(0),
+                pajakNominal: z.number().default(0),
+                grandTotal: z.number(),
                 totalProduk: z.number().min(1),
                 totalHarga: z.number().min(0),
                 umkmId: z.string()
@@ -71,6 +77,9 @@ export const transaksiRouter = createTRPCRouter({
                 data: {
                     totalProduk: input.totalProduk,
                     totalHarga: input.totalHarga,
+                    pajakPersen: input.pajakPersen,
+                    pajakNominal: input.pajakNominal,
+                    grandTotal: input.grandTotal,
                     UMKMId: input.umkmId,
                     transaksiItem: {
                         create: input.items.map((item) => ({

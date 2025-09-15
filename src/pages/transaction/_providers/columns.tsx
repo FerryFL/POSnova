@@ -60,6 +60,32 @@ export const columns: ColumnDef<Transaksi>[] = [
         },
     },
     {
+        accessorKey: "pajakPersen",
+        header: "Pajak",
+        cell: ({ row }) => {
+            const pajak = row.getValue<number>("pajakPersen")
+            return <div className="text-center">{`${pajak ?? 0}%`}</div>
+        },
+    },
+    {
+        accessorKey: "grandTotal",
+        header: ({ column }) => {
+            return (
+                <div className="text-center">
+                    <Button variant="ghost" onClick={() => column.toggleSorting()}>
+                        Grand Total
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                </div>
+            )
+        },
+        cell: ({ row }) => {
+            const harga = row.getValue<number>("totalHarga")
+            const grandTotal = row.getValue<number | undefined>("grandTotal")
+            return <div className="text-center">{`Rp ${(grandTotal ?? harga).toLocaleString()}`}</div>
+        },
+    },
+    {
         id: "actions",
         cell: ({ row }) => <DetailTransaksiDialog transaksi={row.original} />,
     },

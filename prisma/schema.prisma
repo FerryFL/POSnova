@@ -128,8 +128,12 @@ model Transaksi {
     tanggalTransaksi DateTime @default(now())
     totalHarga       Int
     totalProduk      Int
-    createdAt        DateTime @default(now())
-    updatedAt        DateTime @default(now()) @updatedAt
+    pajakPersen      Int?
+    pajakNominal     Int?
+    grandTotal       Int?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
 
     transaksiItem TransaksiItem[]
 

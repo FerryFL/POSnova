@@ -9,6 +9,7 @@ import { HandCoins, ShoppingCart } from "lucide-react"
 import { Card } from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
 import { useUserStore } from "~/store/user"
+import calculateTax from "~/utils/tax"
 
 export const PaymentPage: NextPageWithLayout = () => {
 
@@ -16,7 +17,8 @@ export const PaymentPage: NextPageWithLayout = () => {
     const { profile } = useUserStore()
     const tambahTransaksi = api.transaksi.tambahTransaksi.useMutation()
 
-    const pajak = totalProduk / 10
+    const pajak = 11
+    const { grandTotal, pajakNominal } = calculateTax(totalProduk, pajak)
 
     const handleBayar = () => {
         tambahTransaksi.mutate(
@@ -31,6 +33,9 @@ export const PaymentPage: NextPageWithLayout = () => {
                 })),
                 totalProduk: jumlahProduk,
                 totalHarga: totalProduk,
+                pajakPersen: pajak,
+                pajakNominal: pajakNominal,
+                grandTotal: grandTotal,
                 umkmId: profile?.UMKM?.id ?? ""
             },
             {
@@ -87,13 +92,13 @@ export const PaymentPage: NextPageWithLayout = () => {
                             <p className="text-sm ">Rp {totalProduk.toLocaleString()}</p>
                         </div>
                         <div className="flex justify-between">
-                            <p className="text-sm ">Pajak (10%) </p>
-                            <p className="text-sm ">Rp {pajak.toLocaleString()}</p>
+                            <p className="text-sm ">Pajak {pajak}% </p>
+                            <p className="text-sm ">Rp {pajakNominal.toLocaleString()}</p>
                         </div>
                     </div>
                     <div className="flex justify-between">
                         <p className="text-base">Total Harga </p>
-                        <p className="text-base font-semibold">Rp {(totalProduk + pajak).toLocaleString()}</p>
+                        <p className="text-base font-semibold">Rp {grandTotal.toLocaleString()}</p>
                     </div>
                 </div>
             </Card>

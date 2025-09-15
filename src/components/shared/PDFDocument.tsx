@@ -205,12 +205,12 @@ const PDFDocument = ({ transaksi }: PDFDocumentProps) => {
                         <Text style={styles.value}>Rp {transaksi.totalHarga.toLocaleString()}</Text>
                     </View>
                     <View style={styles.row}>
-                        <Text style={styles.label}>Pajak (10%)</Text>
-                        <Text style={styles.value}>Rp {(transaksi.totalHarga / 10).toLocaleString()}</Text>
+                        <Text style={styles.label}>Pajak ({transaksi.pajakPersen ?? 0}%)</Text>
+                        <Text style={styles.value}>Rp {(transaksi.pajakNominal ?? 0).toLocaleString()}</Text>
                     </View>
                     <View style={styles.totalRow}>
                         <Text style={styles.totalLabel}>Total</Text>
-                        <Text style={styles.totalValue}>Rp {transaksi.totalHarga.toLocaleString()}</Text>
+                        <Text style={styles.totalValue}>Rp {(transaksi.grandTotal ?? transaksi.totalHarga).toLocaleString()}</Text>
                     </View>
                 </View>
 
