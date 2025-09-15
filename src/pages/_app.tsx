@@ -4,10 +4,12 @@ import { Geist } from "next/font/google";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
-import type { ReactElement, ReactNode } from "react";
+import { useEffect, type ReactElement, type ReactNode } from "react";
 import type { NextPage } from "next";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
+import { supabase } from "~/utils/supabase/component";
+import { useUserData } from "~/hooks/use-user-data";
 
 
 const geist = Geist({
@@ -24,6 +26,21 @@ type AppPropsWithLayout = AppProps & {
 
 const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
+  const { loadAfterLogin, clearUserData } = useUserData()
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event) => {
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          await loadAfterLogin()
+        } else if (event === "SIGNED_OUT") {
+          clearUserData()
+        }
+      }
+    )
+    return () => subscription.unsubscribe()
+  }, [loadAfterLogin, clearUserData])
+
   return (
     <ThemeProvider
       attribute="class"

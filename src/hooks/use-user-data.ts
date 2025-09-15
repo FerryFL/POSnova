@@ -2,7 +2,7 @@ import type { User } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import { useUserStore } from "~/store/user"
 import { api } from "~/utils/api"
-import { createClient } from "~/utils/supabase/component"
+import { supabase } from "~/utils/supabase/component"
 
 export const useUserData = () => {
     const {
@@ -11,7 +11,6 @@ export const useUserData = () => {
         clearUser,
     } = useUserStore()
 
-    const supabase = createClient()
     const utils = api.useUtils()
 
     const fetchUserData = async (authUser: User) => {
@@ -40,7 +39,6 @@ export const useUserData = () => {
         try {
             console.log('Loading user after login...')
             const { data: { user }, error } = await supabase.auth.getUser()
-
             if (error) {
                 console.error('Error getting user:', error)
                 toast.error("Error load user, silahkan refresh/coba lagi!")

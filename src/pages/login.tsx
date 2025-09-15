@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { createClient } from "../utils/supabase/component";
+import { supabase } from "../utils/supabase/component";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Mail, Lock, LogIn } from "lucide-react";
@@ -12,7 +12,6 @@ import { loginFormSchema, type LoginFormSchema } from "~/lib/schemas/login";
 
 export default function LoginPage() {
     const router = useRouter();
-    const supabase = createClient();
     const { loadAfterLogin } = useUserData();
 
     const form = useForm<LoginFormSchema>({

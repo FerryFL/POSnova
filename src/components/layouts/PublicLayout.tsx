@@ -4,11 +4,10 @@ import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarSeparator, SidebarTrigger } from "~/components/ui/sidebar";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { createClient } from "~/utils/supabase/component";
 import { useRouter } from "next/router";
-import { useUserData } from "~/hooks/use-user-data";
 import { useUserStore } from "~/store/user";
 import { toast } from "sonner";
+import { supabase } from "~/utils/supabase/component";
 
 const item = [
     {
@@ -49,14 +48,11 @@ const item = [
 ]
 
 export const PublicLayout = ({ children }: { children: ReactNode }) => {
-
-    const { clearUserData } = useUserData()
     const { profile, hasRole } = useUserStore()
     const router = useRouter()
 
     const { setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
-    const supabase = createClient()
 
     const getFilteredItem = () => {
         let menu: typeof item = []
@@ -88,9 +84,6 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error
-
-            await supabase.auth.signOut()
-            clearUserData()
 
             toast.success("Berhasil Logout")
             await router.push("/login")

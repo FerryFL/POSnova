@@ -11,9 +11,9 @@ import type { ProductFormSchema } from "~/forms/product";
 import { Bucket } from "~/server/bucket";
 import { api } from "~/utils/api";
 import { MultiSelectCombobox } from "../MultiSelectCombobox";
-import { createClient } from "~/utils/supabase/component";
 import { useUserStore } from "~/store/user";
 import { toast } from "sonner";
+import { supabase } from "~/utils/supabase/component";
 
 interface ProductFormProps {
     onSubmit: (data: ProductFormSchema) => void
@@ -23,7 +23,6 @@ interface ProductFormProps {
 
 export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormProps) => {
     const form = useFormContext<ProductFormSchema>()
-    const supabase = createClient()
     const { profile } = useUserStore()
 
     const initialUMKM = form.getValues("UMKMId")
