@@ -5,6 +5,7 @@ import { umkmRouter } from "./routers/umkm";
 import { varianRouter } from "./routers/varian";
 import { transaksiRouter } from "./routers/transaksi";
 import { userRouter } from "./routers/user";
+import { rekomendasiRouter } from "./routers/rekomendasi";
 
 /**
  * This is the primary router for your server.
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
   umkm: umkmRouter,
   varian: varianRouter,
   transaksi: transaksiRouter,
+  rekomendasi: rekomendasiRouter,
   user: userRouter
 });
 
