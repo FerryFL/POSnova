@@ -13,47 +13,49 @@ import { useUserData } from "~/hooks/use-user-data";
 
 
 const geist = Geist({
-  subsets: ["latin"],
+    subsets: ["latin"],
 });
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode;
+    getLayout?: (page: ReactElement) => ReactNode;
 };
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
+    Component: NextPageWithLayout;
 };
 
 const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
-  const getLayout = Component.getLayout ?? ((page) => page);
-  const { loadAfterLogin, clearUserData } = useUserData()
+    const getLayout = Component.getLayout ?? ((page) => page);
+    const { loadAfterLogin, clearUserData } = useUserData()
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event) => {
-        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-          await loadAfterLogin()
-        } else if (event === "SIGNED_OUT") {
-          clearUserData()
-        }
-      }
-    )
-    return () => subscription.unsubscribe()
-  }, [loadAfterLogin, clearUserData])
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (event) => {
+                if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+                    setTimeout(() => {
+                        void loadAfterLogin()
+                    }, 0)
+                } else if (event === "SIGNED_OUT") {
+                    clearUserData()
+                }
+            }
+        )
+        return () => subscription.unsubscribe()
+    }, [loadAfterLogin, clearUserData])
 
-  return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <div className={geist.className}>
-        {getLayout(<Component {...pageProps} />)}
-      </div>
-      <Toaster />
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <div className={geist.className}>
+                {getLayout(<Component {...pageProps} />)}
+            </div>
+            <Toaster />
+        </ThemeProvider>
+    );
 };
 
 export default api.withTRPC(MyApp);

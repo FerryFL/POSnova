@@ -1,8 +1,8 @@
 import { Calendar, Download } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { BlobProvider } from "@react-pdf/renderer"
 import { Button } from "~/components/ui/button"
-import { 
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -38,7 +38,7 @@ export const MonthlyReportDownload = ({ transaksi }: MonthlyReportDownloadProps)
 
     const getFilteredTransaksi = () => {
         if (!bulanTerpilih || !tahunTerpilih) return []
-        
+
         return transaksi.filter(item => {
             const tanggalTransaksi = dayjs(item.tanggalTransaksi)
             return (
@@ -50,13 +50,20 @@ export const MonthlyReportDownload = ({ transaksi }: MonthlyReportDownloadProps)
 
     const filteredTransaksi = getFilteredTransaksi()
     const isSelected = bulanTerpilih && tahunTerpilih
+    const count = useRef(0)
 
     const getNamaFile = () => {
         if (!bulanTerpilih || !tahunTerpilih) return "Laporan_Bulanan.pdf"
-        
-        const namaBulan = daftarBulan.find(m => m.value === bulanTerpilih)?.label || ""
+
+        const namaBulan = daftarBulan.find(m => m.value === bulanTerpilih)?.label ?? ""
         return `Laporan_Transaksi_${namaBulan}_${tahunTerpilih}.pdf`
     }
+
+    useEffect(() => {
+        count.current++
+        console.log(count)
+        // console.log(filteredTransaksi)
+    }, [filteredTransaksi, tahunTerpilih, bulanTerpilih])
 
     return (
         <Card className="p-4 space-y-4">
@@ -64,7 +71,7 @@ export const MonthlyReportDownload = ({ transaksi }: MonthlyReportDownloadProps)
                 <Calendar className="size-5" />
                 <h2 className="text-lg font-semibold">Download Laporan Bulanan</h2>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 items-end">
                 <div className="space-y-2 min-w-[150px]">
                     <label className="text-sm font-medium">Pilih Bulan</label>
@@ -99,9 +106,10 @@ export const MonthlyReportDownload = ({ transaksi }: MonthlyReportDownloadProps)
                 </div>
 
                 {isSelected && (
-                    <BlobProvider 
+                    <BlobProvider
+                        key={count.current}
                         document={
-                            <MonthlyPDFDocument 
+                            <MonthlyPDFDocument
                                 transaksi={filteredTransaksi}
                                 bulan={parseInt(bulanTerpilih)}
                                 tahun={parseInt(tahunTerpilih)}
@@ -109,14 +117,14 @@ export const MonthlyReportDownload = ({ transaksi }: MonthlyReportDownloadProps)
                         }
                     >
                         {({ url, loading }) => (
-                            <Button 
-                                variant="default" 
+                            <Button
+                                variant="default"
                                 disabled={!url || loading}
                                 asChild
                             >
                                 {url ? (
-                                    <a 
-                                        href={url} 
+                                    <a
+                                        href={url}
                                         download={getNamaFile()}
                                         target="_blank"
                                         className="flex items-center gap-2"
