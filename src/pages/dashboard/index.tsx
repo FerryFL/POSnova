@@ -1,6 +1,6 @@
 import type { ReactElement } from "react"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
-import { SalesChart } from "~/components/SalesChart"
+import { SalesChart } from "~/components/features/transaction/SalesChart"
 import type { NextPageWithLayout } from "../_app"
 import { api } from "~/utils/api"
 import { useUserStore } from "~/store/user"

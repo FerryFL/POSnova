@@ -1,7 +1,7 @@
 import { useFormContext } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import type { UmkmFormSchema } from "~/forms/umkm";
+import type { UmkmFormSchema } from "~/lib/schemas/umkm";
 
 interface UMKMFormProps {
     onSubmit: (data: UmkmFormSchema) => void;
@@ -47,9 +47,9 @@ export const UMKMForm = ({ onSubmit }: UMKMFormProps) => {
                     <FormItem>
                         <FormLabel>Nomor Telepon</FormLabel>
                         <FormControl>
-                            <Input 
-                                placeholder="08123456789 atau +6281234567890" 
-                                {...field} 
+                            <Input
+                                placeholder="08123456789 atau +6281234567890"
+                                {...field}
                             />
                         </FormControl>
                         <FormMessage />

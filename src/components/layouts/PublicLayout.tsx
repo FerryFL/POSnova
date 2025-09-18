@@ -27,7 +27,7 @@ const item = [
     },
     {
         title: "UMKM",
-        url: "/UMKM",
+        url: "/umkm",
         icon: Building
     },
     {

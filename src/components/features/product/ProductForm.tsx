@@ -7,10 +7,10 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/comp
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import type { ProductFormSchema } from "~/forms/product";
+import type { ProductFormSchema } from "~/lib/schemas/product";
 import { Bucket } from "~/server/bucket";
 import { api } from "~/utils/api";
-import { MultiSelectCombobox } from "../MultiSelectCombobox";
+import { MultiSelectCombobox } from "../../shared/MultiSelectCombobox";
 import { useUserStore } from "~/store/user";
 import { toast } from "sonner";
 import { supabase } from "~/utils/supabase/component";

@@ -5,12 +5,12 @@ import { api } from "~/utils/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { variantFormSchema, type VariantFormSchema } from "~/forms/variant";
-import DialogAddVarian from "./_components/DialogAddVarian";
-import DialogEditVarian from "./_components/DialogEditVarian";
-import DialogDeleteVarian from "./_components/DialogDeleteVarian";
-import VarianSkeleton from "./_components/VarianSkeleton";
-import VarianCard from "./_components/VarianCard";
+import { variantFormSchema, type VariantFormSchema } from "~/lib/schemas/variant";
+import DialogAddVarian from "../../components/features/variant/DialogAddVarian";
+import DialogEditVarian from "../../components/features/variant/DialogEditVarian";
+import DialogDeleteVarian from "../../components/features/variant/DialogDeleteVarian";
+import VarianSkeleton from "../../components/features/variant/VarianSkeleton";
+import VarianCard from "../../components/features/variant/VarianCard";
 import { useUserStore } from "~/store/user";
 
 export const VariantPage: NextPageWithLayout = () => {

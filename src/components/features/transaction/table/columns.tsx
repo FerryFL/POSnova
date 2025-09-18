@@ -2,13 +2,13 @@
 
 import type { ColumnDef } from "@tanstack/react-table"
 import type { Transaksi } from "~/utils/api"
-import { DetailTransaksiDialog } from "../_components/DetailTransaksiDialog"
+import { DetailTransaksiDialog } from "../DetailTransaksiDialog"
 import { Button } from "~/components/ui/button"
 import { ArrowUpDown, FileText } from "lucide-react"
 import dayjs from "dayjs"
 import "dayjs/locale/id"
 import { BlobProvider } from "@react-pdf/renderer"
-import PDFDocument from "~/components/shared/PDFDocument"
+import PDFDocument from "~/components/features/transaction/PDFDocument"
 
 export const columns: ColumnDef<Transaksi>[] = [
     {

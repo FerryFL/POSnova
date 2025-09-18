@@ -4,14 +4,14 @@ import { PublicLayout } from "~/components/layouts/PublicLayout";
 import { api, type Produk } from "~/utils/api";
 import type { NextPageWithLayout } from "../_app";
 import type { ProdukKeranjang } from "~/types/cart";
-import CategorySkeleton from "./_components/CategorySkeleton";
-import CategoryCards from "./_components/CategoryCards";
-import ProductSkeleton from "./_components/ProductSkeleton";
-import ProductCards from "./_components/ProductCards";
-import CartSheet from "./_components/CartSheet";
-import DialogRekomendasiProduk from "./_components/DialogRekomendasiProduk";
-import DialogSelectProduk from "./_components/DialogSelectProduk";
-import DialogDeleteProduk from "./_components/DialogDeleteProduk";
+import CategorySkeleton from "../../components/features/dashboard-cashier/CategorySkeleton";
+import CategoryCards from "../../components/features/dashboard-cashier/CategoryCards";
+import ProductSkeleton from "../../components/features/dashboard-cashier/ProductSkeleton";
+import ProductCards from "../../components/features/dashboard-cashier/ProductCards";
+import CartSheet from "../../components/features/dashboard-cashier/CartSheet";
+import DialogRekomendasiProduk from "../../components/features/dashboard-cashier/DialogRekomendasiProduk";
+import DialogSelectProduk from "../../components/features/dashboard-cashier/DialogSelectProduk";
+import DialogDeleteProduk from "../../components/features/dashboard-cashier/DialogDeleteProduk";
 import { useUserStore } from "~/store/user";
 
 export const DashboardCashier: NextPageWithLayout = () => {

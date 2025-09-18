@@ -1,40 +1,40 @@
 import { LoaderCircle, Plus } from "lucide-react"
 import type { UseFormReturn } from "react-hook-form"
-import { CategoryForm } from "~/components/shared/category/CategoryForm"
+import { VariantForm } from "~/components/features/variant/VariantForm"
 import { Button } from "~/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
-import type { CategoryFormSchema } from "~/forms/category"
+import type { VariantFormSchema } from "~/lib/schemas/variant"
 
-interface DialogAddCategoryProps {
+interface DialogAddVarianProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    addForm: UseFormReturn<CategoryFormSchema>
-    handleSubmit: (data: CategoryFormSchema) => void
-    tambahKategoriIsPending: boolean
+    addForm: UseFormReturn<VariantFormSchema>
+    handleSubmit: (data: VariantFormSchema) => void
+    tambahVarianIsPending: boolean
 }
 
-const DialogAddCategory = (props: DialogAddCategoryProps) => {
-    const { open, onOpenChange, addForm, handleSubmit, tambahKategoriIsPending } = props
+const DialogAddVarian = (props: DialogAddVarianProps) => {
+    const { open, onOpenChange, addForm, handleSubmit, tambahVarianIsPending } = props
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
-                <Button variant="outline"><Plus />Tambah Kategori</Button>
+                <Button variant="outline"><Plus />Tambah Varian</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle><p className="text-lg font-semibold">Tambah Kategori</p></DialogTitle>
+                    <DialogTitle><p className="text-lg font-semibold">Tambah Varian</p></DialogTitle>
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Form {...addForm}>
-                    <CategoryForm onSubmit={handleSubmit} />
+                    <VariantForm onSubmit={handleSubmit} />
                 </Form>
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button variant="outline">Tutup</Button>
                     </DialogClose>
-                    <Button disabled={tambahKategoriIsPending} type="submit" onClick={addForm.handleSubmit(handleSubmit)}>
-                        {tambahKategoriIsPending && <LoaderCircle className="animate-spin" />}
+                    <Button disabled={tambahVarianIsPending} type="submit" onClick={addForm.handleSubmit(handleSubmit)}>
+                        {tambahVarianIsPending && <LoaderCircle className="animate-spin" />}
                         Simpan
                     </Button>
                 </DialogFooter>
@@ -43,4 +43,4 @@ const DialogAddCategory = (props: DialogAddCategoryProps) => {
     )
 }
 
-export default DialogAddCategory
+export default DialogAddVarian

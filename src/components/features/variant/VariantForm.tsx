@@ -1,20 +1,18 @@
-import { useFormContext } from "react-hook-form"
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
-import { type CategoryFormSchema } from "~/forms/category"
-import { Input } from "~/components/ui/input";
-import { Checkbox } from "~/components/ui/checkbox";
-import { useUserStore } from "~/store/user";
 import { useEffect } from "react";
+import { useFormContext } from "react-hook-form"
+import { Checkbox } from "~/components/ui/checkbox";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
+import { Input } from "~/components/ui/input";
+import type { VariantFormSchema } from "~/lib/schemas/variant";
+import { useUserStore } from "~/store/user";
 
-interface CategoryFormProps {
-    onSubmit: (data: CategoryFormSchema) => void;
+interface VariantFormProps {
+    onSubmit: (data: VariantFormSchema) => void;
 }
 
-export const CategoryForm = ({ onSubmit }: CategoryFormProps) => {
+export const VariantForm = ({ onSubmit }: VariantFormProps) => {
     const { profile } = useUserStore()
-
-    const form = useFormContext<CategoryFormSchema>();
-
+    const form = useFormContext<VariantFormSchema>();
     useEffect(() => {
         if (profile?.UMKM?.id) {
             form.setValue("UMKMId", profile.UMKM.id)
@@ -28,9 +26,9 @@ export const CategoryForm = ({ onSubmit }: CategoryFormProps) => {
                 name="nama"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Nama Kategori</FormLabel>
+                        <FormLabel>Nama Varian</FormLabel>
                         <FormControl>
-                            <Input placeholder="Makanan" {...field} />
+                            <Input placeholder="Varian" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -44,7 +42,7 @@ export const CategoryForm = ({ onSubmit }: CategoryFormProps) => {
                     <FormItem className="flex flex-row">
                         <FormControl>
                             <Checkbox
-                                checked={field.value ?? false}
+                                checked={field.value ?? true}
                                 onCheckedChange={field.onChange}
                             />
                         </FormControl>

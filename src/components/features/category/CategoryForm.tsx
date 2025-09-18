@@ -1,18 +1,20 @@
-import { useEffect } from "react";
 import { useFormContext } from "react-hook-form"
-import { Checkbox } from "~/components/ui/checkbox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
+import { type CategoryFormSchema } from "~/lib/schemas/category"
 import { Input } from "~/components/ui/input";
-import type { VariantFormSchema } from "~/forms/variant";
+import { Checkbox } from "~/components/ui/checkbox";
 import { useUserStore } from "~/store/user";
+import { useEffect } from "react";
 
-interface VariantFormProps {
-    onSubmit: (data: VariantFormSchema) => void;
+interface CategoryFormProps {
+    onSubmit: (data: CategoryFormSchema) => void;
 }
 
-export const VariantForm = ({ onSubmit }: VariantFormProps) => {
+export const CategoryForm = ({ onSubmit }: CategoryFormProps) => {
     const { profile } = useUserStore()
-    const form = useFormContext<VariantFormSchema>();
+
+    const form = useFormContext<CategoryFormSchema>();
+
     useEffect(() => {
         if (profile?.UMKM?.id) {
             form.setValue("UMKMId", profile.UMKM.id)
@@ -26,9 +28,9 @@ export const VariantForm = ({ onSubmit }: VariantFormProps) => {
                 name="nama"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Nama Varian</FormLabel>
+                        <FormLabel>Nama Kategori</FormLabel>
                         <FormControl>
-                            <Input placeholder="Varian" {...field} />
+                            <Input placeholder="Makanan" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -42,7 +44,7 @@ export const VariantForm = ({ onSubmit }: VariantFormProps) => {
                     <FormItem className="flex flex-row">
                         <FormControl>
                             <Checkbox
-                                checked={field.value ?? true}
+                                checked={field.value ?? false}
                                 onCheckedChange={field.onChange}
                             />
                         </FormControl>

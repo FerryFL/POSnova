@@ -3,13 +3,13 @@ import { PublicLayout } from "~/components/layouts/PublicLayout"
 import { api } from "~/utils/api"
 import type { NextPageWithLayout } from "../_app"
 import { DataTable } from "../../components/shared/data-table"
-import { columns } from "./_providers/columns"
+import { columns } from "../../components/features/transaction/table/columns"
 import { Card } from "~/components/ui/card"
 import { Button } from "~/components/ui/button"
 import { Plus } from "lucide-react"
 import { useRouter } from "next/router"
 import { useUserStore } from "~/store/user"
-import { MonthlyReportDownload } from "./_components/MonthlyReportDownload"
+import { MonthlyReportDownload } from "../../components/features/transaction/MonthlyReportDownload"
 
 export const TransactionPage: NextPageWithLayout = () => {
 

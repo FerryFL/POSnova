@@ -11,7 +11,7 @@ import {
 } from "~/components/ui/select"
 import { Card } from "~/components/ui/card"
 import type { Transaksi } from "~/utils/api"
-import MonthlyPDFDocument from "~/components/shared/MonthlyPDFDocument"
+import MonthlyPDFDocument from "~/components/features/transaction/MonthlyPDFDocument"
 import dayjs from "dayjs"
 import "dayjs/locale/id"
 

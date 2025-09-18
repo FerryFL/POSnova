@@ -1,10 +1,10 @@
 import { LoaderCircle, Plus } from "lucide-react"
 import type { UseFormReturn } from "react-hook-form"
-import { ProductForm } from "~/components/shared/product/ProductForm"
+import { ProductForm } from "~/components/features/product/ProductForm"
 import { Button } from "~/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
-import type { ProductFormSchema } from "~/forms/product"
+import type { ProductFormSchema } from "~/lib/schemas/product"
 
 interface DialogAddProductProps {
     open: boolean

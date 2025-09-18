@@ -1,37 +1,39 @@
 import { LoaderCircle } from "lucide-react"
 import type { UseFormReturn } from "react-hook-form"
-import { CategoryForm } from "~/components/shared/category/CategoryForm"
+import { ProductForm } from "~/components/features/product/ProductForm"
 import { Button } from "~/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/components/ui/dialog"
 import { Form } from "~/components/ui/form"
-import type { CategoryFormSchema } from "~/forms/category"
+import type { ProductFormSchema } from "~/lib/schemas/product"
 
-interface DialogEditCategoryProps {
+interface DialogEditProductProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    editForm: UseFormReturn<CategoryFormSchema>
-    handleSubmitEdit: (data: CategoryFormSchema) => void
-    ubahKategoriIsPending: boolean
+    editForm: UseFormReturn<ProductFormSchema>
+    handleSubmitEdit: (data: ProductFormSchema) => void
+    handleImageChange: (newImage: string) => void
+    imageUrl: string | null
+    ubahProdukIsPending: boolean
 }
 
-const DialogEditCategory = (props: DialogEditCategoryProps) => {
-    const { open, onOpenChange, editForm, handleSubmitEdit, ubahKategoriIsPending } = props
+const DialogEditProduct = (props: DialogEditProductProps) => {
+    const { open, onOpenChange, editForm, handleSubmitEdit, handleImageChange, imageUrl, ubahProdukIsPending } = props
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle><p className="text-lg font-semibold">Ubah Kategori</p></DialogTitle>
+                    <DialogTitle className="text-lg font-semibold">Ubah Produk</DialogTitle>
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Form {...editForm}>
-                    <CategoryForm onSubmit={handleSubmitEdit} />
+                    <ProductForm onSubmit={handleSubmitEdit} onChangeImage={handleImageChange} imageUrl={imageUrl} />
                 </Form>
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button variant="outline">Tutup</Button>
                     </DialogClose>
-                    <Button disabled={ubahKategoriIsPending} type="submit" onClick={editForm.handleSubmit(handleSubmitEdit)}>
-                        {ubahKategoriIsPending && <LoaderCircle className="animate-spin" />}
+                    <Button type="submit" onClick={editForm.handleSubmit(handleSubmitEdit)}>
+                        {ubahProdukIsPending && <LoaderCircle className="animate-spin" />}
                         Simpan
                     </Button>
                 </DialogFooter>
@@ -40,4 +42,4 @@ const DialogEditCategory = (props: DialogEditCategoryProps) => {
     )
 }
 
-export default DialogEditCategory
+export default DialogEditProduct
