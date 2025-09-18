@@ -86,6 +86,14 @@ export const columns: ColumnDef<Transaksi>[] = [
         },
     },
     {
+        accessorKey: "createdBy",
+        header: "Created By",
+        cell: ({ row }) => {
+            const value = row.getValue<string>("createdBy")
+            return <div>{value ?? "-"}</div>
+        }
+    },
+    {
         id: "actions",
         cell: ({ row }) => <DetailTransaksiDialog transaksi={row.original} />,
     },

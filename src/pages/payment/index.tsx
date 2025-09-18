@@ -36,7 +36,8 @@ export const PaymentPage: NextPageWithLayout = () => {
                 pajakPersen: pajak,
                 pajakNominal: pajakNominal,
                 grandTotal: grandTotal,
-                umkmId: profile?.UMKM?.id ?? ""
+                umkmId: profile?.UMKM?.id ?? "",
+                createdBy: `${profile?.name} - ${profile?.email}`
             },
             {
                 onSuccess: () => {

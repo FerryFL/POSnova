@@ -23,6 +23,7 @@ export const transaksiRouter = createTRPCRouter({
                 pajakPersen: true,
                 pajakNominal: true,
                 grandTotal: true,
+                createdBy: true,
                 UMKM: {
                     select: {
                         id: true,
@@ -42,7 +43,7 @@ export const transaksiRouter = createTRPCRouter({
                             }
                         }
                     }
-                }
+                },
             },
             where: whereClause
         })
@@ -67,7 +68,8 @@ export const transaksiRouter = createTRPCRouter({
                 grandTotal: z.number(),
                 totalProduk: z.number().min(1),
                 totalHarga: z.number().min(0),
-                umkmId: z.string()
+                umkmId: z.string(),
+                createdBy: z.string()
             })
         )
         .mutation(async ({ ctx, input }) => {
@@ -81,6 +83,7 @@ export const transaksiRouter = createTRPCRouter({
                     pajakNominal: input.pajakNominal,
                     grandTotal: input.grandTotal,
                     UMKMId: input.umkmId,
+                    createdBy: input.createdBy,
                     transaksiItem: {
                         create: input.items.map((item) => ({
                             produkId: item.produkId,
