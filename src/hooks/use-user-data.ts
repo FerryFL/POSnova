@@ -37,7 +37,7 @@ export const useUserData = () => {
 
     const loadAfterLogin = async () => {
         try {
-            console.log('Loading user after login...')
+            // console.log('Loading user after login...')
             const { data: { user }, error } = await supabase.auth.getUser()
             if (error) {
                 console.error('Error getting user:', error)
@@ -49,7 +49,7 @@ export const useUserData = () => {
                 const result = await fetchUserData(user)
                 return result !== null
             } else {
-                console.log('No authenticated user found')
+                // console.log('No authenticated user found')
                 return false
             }
         } catch (error) {
@@ -68,7 +68,7 @@ export const useUserData = () => {
     }
 
     const clearUserData = () => {
-        console.log("clear data")
+        // console.log("clear data")
         clearUser()
     }
 

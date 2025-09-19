@@ -36,12 +36,12 @@ export default function LoginPage() {
             }
 
             if (authData.user) {
-                console.log('Login successful, loading user data...');
+                // console.log('Login successful, loading user data...');
 
                 const success = await loadAfterLogin();
 
                 if (success) {
-                    console.log('User data loaded successfully');
+                    // console.log('User data loaded successfully');
                     toast.success("Login Berhasil!");
                     form.reset()
                     await router.push("/");

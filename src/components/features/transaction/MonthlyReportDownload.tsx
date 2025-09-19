@@ -61,7 +61,7 @@ export const MonthlyReportDownload = ({ transaksi }: MonthlyReportDownloadProps)
 
     useEffect(() => {
         count.current++
-        console.log(count)
+        // console.log(count)
         // console.log(filteredTransaksi)
     }, [filteredTransaksi, tahunTerpilih, bulanTerpilih])
 
