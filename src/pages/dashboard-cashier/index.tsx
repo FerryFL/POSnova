@@ -13,11 +13,13 @@ import DialogRekomendasiProduk from "../../components/features/dashboard-cashier
 import DialogSelectProduk from "../../components/features/dashboard-cashier/DialogSelectProduk";
 import DialogDeleteProduk from "../../components/features/dashboard-cashier/DialogDeleteProduk";
 import { useUserStore } from "~/store/user";
+import { useCartStore } from "~/store/cart";
 
 export const DashboardCashier: NextPageWithLayout = () => {
 
     const router = useRouter()
     const { profile } = useUserStore()
+    const { items } = useCartStore()
 
     const [openDialog, setOpenDialog] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
@@ -51,6 +53,11 @@ export const DashboardCashier: NextPageWithLayout = () => {
             enabled: !!profile?.UMKM?.id
         }
     );
+
+    const { data: rekomendasi } = api.transaksi.rekomendasiProduk.useQuery({
+        umkmId: profile?.UMKM?.id ?? "",
+        produkIds: items.map((item) => item.id),
+    });
 
     const totalProducts = categories?.reduce((a, b) => {
         if (b.status) {
@@ -113,7 +120,7 @@ export const DashboardCashier: NextPageWithLayout = () => {
                 onRemoveProduct={handleRemoveProduct} />
 
             <DialogRekomendasiProduk
-                filteredProducts={filteredProducts}
+                rekomendasi={rekomendasi ?? []}
                 onAddToCart={handleAddToCart}
                 open={openDialog}
                 onOpenChange={setOpenDialog}

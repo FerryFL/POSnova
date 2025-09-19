@@ -84,3 +84,6 @@ export type Profile = LihatProfileOutput
 
 type LihatUserRoleOutput = RouterOutputs["user"]["lihatUserRole"]
 export type UserRole = LihatUserRoleOutput[number]
+
+type RekomendasiProdukOutput = RouterOutputs["transaksi"]["rekomendasiProduk"]
+export type RekomendasiProduk = RekomendasiProdukOutput[number]
