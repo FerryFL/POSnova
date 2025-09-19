@@ -23,7 +23,7 @@ const ProductCards = (props: ProductCardsProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                 {
                     filteredProducts.length > 0 ? (
-                        filteredProducts.map((item) => (
+                        filteredProducts.filter(item => item.stok > 0).map((item) => (
                             <Card key={item.id} className="pt-0 gap-2 justify-between">
                                 <CardHeader className="p-0">
                                     <div className="relative h-40 w-full overflow-hidden">

@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { useUserStore } from "~/store/user";
 import { toast } from "sonner";
 import { supabase } from "~/utils/supabase/component";
+import { useCartStore } from "~/store/cart";
 
 const item = [
     {
@@ -49,6 +50,7 @@ const item = [
 
 export const PublicLayout = ({ children }: { children: ReactNode }) => {
     const { profile, hasRole } = useUserStore()
+    const { clearCart } = useCartStore()
     const router = useRouter()
 
     const { setTheme, resolvedTheme } = useTheme();
@@ -84,7 +86,7 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error
-
+            clearCart()
             toast.success("Berhasil Logout")
             await router.push("/login")
         } catch (e) {

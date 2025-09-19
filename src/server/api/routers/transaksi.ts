@@ -166,7 +166,10 @@ export const transaksiRouter = createTRPCRouter({
             if (sorted.length === 0) return [];
 
             const rekomendasi = await db.produk.findMany({
-                where: { id: { in: sorted.map(([id]) => id) } },
+                where: {
+                    id: { in: sorted.map(([id]) => id) },
+                    stok: { gt: 0 }
+                },
                 select: {
                     id: true,
                     nama: true,
