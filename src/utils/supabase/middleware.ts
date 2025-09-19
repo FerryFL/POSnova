@@ -30,7 +30,8 @@ export const updateSession = async (request: NextRequest) => {
 
     const pathName = request.nextUrl.pathname
     const isLogin = pathName.startsWith("/login")
-    const isPublic = pathName.startsWith("/login") || pathName.startsWith("/register")
+    const isPublic = pathName.startsWith("/login")
+    // || pathName.startsWith("/register")
 
     // console.log("=========================TEST========================")
 

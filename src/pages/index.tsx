@@ -4,51 +4,22 @@ import { useUserStore } from "~/store/user";
 import type { NextPageWithLayout } from "./_app";
 
 export const Home: NextPageWithLayout = () => {
-    const {
-        profile,
-        roles,
-        hasRole,
-    } = useUserStore()
+    const { profile } = useUserStore();
     return (
-        <div>
-            {
-                profile ? (
-                    <div>
-                        <h1>Selamat datang, {profile?.name}</h1>
-                        <p>(PROFILE){profile?.id} === (ROLE){roles[0]?.profileId}</p>
-                        <p>(PROFILE){profile?.email}</p>
-                        <p>UMKM: {profile?.UMKM?.nama}</p>
-                        <p>Roles: {roles.map((item) => item.role.name)}</p>
-                        {
-                            roles.map((role) => role.role.id)
-                        }
-                        {
-                            hasRole('RL001') && (
-                                <p>Kamu adalah Kasir</p>
-                            )
-                        }
-                        {
-                            hasRole('RL002') && (
-                                <p>Kamu adalah Pemilik</p>
-                            )
-                        }
-                        {
-                            hasRole('RL003') && (
-                                <p>Kamu adalah Admin</p>
-                            )
-                        }
-                    </div>
-                ) : (
-                    <div>No Data</div>
-                )
-            }
+        <div className="space-y-2">
+            <div className="text-center space-y-2">
+                <h1 className="text-4xl font-bold text-foreground">POSnova</h1>
+                <h2 className="text-xl text-foreground"> Selamat datang, {profile?.name}!</h2>
+                {profile?.UMKM?.nama && (
+                    <p className="text-foreground">{profile?.UMKM.nama}</p>
+                )}
+            </div>
         </div>
     );
-}
+};
 
 Home.getLayout = (page: ReactElement) => {
-    return <PublicLayout>{page}</PublicLayout>
-}
+    return <PublicLayout>{page}</PublicLayout>;
+};
 
-export default Home
-
+export default Home;
