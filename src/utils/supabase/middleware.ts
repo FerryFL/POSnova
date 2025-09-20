@@ -30,7 +30,7 @@ export const updateSession = async (request: NextRequest) => {
 
     const pathName = request.nextUrl.pathname
     const isLogin = pathName.startsWith("/login")
-    const isPublic = pathName.startsWith("/login")
+    const isRegist = pathName.startsWith("/register")
     // || pathName.startsWith("/register")
 
     // console.log("=========================TEST========================")
@@ -50,7 +50,7 @@ export const updateSession = async (request: NextRequest) => {
         pathName.startsWith("/umkm")
 
     // Cek kalau gk ada user, gk boleh ke page selain login/register
-    if (!user && !isPublic) {
+    if (!user && !isLogin) {
         return NextResponse.redirect(new URL("/login", request.url))
     }
 
@@ -72,6 +72,10 @@ export const updateSession = async (request: NextRequest) => {
         const hasCashier = profile?.UserRole.some((r) => r.roleId === "RL001")
         const hasOwner = profile?.UserRole.some((r) => r.roleId === "RL002")
         const hasAdmin = profile?.UserRole.some((r) => r.roleId === "RL003")
+
+        if (isRegist && !hasAdmin) {
+            return NextResponse.redirect(new URL("/", request.url))
+        }
 
         // Ke route kasir, tapi gk punya kasir 
         if (cashierRoute && !hasCashier) {
