@@ -95,7 +95,7 @@ export function SalesChart({ transaksiData }: SalesChartProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+      <CardHeader className="flex sm:items-center gap-2 space-y-0 border-b py-5 flex-col sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Grafik Transaksi</CardTitle>
           <CardDescription>

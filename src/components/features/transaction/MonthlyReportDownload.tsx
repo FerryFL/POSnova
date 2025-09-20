@@ -72,7 +72,7 @@ export const MonthlyReportDownload = ({ transaksi }: MonthlyReportDownloadProps)
                 <h2 className="text-lg font-semibold">Download Laporan Bulanan</h2>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex flex-col sm:flex-row gap-4">
                 <div className="space-y-2 min-w-[150px]">
                     <label className="text-sm font-medium">Pilih Bulan</label>
                     <Select value={bulanTerpilih} onValueChange={setBulanTerpilih}>
