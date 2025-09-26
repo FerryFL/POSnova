@@ -1,4 +1,4 @@
-import type { ReactElement } from "react"
+import { type ReactElement } from "react"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
 import { api } from "~/utils/api"
 import type { NextPageWithLayout } from "../_app"
@@ -26,6 +26,10 @@ export const TransactionPage: NextPageWithLayout = () => {
             enabled: !!profile?.UMKM?.id
         }
     )
+
+    // useEffect(() => {
+    //     console.log(lihatTransaksi)
+    // }, [lihatTransaksi])
 
     return (
         <div className="space-y-4 w-full">

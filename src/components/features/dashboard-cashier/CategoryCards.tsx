@@ -9,6 +9,7 @@ interface CategoryProps {
 
 const CategoryCards = (props: CategoryProps) => {
     const { categories, totalProducts, onSelect } = props
+    // console.log(categories)
 
     return (
         <div className="flex gap-3 overflow-x-auto pb-2 mb-4 w-full">
@@ -20,13 +21,13 @@ const CategoryCards = (props: CategoryProps) => {
             </Card>
 
             {
-                categories.filter((category) => category.status === true).map((category) => (
+                categories.map((category) => (
                     <Card key={category.id} className="hover:bg-gray-100 hover:text-black transition-colors shrink-0 p-3 gap-1 min-w-32 max-w-52 text-center flex justify-center items-center cursor-pointer"
                         onClick={() => onSelect(category.id, category.nama)}>
                         <div className="w-full">
                             <h2 className="text-base font-semibold line-clamp-1 break-words">{category.nama}</h2>
                         </div>
-                        <p className="text-sm">{category.Produk.filter(item => item.status === true).length} Produk</p>
+                        <p className="text-sm">{category.Produk.length} Produk</p>
                     </Card>
                 ))
             }

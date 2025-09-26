@@ -5,7 +5,7 @@ import { z } from "zod";
 export const kategoriRouter = createTRPCRouter({
     lihatKategori: publicProcedure.input(
         z.object({
-            umkmId: z.string()
+            umkmId: z.string(),
         })
     ).query(async ({ ctx, input }) => {
         const { db } = ctx
@@ -23,7 +23,8 @@ export const kategoriRouter = createTRPCRouter({
                 Produk: {
                     select: {
                         id: true,
-                        status: true
+                        status: true,
+                        stok: true
                     }
                 },
                 UMKM: {

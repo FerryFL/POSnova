@@ -10,6 +10,7 @@ import { ThemeProvider } from "~/providers/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
 import { supabase } from "~/utils/supabase/component";
 import { useUserData } from "~/hooks/use-user-data";
+import { useCartStore } from "~/store/cart";
 
 
 const geist = Geist({
@@ -27,6 +28,7 @@ type AppPropsWithLayout = AppProps & {
 const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
     const getLayout = Component.getLayout ?? ((page) => page);
     const { loadAfterLogin, clearUserData } = useUserData()
+    const { clearCart } = useCartStore()
 
     useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -37,11 +39,12 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
                     }, 0)
                 } else if (event === "SIGNED_OUT") {
                     clearUserData()
+                    clearCart()
                 }
             }
         )
         return () => subscription.unsubscribe()
-    }, [loadAfterLogin, clearUserData])
+    }, [loadAfterLogin, clearUserData, clearCart])
 
     return (
         <ThemeProvider

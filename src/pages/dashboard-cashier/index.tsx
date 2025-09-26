@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type ReactElement } from "react";
 import { PublicLayout } from "~/components/layouts/PublicLayout";
 import { api, type Produk } from "~/utils/api";
 import type { NextPageWithLayout } from "../_app";
@@ -14,6 +14,8 @@ import DialogSelectProduk from "../../components/features/dashboard-cashier/Dial
 import DialogDeleteProduk from "../../components/features/dashboard-cashier/DialogDeleteProduk";
 import { useUserStore } from "~/store/user";
 import { useCartStore } from "~/store/cart";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 
 export const DashboardCashier: NextPageWithLayout = () => {
 
@@ -34,6 +36,8 @@ export const DashboardCashier: NextPageWithLayout = () => {
     const [selectedJumlah, setSelectedJumlah] = useState(1)
 
     const [selectedProdukCart, setSelectedProdukCart] = useState<Produk>()
+    const { hasRole } = useUserStore()
+    const [mounted, setMounted] = useState(false)
 
     const { data: products, isLoading } = api.produk.lihatProduk.useQuery(
         {
@@ -54,18 +58,60 @@ export const DashboardCashier: NextPageWithLayout = () => {
         }
     );
 
-    const { data: rekomendasi } = api.transaksi.rekomendasiProduk.useQuery({
-        umkmId: profile?.UMKM?.id ?? "",
-        produkIds: items.map((item) => item.id),
-    });
+    const filteredCategories = categories?.filter((category) => category.status === true).map((category) => ({
+        ...category,
+        Produk: category.Produk.filter((produk) => produk.status && produk.stok > 0)
+    }))
 
-    const totalProducts = categories?.reduce((a, b) => {
+    // const { data: rekomendasi } = api.transaksi.rekomendasiProduk.useQuery({
+    //     umkmId: profile?.UMKM?.id ?? "",
+    //     produkIds: items.map((item) => item.id),
+    // });
+
+    const preparedItems = useMemo(() =>
+        items.map(item => ({
+            ...item,
+            ProdukVarian: item.ProdukVarian ?? []
+        })), [items]
+    )
+
+    const { data: rekomendasiAi } = api.rekomendasi.getRecommendations.useQuery({
+        umkmId: profile?.UMKM?.id ?? "",
+        items: preparedItems,
+        num_recommendations: 3
+    },
+        {
+            enabled: openDialog && items.length > 0,
+        }
+    )
+
+    const totalProduct = categories?.reduce((a, b) => {
         if (b.status) {
-            const activeProduct = b.Produk.filter((product) => product.status)
+            const activeProduct = b.Produk.filter((product) => product.status && product.stok > 0)
             return a + activeProduct.length;
         }
         return a;
     }, 0) ?? 0;
+
+    const { mutate: trainContent, isPending: trainContentIsPending } = api.rekomendasi.trainContentBased.useMutation({
+        onSuccess: () => {
+            toast.success("Berhasil train Content-Based model!");
+        },
+        onError: (error) => {
+            toast.error(`Gagal train Content-Based: ${error.message}`);
+        }
+    });
+
+    const { mutate: trainApriori, isPending: trainAprioriIsPending } = api.rekomendasi.trainApriori.useMutation({
+        onSuccess: () => {
+            toast.success("Berhasil train Apriori model!");
+        },
+        onError: (error) => {
+            toast.error(`Gagal train Apriori: ${error.message}`);
+        }
+    });
+
+    const { data, refetch } = api.rekomendasi.checkHealth.useQuery(undefined, { enabled: false })
 
     const handleNavigate = () => {
         void router.push("/payment")
@@ -95,15 +141,64 @@ export const DashboardCashier: NextPageWithLayout = () => {
         }
     }, [openDialogCart])
 
+    const handleTrainContent = () => {
+        if (profile?.UMKM?.id) {
+            trainContent({ umkmId: profile.UMKM.id });
+        }
+    }
+
+    const handleTrainApriori = () => {
+        if (profile?.UMKM?.id) {
+            trainApriori({ umkmId: profile.UMKM.id });
+        }
+    }
+
+    const handleClickHealth = () => {
+        void refetch()
+        console.log(data)
+    }
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <div>
             <h1 className="text-xl font-bold mb-4">Dashboard Kasir</h1>
+
+            {
+                mounted && hasRole("RL002") && <div className="mb-4">
+                    <h2 className="text-sm font-medium mb-3">Training AI Models</h2>
+                    <div className="flex gap-2 flex-wrap">
+                        <Button
+                            onClick={handleTrainContent}
+                            disabled={trainContentIsPending}
+                        >
+                            {trainContentIsPending ? 'Training...' : 'Train Content-Based'}
+                        </Button>
+
+                        <Button
+                            onClick={handleTrainApriori}
+                            disabled={trainAprioriIsPending}
+                        >
+                            {trainAprioriIsPending ? 'Training...' : 'Train Apriori'}
+                        </Button>
+
+                        <Button
+                            onClick={handleClickHealth}
+                        >
+                            Check Health
+                        </Button>
+                    </div>
+                </div>
+            }
+
             {
                 isCategoriesLoading ?
                     <CategorySkeleton /> :
                     <CategoryCards
-                        categories={categories ?? []}
-                        totalProducts={totalProducts}
+                        categories={filteredCategories ?? []}
+                        totalProducts={totalProduct}
                         onSelect={handleClick} />
             }
             {
@@ -120,7 +215,7 @@ export const DashboardCashier: NextPageWithLayout = () => {
                 onRemoveProduct={handleRemoveProduct} />
 
             <DialogRekomendasiProduk
-                rekomendasi={rekomendasi ?? []}
+                rekomendasi={rekomendasiAi}
                 onAddToCart={handleAddToCart}
                 open={openDialog}
                 onOpenChange={setOpenDialog}
