@@ -4,23 +4,27 @@ import { Button } from "~/components/ui/button"
 import { useCartStore } from "~/store/cart"
 import { api } from "~/utils/api"
 import { toast } from "sonner"
-import type { ReactElement } from "react"
-import { HandCoins, ShoppingCart } from "lucide-react"
+import { useState, type ReactElement } from "react"
+import { HandCoins, LoaderCircle, ShoppingCart } from "lucide-react"
 import { Card } from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
 import { useUserStore } from "~/store/user"
 import calculateTax from "~/utils/tax"
+import { DialogConfirmPayment } from "~/components/features/payment/DialogConfirmPayment"
 
 export const PaymentPage: NextPageWithLayout = () => {
 
     const { items, jumlahProduk, totalProduk, clearCart } = useCartStore()
     const { profile } = useUserStore()
     const tambahTransaksi = api.transaksi.tambahTransaksi.useMutation()
+    const [isLoading, setIsLoading] = useState(false)
+    const [confirmPayment, setConfirmPayment] = useState(false)
 
     const pajak = 11
     const { grandTotal, pajakNominal } = calculateTax(totalProduk, pajak)
 
     const handleBayar = () => {
+        setIsLoading(true)
         tambahTransaksi.mutate(
             {
                 items: items.map((item) => ({
@@ -44,6 +48,9 @@ export const PaymentPage: NextPageWithLayout = () => {
                     clearCart();
                     toast.success("Transaksi berhasil!");
                 },
+                onSettled: () => {
+                    setIsLoading(false)
+                }
             }
         );
     };
@@ -105,15 +112,26 @@ export const PaymentPage: NextPageWithLayout = () => {
             </Card>
 
             <div className="space-y-2">
-                <Button disabled={items.length === 0} onClick={handleBayar} className="w-full">
-                    <HandCoins />
-                    Bayar Sekarang
+                <Button disabled={items.length === 0 || isLoading} onClick={() => setConfirmPayment(true)} className="w-full">
+                    {isLoading ?
+                        <LoaderCircle className="animate-spin" /> :
+                        <div className="flex items-center gap-2">
+                            <HandCoins />
+                            Bayar Sekarang
+                        </div>
+                    }
                 </Button>
 
-                <Button variant="destructive" onClick={clearCart} className="w-full">
+                <Button disabled={items.length === 0} variant="destructive" onClick={clearCart} className="w-full">
                     Hapus Keranjang
                 </Button>
             </div>
+
+            <DialogConfirmPayment
+                open={confirmPayment}
+                onOpenChange={setConfirmPayment}
+                onConfirm={handleBayar}
+            />
         </div>
     )
 }

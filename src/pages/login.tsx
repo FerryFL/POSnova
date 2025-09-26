@@ -2,17 +2,19 @@ import { useRouter } from "next/router";
 import { supabase } from "../utils/supabase/component";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, LogIn, LoaderCircle } from "lucide-react";
 import { useUserData } from "~/hooks/use-user-data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { toast } from "sonner";
 import { loginFormSchema, type LoginFormSchema } from "~/lib/schemas/login";
+import { useState } from "react";
 
 export default function LoginPage() {
     const router = useRouter();
     const { loadAfterLogin } = useUserData();
+    const [isLoading, setIsLoading] = useState(false)
 
     const form = useForm<LoginFormSchema>({
         resolver: zodResolver(loginFormSchema),
@@ -23,6 +25,7 @@ export default function LoginPage() {
     });
 
     const onSubmit = async (data: LoginFormSchema) => {
+        setIsLoading(true)
         try {
             const { data: authData, error } = await supabase.auth.signInWithPassword({
                 email: data.email,
@@ -53,6 +56,7 @@ export default function LoginPage() {
             console.error('Login error:', error);
             toast.error("Login Gagal!");
         }
+        setIsLoading(false)
     };
 
     return (
@@ -137,10 +141,18 @@ export default function LoginPage() {
 
                         <Button
                             type="submit"
-                            className="w-full bg-slate-700 hover:bg-slate-800 text-white flex items-center justify-center gap-2"
+                            className="w-full bg-slate-700 hover:bg-slate-800 text-white"
+                            disabled={isLoading}
                         >
-                            <LogIn className="h-5 w-5" />
-                            Login
+                            {
+                                isLoading ?
+                                    <LoaderCircle className="animate-spin" /> :
+                                    <div className="flex items-center justify-center gap-2">
+                                        <LogIn className="h-5 w-5" />
+                                        Login
+                                    </div>
+                            }
+
                         </Button>
                     </form>
                 </Form>

@@ -45,7 +45,7 @@ export const VariantPage: NextPageWithLayout = () => {
     const { mutate: tambahVarian, isPending: tambahVarianIsPending } = api.varian.tambahVarian.useMutation({
         onSuccess: async () => {
             await apiUtils.varian.lihatVarian.invalidate()
-            toast.success("Data Berhasil Ditambahkan!")
+            toast.success("Varian Berhasil Ditambahkan!")
             addForm.reset()
             setAddOpen(false)
         }
@@ -54,7 +54,7 @@ export const VariantPage: NextPageWithLayout = () => {
     const { mutate: ubahVarian, isPending: ubahVarianIsPending } = api.varian.ubahVarian.useMutation({
         onSuccess: async () => {
             await apiUtils.varian.lihatVarian.invalidate()
-            toast.success("Data Berhasil Diubah!")
+            toast.success("Varian Berhasil Diubah!")
             addForm.reset()
             setEditOpen(false)
         }
@@ -63,7 +63,7 @@ export const VariantPage: NextPageWithLayout = () => {
     const { mutate: hapusVarian, isPending: hapusVarianIsPending } = api.varian.hapusVarian.useMutation({
         onSuccess: async () => {
             await apiUtils.varian.lihatVarian.invalidate()
-            toast.success("Data Berhasil Dihapus!")
+            toast.success("Varian Berhasil Dihapus!")
             addForm.reset()
             setIdToDelete(null)
         }

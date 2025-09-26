@@ -47,7 +47,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const { mutate: tambahKategori, isPending: tambahKategoriIsPending } = api.kategori.tambahKategori.useMutation({
         onSuccess: async () => {
             await apiUtils.kategori.lihatKategori.invalidate()
-            toast.success("Data Kategori Berhasil Ditambahkan!")
+            toast.success("Kategori Berhasil Ditambahkan!")
             addForm.reset()
             setAddOpen(false)
         }
@@ -56,7 +56,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const { mutate: ubahKategori, isPending: ubahKategoriIsPending } = api.kategori.ubahKategori.useMutation({
         onSuccess: async () => {
             await apiUtils.kategori.lihatKategori.invalidate()
-            toast.success("Data Kategori Berhasil Diubah!")
+            toast.success("Kategori Berhasil Diubah!")
             editForm.reset()
             setEditOpen(false)
         }
@@ -65,7 +65,7 @@ export const CategoryPage: NextPageWithLayout = () => {
     const { mutate: hapusKategori, isPending: hapusKategoriIsPending } = api.kategori.hapusKategori.useMutation({
         onSuccess: async () => {
             await apiUtils.kategori.lihatKategori.invalidate()
-            toast.success("Data Kategori Berhasil Dihapus!")
+            toast.success("Kategori Berhasil Dihapus!")
             setIdToDelete(null)
         }
     })

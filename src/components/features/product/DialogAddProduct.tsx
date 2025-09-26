@@ -35,7 +35,7 @@ const DialogAddProduct = (props: DialogAddProductProps) => {
                     <DialogClose asChild>
                         <Button variant="outline">Tutup</Button>
                     </DialogClose>
-                    <Button type="submit" onClick={addForm.handleSubmit(handleSubmit)}>
+                    <Button disabled={tambahProdukIsPending} type="submit" onClick={addForm.handleSubmit(handleSubmit)}>
                         {tambahProdukIsPending && <LoaderCircle className="animate-spin" />}
                         Simpan
                     </Button>

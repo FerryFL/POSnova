@@ -32,7 +32,7 @@ const DialogEditProduct = (props: DialogEditProductProps) => {
                     <DialogClose asChild>
                         <Button variant="outline">Tutup</Button>
                     </DialogClose>
-                    <Button type="submit" onClick={editForm.handleSubmit(handleSubmitEdit)}>
+                    <Button disabled={ubahProdukIsPending} type="submit" onClick={editForm.handleSubmit(handleSubmitEdit)}>
                         {ubahProdukIsPending && <LoaderCircle className="animate-spin" />}
                         Simpan
                     </Button>
