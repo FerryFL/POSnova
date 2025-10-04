@@ -47,7 +47,8 @@ export const updateSession = async (request: NextRequest) => {
         pathName.startsWith("/product")
 
     const adminRoute =
-        pathName.startsWith("/umkm")
+        pathName.startsWith("/umkm") ||
+        pathName.startsWith("/admin")
 
     // Cek kalau gk ada user, gk boleh ke page selain login/register
     if (!user && !isLogin) {

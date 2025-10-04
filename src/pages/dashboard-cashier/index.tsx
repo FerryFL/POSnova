@@ -111,8 +111,6 @@ export const DashboardCashier: NextPageWithLayout = () => {
         }
     });
 
-    const { data, refetch } = api.rekomendasi.checkHealth.useQuery(undefined, { enabled: false })
-
     const handleNavigate = () => {
         void router.push("/payment")
     }
@@ -153,11 +151,6 @@ export const DashboardCashier: NextPageWithLayout = () => {
         }
     }
 
-    const handleClickHealth = () => {
-        void refetch()
-        console.log(data)
-    }
-
     useEffect(() => {
         setMounted(true);
     }, []);
@@ -182,12 +175,6 @@ export const DashboardCashier: NextPageWithLayout = () => {
                             disabled={trainAprioriIsPending}
                         >
                             {trainAprioriIsPending ? 'Training...' : 'Train Apriori'}
-                        </Button>
-
-                        <Button
-                            onClick={handleClickHealth}
-                        >
-                            Check Health
                         </Button>
                     </div>
                 </div>

@@ -7,9 +7,9 @@ import type { ProdukKeranjangSchema } from "~/lib/schemas/produk-keranjang";
 
 const API_BASE_URL = process.env.RECOMMENDATION_API_URL!
 
-export const trainApriori = async (transactions: TransactionForAprioriTraining) => {
+export const trainApriori = async (transactions: TransactionForAprioriTraining, umkmId: string) => {
     try {
-        const { data } = await axios.post<TrainingResponse>(`${API_BASE_URL}/train-apriori`, { transactions })
+        const { data } = await axios.post<TrainingResponse>(`${API_BASE_URL}/train-apriori`, { transactions, umkmId })
         return data
     } catch (e) {
         const error = e as AxiosError<ApiError>
@@ -24,9 +24,9 @@ export const trainApriori = async (transactions: TransactionForAprioriTraining) 
     }
 }
 
-export const getRecommendationApriori = async (items: ProdukKeranjangSchema[], num_recommendations: number) => {
+export const getRecommendationApriori = async (items: ProdukKeranjangSchema[], umkmId: string, num_recommendations: number) => {
     try {
-        const { data } = await axios.post<RecommendationResponse>(`${API_BASE_URL}/recommend-apriori`, { items, num_recommendations })
+        const { data } = await axios.post<RecommendationResponse>(`${API_BASE_URL}/recommend-apriori`, { items, umkmId, num_recommendations })
         return data
     } catch (e) {
         const error = e as AxiosError<ApiError>

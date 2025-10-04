@@ -27,7 +27,7 @@ export const rekomendasiRouter = createTRPCRouter({
                     })
                 }
 
-                const result = await trainContent(products)
+                const result = await trainContent(products, input.umkmId)
                 return {
                     ...result,
                     total_products: products.length
@@ -59,7 +59,7 @@ export const rekomendasiRouter = createTRPCRouter({
                     throw new Error('No transactions found for Apriori training');
                 }
 
-                const result = await trainApriori(transactions)
+                const result = await trainApriori(transactions, input.umkmId)
 
                 return {
                     ...result,
@@ -115,8 +115,8 @@ export const rekomendasiRouter = createTRPCRouter({
                 const useApriori = transactionCounts.some(item => item.count >= 10) && input.items.length > 1;
 
                 const recommendations = useApriori ?
-                    await getRecommendationApriori(input.items, input.num_recommendations) :
-                    await getRecommendationContent(input.items, input.num_recommendations)
+                    await getRecommendationApriori(input.items, input.umkmId, input.num_recommendations) :
+                    await getRecommendationContent(input.items, input.umkmId, input.num_recommendations)
 
                 return {
                     ...recommendations,
