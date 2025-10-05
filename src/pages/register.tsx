@@ -21,37 +21,32 @@ export const RegisterPage = () => {
             name: "",
             email: "",
             password: "",
-            role: []
+            role: [],
+            umkmId: ""
         }
     })
 
-    const mutation = api.user.signUp.useMutation()
     const { data } = api.umkm.lihatUMKM.useQuery()
 
-    const onSubmit = async (data: RegisterFormSchema) => {
-        try {
-            const result = await mutation.mutateAsync({
-                name: data.name,
-                email: data.email,
-                password: data.password,
-                umkmId: data.umkmId,
-                role: data.role
-            });
-
-            if (!result.success) {
-                toast.error(result.message)
-                return
-            }
-
-            // console.log("User created:", result.user);
+    const mutation = api.user.signUp.useMutation({
+        onSuccess: () => {
             toast.success("Registrasi Berhasil!");
-            form.reset()
-        } catch (error) {
-            console.error('Signup error:', error)
-            if (error instanceof Error) {
-                toast.error(error.message)
-            }
+            form.reset();
+        },
+        onError: (error) => {
+            toast.error(error.message)
         }
+    })
+
+
+    const onSubmit = async (data: RegisterFormSchema) => {
+        mutation.mutate({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            umkmId: data.umkmId,
+            role: data.role
+        });
     }
 
     const roles = [
@@ -185,7 +180,7 @@ export const RegisterPage = () => {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="text-gray-600">UMKM</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value ?? ""}>
                                         <FormControl>
                                             <SelectTrigger className="text-gray-600 border-slate-300">
                                                 <SelectValue placeholder="Pilih UMKM" />

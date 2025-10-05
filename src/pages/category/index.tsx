@@ -50,6 +50,9 @@ export const CategoryPage: NextPageWithLayout = () => {
             toast.success("Kategori Berhasil Ditambahkan!")
             addForm.reset()
             setAddOpen(false)
+        },
+        onError: async (error) => {
+            toast.error(error.message)
         }
     })
 
@@ -59,6 +62,9 @@ export const CategoryPage: NextPageWithLayout = () => {
             toast.success("Kategori Berhasil Diubah!")
             editForm.reset()
             setEditOpen(false)
+        },
+        onError: async (error) => {
+            toast.error(error.message)
         }
     })
 

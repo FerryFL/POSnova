@@ -84,17 +84,17 @@ export const userRouter = createTRPCRouter({
         });
 
         if (error) {
-            return {
-                success: false,
-                message: error.message,
-            };
+            throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: error.message
+            })
         }
 
         if (!data.user) {
-            return {
-                success: false,
-                message: "User tidak berhasil dibuat",
-            };
+            throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "User tidak berhasil dibuat"
+            })
         }
 
         try {
@@ -117,16 +117,16 @@ export const userRouter = createTRPCRouter({
                 })
             }
         } catch (e) {
-            const error = e instanceof Error ? e.message : "Unknown Error"
+            const error = e instanceof Error ? e.message : "Tidak berhasil membuat akun"
 
             console.error("Error dalam pembuatan profile: ", error)
 
             await supabaseAccess.auth.admin.deleteUser(data.user.id)
 
-            return {
-                success: false,
-                message: error
-            }
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: error,
+            });
         }
 
         return { success: true, user: data.user };

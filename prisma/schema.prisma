@@ -18,7 +18,7 @@ model Profile {
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id], onDelete: Cascade)
     UMKMId String?
 
     UserRole UserRole[]
@@ -58,8 +58,10 @@ model Kategori {
 
     Produk Produk[]
 
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id], onDelete: Cascade)
     UMKMId String?
+
+    @@unique([UMKMId, nama])
 }
 
 model Varian {
@@ -72,7 +74,7 @@ model Varian {
     // Produk       Produk[]
     ProdukVarian ProdukVarian[]
 
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id], onDelete: Cascade)
     UMKMId String?
 }
 
@@ -87,15 +89,17 @@ model Produk {
     updatedAt DateTime @default(now()) @updatedAt
 
     kategoriId String
-    kategori   Kategori @relation(fields: [kategoriId], references: [id])
+    kategori   Kategori @relation(fields: [kategoriId], references: [id], onDelete: Cascade)
     // varian       Varian         @relation(fields: [varianId], references: [id])
 
     ProdukVarian ProdukVarian[]
 
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id], onDelete: Cascade)
     UMKMId String?
 
     TransaksiItem TransaksiItem[]
+
+    @@unique([UMKMId, nama])
 }
 
 model ProdukVarian {
@@ -138,7 +142,7 @@ model Transaksi {
 
     transaksiItem TransaksiItem[]
 
-    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id])
+    UMKM   UMKM?   @relation(fields: [UMKMId], references: [id], onDelete: Cascade)
     UMKMId String?
 }
 
@@ -154,6 +158,6 @@ model TransaksiItem {
     transaksi   Transaksi @relation(fields: [transaksiId], references: [id], onDelete: Cascade)
     transaksiId String
 
-    produk   Produk @relation(fields: [produkId], references: [id])
+    produk   Produk @relation(fields: [produkId], references: [id], onDelete: Cascade)
     produkId String
 }

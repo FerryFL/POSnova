@@ -33,30 +33,30 @@ export default function LoginPage() {
             });
 
             if (error) {
-                console.error(error);
                 toast.error(error.message);
                 return;
             }
 
-            if (authData.user) {
-                // console.log('Login successful, loading user data...');
-
-                const success = await loadAfterLogin();
-
-                if (success) {
-                    // console.log('User data loaded successfully');
-                    toast.success("Login Berhasil!");
-                    form.reset()
-                    await router.push("/");
-                } else {
-                    toast.error("Gagal melakukan User Load setelah login");
-                }
+            if (!authData.user) {
+                toast.error("Login gagal, user tidak ditemukan");
+                return;
             }
-        } catch (error) {
-            console.error('Login error:', error);
-            toast.error("Login Gagal!");
+
+            const success = await loadAfterLogin();
+
+            if (success) {
+                toast.success("Login Berhasil!");
+                form.reset()
+                await router.push("/");
+            } else {
+                toast.error("Gagal melakukan User Load setelah login");
+            }
+        } catch (e) {
+            const error = e instanceof Error ? e.message : "Terjadi kesalahan tak terduga"
+            toast.error(error);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false)
     };
 
     return (

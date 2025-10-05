@@ -77,6 +77,20 @@ export const produkRouter = createTRPCRouter({
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
 
+        const existing = await db.produk.findFirst({
+            where: {
+                nama: input.nama,
+                UMKMId: input.UMKMId
+            }
+        })
+
+        if (existing) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: "Produk dengan nama ini sudah tersimpan!"
+            })
+        }
+
         const produkBaru = await db.produk.create({
             data: {
                 nama: input.nama,
@@ -125,6 +139,20 @@ export const produkRouter = createTRPCRouter({
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
+
+        const existing = await db.produk.findFirst({
+            where: {
+                nama: input.nama,
+                UMKMId: input.UMKMId
+            }
+        })
+
+        if (existing) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: "Produk dengan nama ini sudah tersimpan!"
+            })
+        }
 
         await db.produk.update({
             where: {

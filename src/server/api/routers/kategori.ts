@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 export const kategoriRouter = createTRPCRouter({
     lihatKategori: publicProcedure.input(
@@ -48,6 +49,20 @@ export const kategoriRouter = createTRPCRouter({
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
 
+        const existing = await db.kategori.findFirst({
+            where: {
+                nama: input.nama,
+                UMKMId: input.UMKMId
+            }
+        })
+
+        if (existing) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: "Kategori dengan nama ini sudah tersimpan!"
+            })
+        }
+
         const kategoriBaru = await db.kategori.create({
             data: {
                 nama: input.nama,
@@ -67,6 +82,20 @@ export const kategoriRouter = createTRPCRouter({
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
+
+        const existing = await db.kategori.findFirst({
+            where: {
+                nama: input.nama,
+                UMKMId: input.UMKMId
+            }
+        })
+
+        if (existing) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: "Kategori dengan nama ini sudah tersimpan!"
+            })
+        }
 
         await db.kategori.update({
             where: {

@@ -64,6 +64,9 @@ export const ProductPage: NextPageWithLayout = () => {
             resetImageState()
             addForm.reset()
             setAddOpen(false)
+        },
+        onError: async (error) => {
+            toast.error(error.message)
         }
     })
 
@@ -74,6 +77,9 @@ export const ProductPage: NextPageWithLayout = () => {
             resetImageState()
             editForm.reset()
             setEditOpen(false)
+        },
+        onError: async (error) => {
+            toast.error(error.message)
         }
     })
 
