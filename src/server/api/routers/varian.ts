@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import type { Prisma } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 export const varianRouter = createTRPCRouter({
     lihatVarian: publicProcedure.input(
@@ -41,6 +42,20 @@ export const varianRouter = createTRPCRouter({
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
 
+        const existing = await db.varian.findFirst({
+            where: {
+                nama: input.nama,
+                UMKMId: input.UMKMId
+            }
+        })
+
+        if (existing) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: "Varian dengan nama ini sudah tersimpan!"
+            })
+        }
+
         const varianBaru = await db.varian.create({
             data: {
                 nama: input.nama,
@@ -59,6 +74,20 @@ export const varianRouter = createTRPCRouter({
         })
     ).mutation(async ({ ctx, input }) => {
         const { db } = ctx
+
+        const existing = await db.varian.findFirst({
+            where: {
+                nama: input.nama,
+                UMKMId: input.UMKMId
+            }
+        })
+
+        if (existing) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message: "Varian dengan nama ini sudah tersimpan!"
+            })
+        }
 
         await db.varian.update({
             where: {

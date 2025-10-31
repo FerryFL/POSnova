@@ -48,6 +48,9 @@ export const VariantPage: NextPageWithLayout = () => {
             toast.success("Varian Berhasil Ditambahkan!")
             addForm.reset()
             setAddOpen(false)
+        },
+        onError: async (error) => {
+            toast.error(error.message)
         }
     })
 
@@ -57,6 +60,9 @@ export const VariantPage: NextPageWithLayout = () => {
             toast.success("Varian Berhasil Diubah!")
             addForm.reset()
             setEditOpen(false)
+        },
+        onError: async (error) => {
+            toast.error(error.message)
         }
     })
 
