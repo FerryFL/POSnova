@@ -14,8 +14,6 @@ import DialogSelectProduk from "../../components/features/dashboard-cashier/Dial
 import DialogDeleteProduk from "../../components/features/dashboard-cashier/DialogDeleteProduk";
 import { useUserStore } from "~/store/user";
 import { useCartStore } from "~/store/cart";
-import { toast } from "sonner";
-import { Button } from "~/components/ui/button";
 
 export const DashboardCashier: NextPageWithLayout = () => {
 
@@ -36,8 +34,6 @@ export const DashboardCashier: NextPageWithLayout = () => {
     const [selectedJumlah, setSelectedJumlah] = useState(1)
 
     const [selectedProdukCart, setSelectedProdukCart] = useState<Produk>()
-    const { hasRole } = useUserStore()
-    const [mounted, setMounted] = useState(false)
 
     const { data: products, isLoading } = api.produk.lihatProduk.useQuery(
         {
@@ -93,24 +89,6 @@ export const DashboardCashier: NextPageWithLayout = () => {
         return a;
     }, 0) ?? 0;
 
-    const { mutate: trainContent, isPending: trainContentIsPending } = api.rekomendasi.trainContentBased.useMutation({
-        onSuccess: () => {
-            toast.success("Berhasil train Content-Based model!");
-        },
-        onError: (error) => {
-            toast.error(`Gagal train Content-Based: ${error.message}`);
-        }
-    });
-
-    const { mutate: trainApriori, isPending: trainAprioriIsPending } = api.rekomendasi.trainApriori.useMutation({
-        onSuccess: () => {
-            toast.success("Berhasil train Apriori model!");
-        },
-        onError: (error) => {
-            toast.error(`Gagal train Apriori: ${error.message}`);
-        }
-    });
-
     const handleNavigate = () => {
         void router.push("/payment")
     }
@@ -139,46 +117,9 @@ export const DashboardCashier: NextPageWithLayout = () => {
         }
     }, [openDialogCart])
 
-    const handleTrainContent = () => {
-        if (profile?.UMKM?.id) {
-            trainContent({ umkmId: profile.UMKM.id });
-        }
-    }
-
-    const handleTrainApriori = () => {
-        if (profile?.UMKM?.id) {
-            trainApriori({ umkmId: profile.UMKM.id });
-        }
-    }
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
     return (
         <div>
             <h1 className="text-xl font-bold mb-4">Dashboard Kasir</h1>
-
-            {
-                mounted && hasRole("RL002") && <div className="mb-4">
-                    <h2 className="text-sm font-medium mb-3">Training AI Models</h2>
-                    <div className="flex gap-2 flex-wrap">
-                        <Button
-                            onClick={handleTrainContent}
-                            disabled={trainContentIsPending}
-                        >
-                            {trainContentIsPending ? 'Training...' : 'Train Content-Based'}
-                        </Button>
-
-                        <Button
-                            onClick={handleTrainApriori}
-                            disabled={trainAprioriIsPending}
-                        >
-                            {trainAprioriIsPending ? 'Training...' : 'Train Apriori'}
-                        </Button>
-                    </div>
-                </div>
-            }
 
             {
                 isCategoriesLoading ?

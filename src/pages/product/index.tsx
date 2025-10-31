@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from "react"
+import { useEffect, useState, type ReactElement } from "react"
 import type { NextPageWithLayout } from "../_app"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
 import { api } from "~/utils/api"
@@ -12,6 +12,7 @@ import DialogDeleteProduct from "../../components/features/product/DialogDeleteP
 import ProductSkeleton from "../../components/features/product/ProductSkeleton"
 import ProductCards from "../../components/features/product/ProductCards"
 import { useUserStore } from "~/store/user"
+import { Button } from "~/components/ui/button"
 
 interface ImageState {
     current: string | null
@@ -24,6 +25,9 @@ export const ProductPage: NextPageWithLayout = () => {
     const { profile } = useUserStore()
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
+
+    const { hasRole } = useUserStore()
+    const [mounted, setMounted] = useState(false)
 
     const [imageState, setImageState] = useState<ImageState>({
         current: null,
@@ -223,9 +227,65 @@ export const ProductPage: NextPageWithLayout = () => {
         setEditOpen(open)
     }
 
+    const { mutate: trainContent, isPending: trainContentIsPending } = api.rekomendasi.trainContentBased.useMutation({
+        onSuccess: () => {
+            toast.success("Berhasil train Content-Based model!");
+        },
+        onError: (error) => {
+            toast.error(`Gagal train Content-Based: ${error.message}`);
+        }
+    });
+
+    const { mutate: trainApriori, isPending: trainAprioriIsPending } = api.rekomendasi.trainApriori.useMutation({
+        onSuccess: () => {
+            toast.success("Berhasil train Apriori model!");
+        },
+        onError: (error) => {
+            toast.error(`Gagal train Apriori: ${error.message}`);
+        }
+    });
+
+    const handleTrainContent = () => {
+        if (profile?.UMKM?.id) {
+            trainContent({ umkmId: profile.UMKM.id });
+        }
+    }
+
+    const handleTrainApriori = () => {
+        if (profile?.UMKM?.id) {
+            trainApriori({ umkmId: profile.UMKM.id });
+        }
+    }
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen Produk</h1>
+
+            {
+                mounted && hasRole("RL002") && <div className="mb-4">
+                    <h2 className="text-sm font-medium mb-3">Training AI Models</h2>
+                    <div className="flex gap-2 flex-wrap">
+                        <Button
+                            onClick={handleTrainContent}
+                            disabled={trainContentIsPending}
+                        >
+                            {trainContentIsPending ? 'Training...' : 'Train Content-Based'}
+                        </Button>
+
+                        <Button
+                            onClick={handleTrainApriori}
+                            disabled={trainAprioriIsPending}
+                        >
+                            {trainAprioriIsPending ? 'Training...' : 'Train Apriori'}
+                        </Button>
+                    </div>
+                </div>
+            }
+
             <DialogAddProduct
                 open={addOpen}
                 onOpenChange={handleAddDialogClose}
