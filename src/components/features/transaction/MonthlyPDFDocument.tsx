@@ -125,7 +125,7 @@ interface MonthlyPDFDocumentProps {
 
 const MonthlyPDFDocument = ({ transaksi, bulan, tahun }: MonthlyPDFDocumentProps) => {
     const namaBulan = dayjs().month(bulan - 1).locale('id').format('MMMM')
-    
+
     const totalTransaksi = transaksi.length
     const totalProduk = transaksi.reduce((sum, t) => sum + t.totalProduk, 0)
     const totalPendapatan = transaksi.reduce((sum, t) => sum + t.totalHarga, 0)
@@ -143,10 +143,12 @@ const MonthlyPDFDocument = ({ transaksi, bulan, tahun }: MonthlyPDFDocumentProps
                     </View>
 
                     <View style={styles.rightBox}>
-                        <Text style={styles.tokoNama}>Toko ABC</Text>
-                        <Text>Jl. Contoh No. 123</Text>
-                        <Text>Jakarta Selatan, 12345</Text>
-                        <Text>Tel: (021) 1234-5678</Text>
+                        <Text style={styles.tokoNama}>
+                            {transaksi?.[0]?.UMKM?.nama ?? ""}
+                        </Text>
+                        <Text>
+                            {transaksi?.[0]?.UMKM?.alamat ?? ""}
+                        </Text>
                     </View>
                 </View>
 

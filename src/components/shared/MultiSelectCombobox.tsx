@@ -56,7 +56,7 @@ export function MultiSelectCombobox({
                         <ChevronsUpDown className="opacity-50 w-4 h-4" />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[250px] p-0">
+                <PopoverContent className="w-[250px] p-0" >
                     <Command>
                         <CommandInput placeholder="Cari varian..." className="h-9" />
                         <CommandList>

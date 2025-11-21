@@ -78,7 +78,10 @@ export const varianRouter = createTRPCRouter({
         const existing = await db.varian.findFirst({
             where: {
                 nama: input.nama,
-                UMKMId: input.UMKMId
+                UMKMId: input.UMKMId,
+                NOT: {
+                    id: input.id
+                }
             }
         })
 

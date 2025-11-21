@@ -83,7 +83,7 @@ const DialogRekomendasiProduk = (props: DialogRekomendasiProdukProps) => {
                                         <ShoppingCart className="text-primary cursor-pointer" />
                                     </Button>
                                 </CardFooter>
-                                {item.score}
+                                {/* <p className="text-center">Skor AI : {item.score.toFixed(3)}</p> */}
                             </Card>
                         ))
                     ) : (

@@ -52,7 +52,7 @@ export const kategoriRouter = createTRPCRouter({
         const existing = await db.kategori.findFirst({
             where: {
                 nama: input.nama,
-                UMKMId: input.UMKMId
+                UMKMId: input.UMKMId,
             }
         })
 
@@ -86,7 +86,10 @@ export const kategoriRouter = createTRPCRouter({
         const existing = await db.kategori.findFirst({
             where: {
                 nama: input.nama,
-                UMKMId: input.UMKMId
+                UMKMId: input.UMKMId,
+                NOT: {
+                    id: input.id
+                }
             }
         })
 

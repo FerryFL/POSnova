@@ -257,6 +257,15 @@ export const ProductPage: NextPageWithLayout = () => {
         }
     }
 
+    const handleTrainAll = async () => {
+        await Promise.all([
+            handleTrainContent(),
+            handleTrainApriori()
+        ])
+    }
+
+    const isAnyPending = trainContentIsPending || trainAprioriIsPending;
+
     useEffect(() => {
         setMounted(true);
     }, []);
@@ -270,6 +279,13 @@ export const ProductPage: NextPageWithLayout = () => {
                     <h2 className="text-sm font-medium mb-3">Training AI Models</h2>
                     <div className="flex gap-2 flex-wrap">
                         <Button
+                            onClick={handleTrainAll}
+                            disabled={isAnyPending}
+                        >
+                            {isAnyPending ? 'Training...' : 'Train AI untuk Rekomendasi Produk'}
+                        </Button>
+
+                        {/* <Button
                             onClick={handleTrainContent}
                             disabled={trainContentIsPending}
                         >
@@ -281,7 +297,7 @@ export const ProductPage: NextPageWithLayout = () => {
                             disabled={trainAprioriIsPending}
                         >
                             {trainAprioriIsPending ? 'Training...' : 'Train Apriori'}
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
             }

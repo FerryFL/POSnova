@@ -143,7 +143,10 @@ export const produkRouter = createTRPCRouter({
         const existing = await db.produk.findFirst({
             where: {
                 nama: input.nama,
-                UMKMId: input.UMKMId
+                UMKMId: input.UMKMId,
+                NOT: {
+                    id: input.id
+                }
             }
         })
 

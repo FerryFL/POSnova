@@ -117,6 +117,12 @@ export const DashboardCashier: NextPageWithLayout = () => {
         }
     }, [openDialogCart])
 
+    useEffect(() => {
+        if (rekomendasiAi) {
+            console.log("Rekomendasi AI:", rekomendasiAi);
+        }
+    }, [rekomendasiAi]);
+
     return (
         <div>
             <h1 className="text-xl font-bold mb-4">Dashboard Kasir</h1>

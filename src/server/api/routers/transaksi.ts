@@ -27,7 +27,8 @@ export const transaksiRouter = createTRPCRouter({
                 UMKM: {
                     select: {
                         id: true,
-                        nama: true
+                        nama: true,
+                        alamat: true,
                     }
                 },
                 tanggalTransaksi: true,

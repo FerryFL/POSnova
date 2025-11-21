@@ -1,4 +1,5 @@
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
+import dayjs from 'dayjs'
 import type { Transaksi } from '~/utils/api'
 
 const styles = StyleSheet.create({
@@ -152,17 +153,15 @@ const PDFDocument = ({ transaksi }: PDFDocumentProps) => {
                     {/* Kiri */}
                     <View style={styles.left}>
                         <Text style={styles.invoiceTitle}>INVOICE</Text>
-                        <Text>Invoice #: inv-{transaksi.id}</Text>
-                        <Text>Tanggal: 30 Agustus 2025</Text>
+                        <Text>Invoice: {transaksi.id}</Text>
+                        <Text>{dayjs(transaksi.tanggalTransaksi).locale('id').format('DD MMMM YYYY')}</Text>
                         <Text style={styles.status}>Lunas</Text>
                     </View>
 
                     {/* Kanan */}
                     <View style={styles.rightBox}>
-                        <Text style={styles.tokoNama}>Toko ABC</Text>
-                        <Text>Jl. Contoh No. 123</Text>
-                        <Text>Jakarta Selatan, 12345</Text>
-                        <Text>Tel: (021) 1234-5678</Text>
+                        <Text style={styles.tokoNama}>{transaksi.UMKM?.nama}</Text>
+                        <Text>{transaksi.UMKM?.alamat}</Text>
                     </View>
                 </View>
 
