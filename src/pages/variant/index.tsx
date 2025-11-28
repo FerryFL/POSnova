@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type ReactElement } from "react";
 import type { NextPageWithLayout } from "../_app";
 import { PublicLayout } from "~/components/layouts/PublicLayout";
 import { api } from "~/utils/api";
@@ -12,12 +12,16 @@ import DialogDeleteVarian from "../../components/features/variant/DialogDeleteVa
 import VarianSkeleton from "../../components/features/variant/VarianSkeleton";
 import VarianCard from "../../components/features/variant/VarianCard";
 import { useUserStore } from "~/store/user";
+import { Input } from "~/components/ui/input";
+import { Search } from "lucide-react";
 
 export const VariantPage: NextPageWithLayout = () => {
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
     const [idToEdit, setIdToEdit] = useState<string | null>(null)
     const [idToDelete, setIdToDelete] = useState<string | null>(null)
+
+    const [searchTerm, setSearchTerm] = useState("")
 
     const apiUtils = api.useUtils()
     const { profile } = useUserStore()
@@ -41,6 +45,14 @@ export const VariantPage: NextPageWithLayout = () => {
             enabled: !!profile?.UMKM?.id
         }
     )
+
+    const filteredData = useMemo(() => {
+        if (!varianData) return []
+
+        return varianData.filter((item) =>
+            item.nama.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    }, [varianData, searchTerm])
 
     const { mutate: tambahVarian, isPending: tambahVarianIsPending } = api.varian.tambahVarian.useMutation({
         onSuccess: async () => {
@@ -126,12 +138,25 @@ export const VariantPage: NextPageWithLayout = () => {
         <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen Varian</h1>
 
-            <DialogAddVarian
-                open={addOpen}
-                onOpenChange={setAddOpen}
-                addForm={addForm}
-                handleSubmit={handleSubmit}
-                tambahVarianIsPending={tambahVarianIsPending} />
+            <div className="flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                        placeholder="Cari Varian..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                
+                <DialogAddVarian
+                    open={addOpen}
+                    onOpenChange={setAddOpen}
+                    addForm={addForm}
+                    handleSubmit={handleSubmit}
+                    tambahVarianIsPending={tambahVarianIsPending} 
+                />
+            </div>
 
             <DialogEditVarian
                 open={editOpen}
@@ -153,7 +178,7 @@ export const VariantPage: NextPageWithLayout = () => {
                     varianIsLoading ?
                         <VarianSkeleton /> :
                         <VarianCard
-                            varian={varianData}
+                            varian={filteredData}
                             handleEdit={handleEdit}
                             handleDelete={handleDelete} />
                 }

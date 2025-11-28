@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react"
+import { useEffect, useMemo, useState, type ReactElement } from "react"
 import type { NextPageWithLayout } from "../_app"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
 import { api } from "~/utils/api"
@@ -13,6 +13,8 @@ import ProductSkeleton from "../../components/features/product/ProductSkeleton"
 import ProductCards from "../../components/features/product/ProductCards"
 import { useUserStore } from "~/store/user"
 import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input";
+import { Search } from "lucide-react";
 
 interface ImageState {
     current: string | null
@@ -25,6 +27,8 @@ export const ProductPage: NextPageWithLayout = () => {
     const { profile } = useUserStore()
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
+
+    const [searchTerm, setSearchTerm] = useState("")
 
     const { hasRole } = useUserStore()
     const [mounted, setMounted] = useState(false)
@@ -61,6 +65,15 @@ export const ProductPage: NextPageWithLayout = () => {
             enabled: !!profile?.UMKM?.id
         }
     )
+
+    const filteredData = useMemo(() => {
+        if (!produkData) return []
+
+        return produkData.filter((item) =>
+            item.nama.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    }, [produkData, searchTerm])
+
     const { mutate: tambahProduk, isPending: tambahProdukIsPending } = api.produk.tambahProduk.useMutation({
         onSuccess: async () => {
             await apiUtils.produk.lihatProduk.invalidate()
@@ -302,15 +315,27 @@ export const ProductPage: NextPageWithLayout = () => {
                 </div>
             }
 
-            <DialogAddProduct
-                open={addOpen}
-                onOpenChange={handleAddDialogClose}
-                addForm={addForm}
-                handleImageChange={handleImageChange}
-                handleSubmit={handleSubmit}
-                imageUrl={imageState.current}
-                tambahProdukIsPending={tambahProdukIsPending}
-            />
+            <div className="flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                        placeholder="Cari Produk..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                
+                <DialogAddProduct
+                    open={addOpen}
+                    onOpenChange={handleAddDialogClose}
+                    addForm={addForm}
+                    handleImageChange={handleImageChange}
+                    handleSubmit={handleSubmit}
+                    imageUrl={imageState.current}
+                    tambahProdukIsPending={tambahProdukIsPending}
+                />
+            </div>
 
             <DialogEditProduct
                 open={editOpen}
@@ -334,7 +359,7 @@ export const ProductPage: NextPageWithLayout = () => {
                     produkIsLoading ?
                         <ProductSkeleton /> :
                         <ProductCards
-                            produk={produkData}
+                            produk={filteredData}
                             handleEdit={handleEdit}
                             handleDelete={handleDelete}
                         />
