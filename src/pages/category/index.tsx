@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react"
+import { useEffect, useMemo, useState, type ReactElement } from "react"
 import type { NextPageWithLayout } from "../_app"
 import { PublicLayout } from "~/components/layouts/PublicLayout"
 import { api } from "~/utils/api"
@@ -12,12 +12,16 @@ import DialogDeleteCategory from "../../components/features/category/DialogDelet
 import CategorySkeleton from "../../components/features/category/CategorySkeleton"
 import CategoryCards from "../../components/features/category/CategoryCards"
 import { useUserStore } from "~/store/user"
+import { Input } from "~/components/ui/input";
+import { Search } from "lucide-react";
 
 export const CategoryPage: NextPageWithLayout = () => {
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
     const [idToEdit, setIdToEdit] = useState<string | null>(null)
     const [idToDelete, setIdToDelete] = useState<string | null>(null)
+
+    const [searchTerm, setSearchTerm] = useState("")
 
     const apiUtils = api.useUtils()
 
@@ -43,6 +47,14 @@ export const CategoryPage: NextPageWithLayout = () => {
             enabled: !!profile?.UMKM?.id
         }
     )
+
+    const filteredData = useMemo(() => {
+        if (!kategoriData) return []
+
+        return kategoriData.filter((item) =>
+            item.nama.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    }, [kategoriData, searchTerm])
 
     const { mutate: tambahKategori, isPending: tambahKategoriIsPending } = api.kategori.tambahKategori.useMutation({
         onSuccess: async () => {
@@ -131,13 +143,25 @@ export const CategoryPage: NextPageWithLayout = () => {
         <div className="space-y-4 w-full">
             <h1 className="text-xl font-bold">Manajemen Kategori</h1>
 
-            <DialogAddCategory
-                open={addOpen}
-                onOpenChange={setAddOpen}
-                addForm={addForm}
-                handleSubmit={handleSubmit}
-                tambahKategoriIsPending={tambahKategoriIsPending}
-            />
+            <div className="flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                        placeholder="Cari Kategori..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                
+                <DialogAddCategory
+                    open={addOpen}
+                    onOpenChange={setAddOpen}
+                    addForm={addForm}
+                    handleSubmit={handleSubmit}
+                    tambahKategoriIsPending={tambahKategoriIsPending}
+                />
+            </div>
 
             <DialogEditCategory
                 open={editOpen}
@@ -159,7 +183,7 @@ export const CategoryPage: NextPageWithLayout = () => {
                     kategoriIsLoading ?
                         <CategorySkeleton /> :
                         <CategoryCards
-                            kategori={kategoriData}
+                            kategori={filteredData}
                             handleEdit={handleEdit}
                             handleDelete={handleDelete}
                         />
