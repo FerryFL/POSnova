@@ -26,7 +26,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
     const { profile } = useUserStore()
 
     const initialUMKM = form.getValues("UMKMId")
-    const [currUMKM, setCurrUMKM] = useState(initialUMKM ?? "")
+    const [currUMKM, setCurrUMKM] = useState(profile?.UMKM?.id ?? initialUMKM ?? "")
 
     const { data: kategoriData } = api.kategori.lihatKategori.useQuery(
         { umkmId: profile?.UMKM?.id ?? "" },
