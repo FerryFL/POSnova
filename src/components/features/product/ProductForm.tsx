@@ -198,7 +198,7 @@ export const ProductForm = ({ onSubmit, onChangeImage, imageUrl }: ProductFormPr
                     <FormItem>
                         <FormLabel>Daftar Kategori</FormLabel>
                         <FormControl>
-                            <Select value={field.value ?? false} onValueChange={(value: string) => {
+                            <Select value={field.value ?? ""} onValueChange={(value: string) => {
                                 field.onChange(value)
                             }}>
                                 <SelectTrigger className="w-[180px]">
